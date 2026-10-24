@@ -5,3 +5,20 @@ requires-python = ">=3.14"
 dependencies = [
     "flet>=1.0.5",
 ]
+
+[dependency-groups]
+dev = [
+    "ruff>=0.17.2",
+]
+
+[tool.ruff]
+line-length = 88
+src = ["src"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I"] # E: Pycodestyle, F: Pyflakes, I: Isort (urutkan import)
+ignore = []
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"

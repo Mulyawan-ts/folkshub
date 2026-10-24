@@ -1,25 +1,29 @@
 import flet as ft
-
+from assets.theme import setup_theme
+from pages.home import HomePage
+from src.components.button import PrimaryButton
 
 def main(page: ft.Page):
-    counter = ft.Text("0", size=50, data=0)
+    setup_theme(page)
 
-    def increment_click(e):
-        counter.data += 1
-        counter.value = str(counter.data)
+def on_btn_click(e):
+        page.add(ft.Text("Tombol berhasil diklik!"))
 
-    page.floating_action_button = ft.FloatingActionButton(
-        icon=ft.Icons.ADD, on_click=increment_click
-    )
     page.add(
-        ft.SafeArea(
-            expand=True,
-            content=ft.Container(
-                content=counter,
-                alignment=ft.Alignment.CENTER,
+        ft.Container(
+            content=ft.Column(
+                controls=[
+                    ft.Text("Uji Coba Komponen Button", size=20, weight=ft.FontWeight.BOLD),
+                    PrimaryButton(
+                        text="Klik Saya",
+                        icon=ft.icons.CHECK,
+                        on_click=on_btn_click
+                    )
+                ]
             ),
+            padding=20
         )
     )
 
-
-ft.run(main)
+if __name__ == "__main__":
+    ft.app(target=main)
