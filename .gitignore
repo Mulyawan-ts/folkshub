@@ -6,3 +6,9 @@ __pycache__/
 # Virtual environment & Flet
 .venv/
 .flet/
+.ruff_cache/
+.ruffcache/
+
+# IDE settings
+.vscode/
+.idea/
