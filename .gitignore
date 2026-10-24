@@ -1,0 +1,8 @@
+# Python cache & build
+__pycache__/
+*.pyc
+*.pyo
+
+# Virtual environment & Flet
+.venv/
+.flet/
