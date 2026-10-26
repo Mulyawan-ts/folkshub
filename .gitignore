@@ -1,14 +1,3 @@
-# Python cache & build
-__pycache__/
-*.pyc
-*.pyo
-
-# Virtual environment & Flet
-.venv/
-.flet/
-.ruff_cache/
-.ruffcache/
-
-# IDE settings
-.vscode/
-.idea/
+build/bin
+node_modules
+frontend/dist

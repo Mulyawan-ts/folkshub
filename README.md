@@ -1,25 +1,19 @@
-# FolksHub Desktop Application
+# README
 
-Aplikasi desktop yang dibangun menggunakan Python, Flet, dan uv sebagai package manager.
+## About
 
-## Prasyarat
+This is the official Wails Vue template.
 
-- Python 3.10 atau versi yang lebih baru
-- uv (Python package installer and resolver)
+You can configure the project by editing `wails.json`. More information about the project settings can be found
+here: https://wails.io/docs/reference/project-config
 
-## Struktur Proyek
+## Live Development
 
-```text
-folkshub/
-├── .gitignore
-├── pyproject.toml
-├── README.md
-├── uv.lock
-└── src/
-    ├── main.py
-    ├── assets/
-    │   └── theme.py
-    ├── component/
-    │   └── button.py
-    └── pages/
-        └── home.py
+To run in live development mode, run `wails dev` in the project directory. This will run a Vite development
+server that will provide very fast hot reload of your frontend changes. If you want to develop in a browser
+and have access to your Go methods, there is also a dev server that runs on http://localhost:34115. Connect
+to this in your browser, and you can call your Go code from devtools.
+
+## Building
+
+To build a redistributable, production mode package, use `wails build`.
