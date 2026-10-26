@@ -21,6 +21,9 @@ importers:
       '@vitejs/plugin-vue':
         specifier: ^6.0.10
         version: 6.0.10(vite@7.3.7(jiti@2.7.0)(lightningcss@1.32.0))(vue@3.5.44)
+      daisyui:
+        specifier: ^5.7.50
+        version: 5.7.50
       vite:
         specifier: ^7.3.7
         version: 7.3.7(jiti@2.7.0)(lightningcss@1.32.0)
@@ -497,6 +500,9 @@ packages:
 
   csstype@3.2.3:
     resolution: {integrity: sha512-z1HGKcYy2xA8AGQfwrn0PAy+PB7X/GSj3UVJW9qKyn43xWa+gl5nXmU4qqLMRzWVLFC8KusUX8T/0kCiOYpAIQ==}
+
+  daisyui@5.7.50:
+    resolution: {integrity: sha512-+/LRqnTCoc7s/bJEKKwtJSwzeXCVdAmRdNmZeZzgHCaQ9PJyl7j+2V2U32GQDMyD+VDkP9e/+JGoC72Y1hLk7w==}
 
   detect-libc@2.1.2:
     resolution: {integrity: sha512-Btj2BOOO83o3WyH59e8MgXsxEQVcarkUOpEYrubB0urwnN10yQ364rsiByU11nZlqWYZm05i/of7io4mzihBtQ==}
@@ -1023,6 +1029,8 @@ snapshots:
   '@vue/shared@3.5.44': {}
 
   csstype@3.2.3: {}
+
+  daisyui@5.7.50: {}
 
   detect-libc@2.1.2: {}
 
