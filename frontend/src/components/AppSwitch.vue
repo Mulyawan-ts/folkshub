@@ -1,44 +1,34 @@
-<script setup>
+<script setup lang="ts">
 import { computed, useId } from 'vue'
+import type { Size, Variant } from '../types/ui'
 
-const props = defineProps({
-  modelValue: {
-    type: Boolean,
-    default: false
-  },
-  variant: {
-    type: String,
-    default: 'primary',
-    validator: (val) => ['primary', 'secondary', 'accent', 'neutral', 'info', 'success', 'warning', 'error'].includes(val)
-  },
-  size: {
-    type: String,
-    default: 'md',
-    validator: (val) => ['xs', 'sm', 'md', 'lg'].includes(val)
-  },
-  label: {
-    type: String,
-    default: ''
-  },
-  activeText: {
-    type: String,
-    default: ''
-  },
-  inactiveText: {
-    type: String,
-    default: ''
-  },
-  disabled: {
-    type: Boolean,
-    default: false
-  },
-  required: {
-    type: Boolean,
-    default: false
+const props = withDefaults(
+  defineProps<{
+    modelValue?: boolean
+    variant?: Variant
+    size?: Size
+    label?: string
+    activeText?: string
+    inactiveText?: string
+    disabled?: boolean
+    required?: boolean
+  }>(),
+  {
+    modelValue: false,
+    variant: 'primary',
+    size: 'md',
+    label: '',
+    activeText: '',
+    inactiveText: '',
+    disabled: false,
+    required: false
   }
-})
+)
 
-const emit = defineEmits(['update:modelValue', 'change'])
+const emit = defineEmits<{
+  'update:modelValue': [value: boolean]
+  change: [checked: boolean]
+}>()
 
 const switchId = useId()
 
@@ -49,9 +39,11 @@ const switchClasses = computed(() => {
   return classes.join(' ')
 })
 
-function onChange(event) {
-  emit('update:modelValue', event.target.checked)
-  emit('change', event.target.checked)
+function onChange(event: Event) {
+  const checked = (event.target as HTMLInputElement).checked
+
+  emit('update:modelValue', checked)
+  emit('change', checked)
 }
 </script>
 

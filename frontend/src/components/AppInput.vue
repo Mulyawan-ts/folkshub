@@ -1,60 +1,42 @@
-<script setup>
+<script setup lang="ts">
 import { computed, useId } from 'vue'
+import type { Size } from '../types/ui'
 
-const props = defineProps({
-  modelValue: {
-    type: [String, Number],
-    default: ''
-  },
-  type: {
-    type: String,
-    default: 'text'
-  },
-  variant: {
-    type: String,
-    default: 'default',
-    validator: (val) => ['default', 'filled', 'ghost'].includes(val)
-  },
-  size: {
-    type: String,
-    default: 'md',
-    validator: (val) => ['xs', 'sm', 'md', 'lg'].includes(val)
-  },
-  placeholder: {
-    type: String,
-    default: ''
-  },
-  label: {
-    type: String,
-    default: ''
-  },
-  hint: {
-    type: String,
-    default: ''
-  },
-  error: {
-    type: String,
-    default: ''
-  },
-  disabled: {
-    type: Boolean,
-    default: false
-  },
-  readonly: {
-    type: Boolean,
-    default: false
-  },
-  required: {
-    type: Boolean,
-    default: false
-  },
-  maxlength: {
-    type: Number,
-    default: undefined
+const props = withDefaults(
+  defineProps<{
+    modelValue?: string | number
+    type?: string
+    variant?: 'default' | 'filled' | 'ghost'
+    size?: Size
+    placeholder?: string
+    label?: string
+    hint?: string
+    error?: string
+    disabled?: boolean
+    readonly?: boolean
+    required?: boolean
+    maxlength?: number
+  }>(),
+  {
+    modelValue: '',
+    type: 'text',
+    variant: 'default',
+    size: 'md',
+    placeholder: '',
+    label: '',
+    hint: '',
+    error: '',
+    disabled: false,
+    readonly: false,
+    required: false,
+    maxlength: undefined
   }
-})
+)
 
-const emit = defineEmits(['update:modelValue', 'enter'])
+const emit = defineEmits<{
+  'update:modelValue': [value: string | number]
+  enter: [value: string | number]
+}>()
 
 const inputId = useId()
 
@@ -71,23 +53,17 @@ const inputClasses = computed(() => {
   return classes.join(' ')
 })
 
-const wrapperClasses = computed(() => {
-  const classes = ['form-control', 'w-full']
-  if (props.label) classes.push('w-full')
-  return classes.join(' ')
-})
-
-function onInput(event) {
-  emit('update:modelValue', event.target.value)
+function onInput(event: Event) {
+  emit('update:modelValue', (event.target as HTMLInputElement).value)
 }
 
-function onKeydown(event) {
-  if (event.key === 'Enter') emit('enter', event.target.value)
+function onKeydown(event: KeyboardEvent) {
+  if (event.key === 'Enter') emit('enter', (event.target as HTMLInputElement).value)
 }
 </script>
 
 <template>
-  <div :class="wrapperClasses">
+  <div class="form-control w-full">
     <label v-if="label" :for="inputId" class="label">
       <span class="label-text">{{ label }}</span>
       <span v-if="required" class="text-error">*</span>

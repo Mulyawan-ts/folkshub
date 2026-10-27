@@ -1,45 +1,38 @@
-<script setup>
+<script setup lang="ts">
 import { computed } from 'vue'
+import type { Size, Variant } from '../types/ui'
 
-const props = defineProps({
-  variant: {
-    type: String,
-    default: 'primary',
-    validator: (val) => ['primary', 'secondary', 'accent', 'ghost', 'error', 'success', 'warning'].includes(val)
-  },
-  size: {
-    type: String,
-    default: 'md',
-    validator: (val) => ['xs', 'sm', 'md', 'lg'].includes(val)
-  },
-  type: {
-    type: String,
-    default: 'button'
-  },
-  outline: {
-    type: Boolean,
-    default: false
-  },
-  loading: {
-    type: Boolean,
-    default: false
-  },
-  disabled: {
-    type: Boolean,
-    default: false
+type ButtonVariant = Variant | 'ghost'
+
+const props = withDefaults(
+  defineProps<{
+    variant?: ButtonVariant
+    size?: Size
+    type?: 'button' | 'submit' | 'reset'
+    outline?: boolean
+    loading?: boolean
+    disabled?: boolean
+  }>(),
+  {
+    variant: 'primary',
+    size: 'md',
+    type: 'button',
+    outline: false,
+    loading: false,
+    disabled: false
   }
-})
+)
 
-defineEmits(['click'])
+const emit = defineEmits<{
+  click: [event: MouseEvent]
+}>()
 
 const buttonClasses = computed(() => {
   const classes = ['btn']
 
-  // Variant & Outline
   if (props.outline) classes.push('btn-outline')
-  if (props.variant) classes.push(`btn-${props.variant}`)
+  classes.push(`btn-${props.variant}`)
 
-  // Ukuran
   if (props.size !== 'md') classes.push(`btn-${props.size}`)
 
   return classes.join(' ')
@@ -51,7 +44,7 @@ const buttonClasses = computed(() => {
     :type="type"
     :class="buttonClasses"
     :disabled="disabled || loading"
-    @click="$emit('click', $event)"
+    @click="emit('click', $event)"
   >
     <span v-if="loading" class="loading loading-spinner loading-xs"></span>
     <slot />

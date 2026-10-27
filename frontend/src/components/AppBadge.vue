@@ -1,27 +1,21 @@
-<script setup>
+<script setup lang="ts">
 import { computed } from 'vue'
+import type { Size, Variant } from '../types/ui'
 
-const props = defineProps({
-  variant: {
-    type: String,
-    default: 'primary',
-    validator: (val) => ['primary', 'secondary', 'accent', 'neutral', 'info', 'success', 'warning', 'error'].includes(val)
-  },
-  size: {
-    type: String,
-    default: 'md',
-    validator: (val) => ['xs', 'sm', 'md', 'lg'].includes(val)
-  },
-  outline: {
-    type: Boolean,
-    default: false
-  },
-  style: {
-    type: String,
-    default: 'filled',
-    validator: (val) => ['filled', 'soft'].includes(val)
+const props = withDefaults(
+  defineProps<{
+    variant?: Variant
+    size?: Size
+    outline?: boolean
+    style?: 'filled' | 'soft'
+  }>(),
+  {
+    variant: 'primary',
+    size: 'md',
+    outline: false,
+    style: 'filled'
   }
-})
+)
 
 const badgeClasses = computed(() => {
   const classes = ['badge']
