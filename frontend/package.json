@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "vue-tsc --noEmit && vite build",
+    "type-check": "vue-tsc --noEmit",
     "preview": "vite preview"
   },
   "dependencies": {
@@ -16,8 +17,11 @@
     "vue": "^3.5.44"
   },
   "devDependencies": {
+    "@types/node": "^26.6.5",
     "@vitejs/plugin-vue": "^6.0.10",
     "daisyui": "^5.7.50",
-    "vite": "^7.3.7"
+    "typescript": "^7.0.2",
+    "vite": "^7.3.7",
+    "vue-tsc": "^3.3.13"
   }
 }
