@@ -1,21 +1,16 @@
 <script setup>
-import HelloWorld from './components/HelloWorld.vue'</script>
+import { storeToRefs } from 'pinia'
+import AppToast from './components/AppToast.vue'
+import { useToastStore } from './stores/toast'
+
+const toastStore = useToastStore()
+const { items } = storeToRefs(toastStore)
+</script>
 
 <template>
-  <img id="logo" alt="Wails logo" src="./assets/images/logo-universal.png"/>
-  <HelloWorld/>
-</template>
+  <main class="p-8">
+    <h1 class="text-2xl font-semibold">Folkshub</h1>
+  </main>
 
-<style>
-#logo {
-  display: block;
-  width: 50%;
-  height: 50%;
-  margin: auto;
-  padding: 10% 0 0;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: 100% 100%;
-  background-origin: content-box;
-}
-</style>
+  <AppToast :items="items" @dismiss="toastStore.dismiss" />
+</template>
