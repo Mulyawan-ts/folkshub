@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { SimpanKaryawan, SemuaKaryawan, HapusKaryawan, UpdateKaryawan } from '../../wailsjs/go/main/App'
+import { SimpanKaryawan, SemuaKaryawan, HapusKaryawan } from '../../wailsjs/go/main/App'
 
 export interface Karyawan {
   id: number
@@ -56,23 +56,5 @@ export const useKaryawanStore = defineStore('karyawan', {
         this.loading = false
       }
     },
-
-    async update(id: number, karyawan: Omit<Karyawan, 'id'>) {
-      this.loading = true
-      this.error = ''
-      try {
-        const updated = await UpdateKaryawan(id, karyawan.nama, karyawan.email, karyawan.status)
-        const index = this.items.findIndex((k) => k.id === id)
-        if (index !== -1) {
-          this.items[index] = updated
-        }
-        return updated
-      } catch (err: any) {
-        this.error = err?.message || 'Gagal mengupdate karyawan'
-        throw err
-      } finally {
-        this.loading = false
-      }
-    }
   }
 })
