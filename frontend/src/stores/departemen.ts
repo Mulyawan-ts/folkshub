@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia'
+import { SimpanDepartemen, SemuaDepartemen, HapusDepartemen, UpdateDepartemen, AmbilDepartemen } from '../../wailsjs/go/main/App'
 
 export interface Departemen {
   id: number
@@ -7,8 +8,6 @@ export interface Departemen {
   kepala: string
   deskripsi: string
 }
-
-let nextDepartemenId = 1
 
 export const useDepartemenStore = defineStore('departemen', {
   state: () => ({
@@ -27,7 +26,7 @@ export const useDepartemenStore = defineStore('departemen', {
       this.loading = true
       this.error = ''
       try {
-        await new Promise((r) => setTimeout(r, 300))
+        this.items = await SemuaDepartemen()
       } catch (err: any) {
         this.error = err?.message || 'Gagal memuat data departemen'
       } finally {
@@ -39,7 +38,12 @@ export const useDepartemenStore = defineStore('departemen', {
       this.loading = true
       this.error = ''
       try {
-        const created: Departemen = { id: nextDepartemenId++, ...departemen }
+        const created = await SimpanDepartemen(
+          departemen.kode,
+          departemen.nama,
+          departemen.kepala,
+          departemen.deskripsi
+        )
         this.items.push(created)
         return created
       } catch (err: any) {
@@ -54,6 +58,7 @@ export const useDepartemenStore = defineStore('departemen', {
       this.loading = true
       this.error = ''
       try {
+        await HapusDepartemen(id)
         this.items = this.items.filter((d) => d.id !== id)
       } catch (err: any) {
         this.error = err?.message || 'Gagal menghapus departemen'
@@ -67,12 +72,17 @@ export const useDepartemenStore = defineStore('departemen', {
       this.loading = true
       this.error = ''
       try {
+        const updated = await UpdateDepartemen(
+          id,
+          departemen.kode,
+          departemen.nama,
+          departemen.kepala,
+          departemen.deskripsi
+        )
         const index = this.items.findIndex((d) => d.id === id)
-        if (index === -1) {
-          throw new Error('Departemen tidak ditemukan')
+        if (index !== -1) {
+          this.items[index] = updated
         }
-        const updated: Departemen = { id, ...departemen }
-        this.items[index] = updated
         return updated
       } catch (err: any) {
         this.error = err?.message || 'Gagal mengupdate departemen'
@@ -86,11 +96,7 @@ export const useDepartemenStore = defineStore('departemen', {
       this.loading = true
       this.error = ''
       try {
-        const departemen = this.items.find((d) => d.id === id)
-        if (!departemen) {
-          throw new Error('Departemen tidak ditemukan')
-        }
-        return departemen
+        return await AmbilDepartemen(id)
       } catch (err: any) {
         this.error = err?.message || 'Gagal memuat detail departemen'
         throw err

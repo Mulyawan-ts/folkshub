@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia'
+import { SimpanPelatihan, SemuaPelatihan, HapusPelatihan, UpdatePelatihan, AmbilPelatihan } from '../../wailsjs/go/main/App'
 
 export type StatusPelatihan = 'terjadwal' | 'berlangsung' | 'selesai' | 'dibatalkan'
 
@@ -15,8 +16,6 @@ export interface Pelatihan {
   sertifikat: string
   catatan: string
 }
-
-let nextPelatihanId = 1
 
 export const usePelatihanStore = defineStore('pelatihan', {
   state: () => ({
@@ -38,7 +37,7 @@ export const usePelatihanStore = defineStore('pelatihan', {
       this.loading = true
       this.error = ''
       try {
-        await new Promise((r) => setTimeout(r, 300))
+        this.items = await SemuaPelatihan()
       } catch (err: any) {
         this.error = err?.message || 'Gagal memuat data pelatihan'
       } finally {
@@ -50,7 +49,18 @@ export const usePelatihanStore = defineStore('pelatihan', {
       this.loading = true
       this.error = ''
       try {
-        const created: Pelatihan = { id: nextPelatihanId++, ...pelatihan }
+        const created = await SimpanPelatihan(
+          pelatihan.karyawanId,
+          pelatihan.nama,
+          pelatihan.jenis,
+          pelatihan.tanggalMulai,
+          pelatihan.tanggalSelesai,
+          pelatihan.lokasi,
+          pelatihan.sertifikat,
+          pelatihan.catatan,
+          pelatihan.status,
+          pelatihan.biaya
+        )
         this.items.push(created)
         return created
       } catch (err: any) {
@@ -65,6 +75,7 @@ export const usePelatihanStore = defineStore('pelatihan', {
       this.loading = true
       this.error = ''
       try {
+        await HapusPelatihan(id)
         this.items = this.items.filter((p) => p.id !== id)
       } catch (err: any) {
         this.error = err?.message || 'Gagal menghapus pelatihan'
@@ -78,12 +89,23 @@ export const usePelatihanStore = defineStore('pelatihan', {
       this.loading = true
       this.error = ''
       try {
+        const updated = await UpdatePelatihan(
+          id,
+          pelatihan.karyawanId,
+          pelatihan.nama,
+          pelatihan.jenis,
+          pelatihan.tanggalMulai,
+          pelatihan.tanggalSelesai,
+          pelatihan.lokasi,
+          pelatihan.sertifikat,
+          pelatihan.catatan,
+          pelatihan.status,
+          pelatihan.biaya
+        )
         const index = this.items.findIndex((p) => p.id === id)
-        if (index === -1) {
-          throw new Error('Pelatihan tidak ditemukan')
+        if (index !== -1) {
+          this.items[index] = updated
         }
-        const updated: Pelatihan = { id, ...pelatihan }
-        this.items[index] = updated
         return updated
       } catch (err: any) {
         this.error = err?.message || 'Gagal mengupdate pelatihan'
@@ -97,11 +119,7 @@ export const usePelatihanStore = defineStore('pelatihan', {
       this.loading = true
       this.error = ''
       try {
-        const pelatihan = this.items.find((p) => p.id === id)
-        if (!pelatihan) {
-          throw new Error('Pelatihan tidak ditemukan')
-        }
-        return pelatihan
+        return await AmbilPelatihan(id)
       } catch (err: any) {
         this.error = err?.message || 'Gagal memuat detail pelatihan'
         throw err

@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia'
+import { SimpanCuti, SemuaCuti, HapusCuti, UpdateCuti, AmbilCuti } from '../../wailsjs/go/main/App'
 
 export type StatusCuti = 'draft' | 'submitted' | 'approved' | 'rejected' | 'cancelled'
 
@@ -16,8 +17,6 @@ export interface Cuti {
   catatanApproval?: string
   disetujuiOleh?: number
 }
-
-let nextCutiId = 1
 
 export const useCutiStore = defineStore('cuti', {
   state: () => ({
@@ -45,7 +44,7 @@ export const useCutiStore = defineStore('cuti', {
       this.loading = true
       this.error = ''
       try {
-        await new Promise((r) => setTimeout(r, 300))
+        this.items = await SemuaCuti()
       } catch (err: any) {
         this.error = err?.message || 'Gagal memuat data cuti'
       } finally {
@@ -57,7 +56,15 @@ export const useCutiStore = defineStore('cuti', {
       this.loading = true
       this.error = ''
       try {
-        const created: Cuti = { id: nextCutiId++, ...cuti }
+        const created = await SimpanCuti(
+          cuti.karyawanId,
+          cuti.jenis,
+          cuti.tanggalMulai,
+          cuti.tanggalSelesai,
+          cuti.keterangan,
+          cuti.status,
+          cuti.jumlahHari
+        )
         this.items.push(created)
         return created
       } catch (err: any) {
@@ -72,6 +79,7 @@ export const useCutiStore = defineStore('cuti', {
       this.loading = true
       this.error = ''
       try {
+        await HapusCuti(id)
         this.items = this.items.filter((c) => c.id !== id)
       } catch (err: any) {
         this.error = err?.message || 'Gagal menghapus cuti'
@@ -85,12 +93,20 @@ export const useCutiStore = defineStore('cuti', {
       this.loading = true
       this.error = ''
       try {
+        const updated = await UpdateCuti(
+          id,
+          cuti.karyawanId,
+          cuti.jenis,
+          cuti.tanggalMulai,
+          cuti.tanggalSelesai,
+          cuti.keterangan,
+          cuti.status,
+          cuti.jumlahHari
+        )
         const index = this.items.findIndex((c) => c.id === id)
-        if (index === -1) {
-          throw new Error('Cuti tidak ditemukan')
+        if (index !== -1) {
+          this.items[index] = updated
         }
-        const updated: Cuti = { id, ...cuti }
-        this.items[index] = updated
         return updated
       } catch (err: any) {
         this.error = err?.message || 'Gagal mengupdate cuti'
@@ -104,37 +120,9 @@ export const useCutiStore = defineStore('cuti', {
       this.loading = true
       this.error = ''
       try {
-        const cuti = this.items.find((c) => c.id === id)
-        if (!cuti) {
-          throw new Error('Cuti tidak ditemukan')
-        }
-        return cuti
+        return await AmbilCuti(id)
       } catch (err: any) {
         this.error = err?.message || 'Gagal memuat detail cuti'
-        throw err
-      } finally {
-        this.loading = false
-      }
-    },
-
-    async setStatus(id: number, status: StatusCuti, catatan?: string, disetujuiOleh?: number) {
-      this.loading = true
-      this.error = ''
-      try {
-        const index = this.items.findIndex((c) => c.id === id)
-        if (index === -1) {
-          throw new Error('Cuti tidak ditemukan')
-        }
-        this.items[index].status = status
-        if (catatan !== undefined) {
-          this.items[index].catatanApproval = catatan
-        }
-        if (disetujuiOleh !== undefined) {
-          this.items[index].disetujuiOleh = disetujuiOleh
-        }
-        return this.items[index]
-      } catch (err: any) {
-        this.error = err?.message || 'Gagal mengupdate status cuti'
         throw err
       } finally {
         this.loading = false

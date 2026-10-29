@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia'
+import { SimpanAbsensi, SemuaAbsensi, HapusAbsensi, UpdateAbsensi, AmbilAbsensi } from '../../wailsjs/go/main/App'
 
 export type StatusAbsensi = 'hadir' | 'izin' | 'sakit' | 'alfa' | 'lembur'
 
@@ -11,8 +12,6 @@ export interface Absensi {
   status: StatusAbsensi
   keterangan?: string
 }
-
-let nextAbsensiId = 1
 
 export const useAbsensiStore = defineStore('absensi', {
   state: () => ({
@@ -36,7 +35,7 @@ export const useAbsensiStore = defineStore('absensi', {
       this.loading = true
       this.error = ''
       try {
-        await new Promise((r) => setTimeout(r, 300))
+        this.items = await SemuaAbsensi()
       } catch (err: any) {
         this.error = err?.message || 'Gagal memuat data absensi'
       } finally {
@@ -48,7 +47,14 @@ export const useAbsensiStore = defineStore('absensi', {
       this.loading = true
       this.error = ''
       try {
-        const created: Absensi = { id: nextAbsensiId++, ...absensi }
+        const created = await SimpanAbsensi(
+          absensi.karyawanId,
+          absensi.tanggal,
+          absensi.checkIn || '',
+          absensi.checkOut || '',
+          absensi.status,
+          absensi.keterangan || ''
+        )
         this.items.push(created)
         return created
       } catch (err: any) {
@@ -63,6 +69,7 @@ export const useAbsensiStore = defineStore('absensi', {
       this.loading = true
       this.error = ''
       try {
+        await HapusAbsensi(id)
         this.items = this.items.filter((a) => a.id !== id)
       } catch (err: any) {
         this.error = err?.message || 'Gagal menghapus absensi'
@@ -76,12 +83,19 @@ export const useAbsensiStore = defineStore('absensi', {
       this.loading = true
       this.error = ''
       try {
+        const updated = await UpdateAbsensi(
+          id,
+          absensi.karyawanId,
+          absensi.tanggal,
+          absensi.checkIn || '',
+          absensi.checkOut || '',
+          absensi.status,
+          absensi.keterangan || ''
+        )
         const index = this.items.findIndex((a) => a.id === id)
-        if (index === -1) {
-          throw new Error('Absensi tidak ditemukan')
+        if (index !== -1) {
+          this.items[index] = updated
         }
-        const updated: Absensi = { id, ...absensi }
-        this.items[index] = updated
         return updated
       } catch (err: any) {
         this.error = err?.message || 'Gagal mengupdate absensi'
@@ -95,11 +109,7 @@ export const useAbsensiStore = defineStore('absensi', {
       this.loading = true
       this.error = ''
       try {
-        const absensi = this.items.find((a) => a.id === id)
-        if (!absensi) {
-          throw new Error('Absensi tidak ditemukan')
-        }
-        return absensi
+        return await AmbilAbsensi(id)
       } catch (err: any) {
         this.error = err?.message || 'Gagal memuat detail absensi'
         throw err

@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia'
+import { SimpanJabatan, SemuaJabatan, HapusJabatan, UpdateJabatan, AmbilJabatan } from '../../wailsjs/go/main/App'
 
 export interface Jabatan {
   id: number
@@ -9,8 +10,6 @@ export interface Jabatan {
   tunjangan: number
   deskripsi: string
 }
-
-let nextJabatanId = 1
 
 export const useJabatanStore = defineStore('jabatan', {
   state: () => ({
@@ -30,7 +29,7 @@ export const useJabatanStore = defineStore('jabatan', {
       this.loading = true
       this.error = ''
       try {
-        await new Promise((r) => setTimeout(r, 300))
+        this.items = await SemuaJabatan()
       } catch (err: any) {
         this.error = err?.message || 'Gagal memuat data jabatan'
       } finally {
@@ -42,7 +41,14 @@ export const useJabatanStore = defineStore('jabatan', {
       this.loading = true
       this.error = ''
       try {
-        const created: Jabatan = { id: nextJabatanId++, ...jabatan }
+        const created = await SimpanJabatan(
+          jabatan.kode,
+          jabatan.nama,
+          jabatan.departemen,
+          jabatan.deskripsi,
+          jabatan.gajiPokok,
+          jabatan.tunjangan
+        )
         this.items.push(created)
         return created
       } catch (err: any) {
@@ -57,6 +63,7 @@ export const useJabatanStore = defineStore('jabatan', {
       this.loading = true
       this.error = ''
       try {
+        await HapusJabatan(id)
         this.items = this.items.filter((j) => j.id !== id)
       } catch (err: any) {
         this.error = err?.message || 'Gagal menghapus jabatan'
@@ -70,12 +77,19 @@ export const useJabatanStore = defineStore('jabatan', {
       this.loading = true
       this.error = ''
       try {
+        const updated = await UpdateJabatan(
+          id,
+          jabatan.kode,
+          jabatan.nama,
+          jabatan.departemen,
+          jabatan.deskripsi,
+          jabatan.gajiPokok,
+          jabatan.tunjangan
+        )
         const index = this.items.findIndex((j) => j.id === id)
-        if (index === -1) {
-          throw new Error('Jabatan tidak ditemukan')
+        if (index !== -1) {
+          this.items[index] = updated
         }
-        const updated: Jabatan = { id, ...jabatan }
-        this.items[index] = updated
         return updated
       } catch (err: any) {
         this.error = err?.message || 'Gagal mengupdate jabatan'
@@ -89,11 +103,7 @@ export const useJabatanStore = defineStore('jabatan', {
       this.loading = true
       this.error = ''
       try {
-        const jabatan = this.items.find((j) => j.id === id)
-        if (!jabatan) {
-          throw new Error('Jabatan tidak ditemukan')
-        }
-        return jabatan
+        return await AmbilJabatan(id)
       } catch (err: any) {
         this.error = err?.message || 'Gagal memuat detail jabatan'
         throw err

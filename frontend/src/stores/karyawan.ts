@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { SimpanKaryawan, SemuaKaryawan, HapusKaryawan } from '../../wailsjs/go/main/App'
+import { SimpanKaryawan, SemuaKaryawan, HapusKaryawan, UpdateKaryawan, AmbilKaryawan } from '../../wailsjs/go/main/App'
 
 export interface Karyawan {
   id: number
@@ -14,6 +14,10 @@ export const useKaryawanStore = defineStore('karyawan', {
     loading: false,
     error: '' as string
   }),
+
+  getters: {
+    itemById: (state) => (id: number) => state.items.find((k) => k.id === id)
+  },
 
   actions: {
     async fetchAll() {
@@ -56,5 +60,36 @@ export const useKaryawanStore = defineStore('karyawan', {
         this.loading = false
       }
     },
+
+    async update(id: number, karyawan: Omit<Karyawan, 'id'>) {
+      this.loading = true
+      this.error = ''
+      try {
+        const updated = await UpdateKaryawan(id, karyawan.nama, karyawan.email, karyawan.status)
+        const index = this.items.findIndex((k) => k.id === id)
+        if (index !== -1) {
+          this.items[index] = updated
+        }
+        return updated
+      } catch (err: any) {
+        this.error = err?.message || 'Gagal mengupdate karyawan'
+        throw err
+      } finally {
+        this.loading = false
+      }
+    },
+
+    async ambil(id: number) {
+      this.loading = true
+      this.error = ''
+      try {
+        return await AmbilKaryawan(id)
+      } catch (err: any) {
+        this.error = err?.message || 'Gagal memuat detail karyawan'
+        throw err
+      } finally {
+        this.loading = false
+      }
+    }
   }
 })

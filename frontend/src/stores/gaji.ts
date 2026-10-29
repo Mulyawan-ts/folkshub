@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia'
+import { SimpanGaji, SemuaGaji, HapusGaji, UpdateGaji, AmbilGaji } from '../../wailsjs/go/main/App'
 
 export type StatusGaji = 'draft' | 'diproses' | 'dibayar' | 'ditolak'
 
@@ -14,8 +15,6 @@ export interface Gaji {
   tanggalBayar?: string
   keterangan?: string
 }
-
-let nextGajiId = 1
 
 export const useGajiStore = defineStore('gaji', {
   state: () => ({
@@ -47,7 +46,7 @@ export const useGajiStore = defineStore('gaji', {
       this.loading = true
       this.error = ''
       try {
-        await new Promise((r) => setTimeout(r, 300))
+        this.items = await SemuaGaji()
       } catch (err: any) {
         this.error = err?.message || 'Gagal memuat data gaji'
       } finally {
@@ -59,11 +58,14 @@ export const useGajiStore = defineStore('gaji', {
       this.loading = true
       this.error = ''
       try {
-        const created: Gaji = {
-          id: nextGajiId++,
-          ...gaji,
-          total: gaji.gajiPokok + gaji.tunjangan - gaji.potongan
-        }
+        const created = await SimpanGaji(
+          gaji.karyawanId,
+          gaji.bulan,
+          gaji.gajiPokok,
+          gaji.tunjangan,
+          gaji.potongan,
+          gaji.status
+        )
         this.items.push(created)
         return created
       } catch (err: any) {
@@ -78,6 +80,7 @@ export const useGajiStore = defineStore('gaji', {
       this.loading = true
       this.error = ''
       try {
+        await HapusGaji(id)
         this.items = this.items.filter((g) => g.id !== id)
       } catch (err: any) {
         this.error = err?.message || 'Gagal menghapus gaji'
@@ -91,16 +94,19 @@ export const useGajiStore = defineStore('gaji', {
       this.loading = true
       this.error = ''
       try {
-        const index = this.items.findIndex((g) => g.id === id)
-        if (index === -1) {
-          throw new Error('Gaji tidak ditemukan')
-        }
-        const updated: Gaji = {
+        const updated = await UpdateGaji(
           id,
-          ...gaji,
-          total: gaji.gajiPokok + gaji.tunjangan - gaji.potongan
+          gaji.karyawanId,
+          gaji.bulan,
+          gaji.gajiPokok,
+          gaji.tunjangan,
+          gaji.potongan,
+          gaji.status
+        )
+        const index = this.items.findIndex((g) => g.id === id)
+        if (index !== -1) {
+          this.items[index] = updated
         }
-        this.items[index] = updated
         return updated
       } catch (err: any) {
         this.error = err?.message || 'Gagal mengupdate gaji'
@@ -114,11 +120,7 @@ export const useGajiStore = defineStore('gaji', {
       this.loading = true
       this.error = ''
       try {
-        const gaji = this.items.find((g) => g.id === id)
-        if (!gaji) {
-          throw new Error('Gaji tidak ditemukan')
-        }
-        return gaji
+        return await AmbilGaji(id)
       } catch (err: any) {
         this.error = err?.message || 'Gagal memuat detail gaji'
         throw err
@@ -131,13 +133,18 @@ export const useGajiStore = defineStore('gaji', {
       this.loading = true
       this.error = ''
       try {
+        const updated = await UpdateGaji(
+          id,
+          0,
+          '',
+          0,
+          0,
+          0,
+          status
+        )
         const index = this.items.findIndex((g) => g.id === id)
-        if (index === -1) {
-          throw new Error('Gaji tidak ditemukan')
-        }
-        this.items[index].status = status
-        if (tanggalBayar !== undefined) {
-          this.items[index].tanggalBayar = tanggalBayar
+        if (index !== -1) {
+          this.items[index] = updated
         }
         return this.items[index]
       } catch (err: any) {
