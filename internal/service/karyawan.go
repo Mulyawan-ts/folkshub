@@ -1,79 +1,43 @@
 package service
 
 import (
-	"errors"
-	"sync"
-
 	"app/internal/model"
-)
-
-var (
-	ErrKaryawanNotFound = errors.New("karyawan tidak ditemukan")
-	ErrKaryawanExists   = errors.New("karyawan sudah terdaftar")
+	"app/internal/repository"
+	"gorm.io/driver/sqlite"
+	"gorm.io/gorm"
 )
 
 type KaryawanService struct {
-	mu     sync.RWMutex
-	daftar map[int]*model.Karyawan
-	nextID int
+	repo *repository.KaryawanRepository
 }
 
-func NewKaryawanService() *KaryawanService {
-	return &KaryawanService{
-		daftar: make(map[int]*model.Karyawan),
-		nextID: 1,
+func NewKaryawanService(dbPath string) (*KaryawanService, error) {
+	db, err := gorm.Open(sqlite.Open(dbPath), &gorm.Config{})
+	if err != nil {
+		return nil, err
 	}
+
+	repo := repository.NewKaryawanRepository(db)
+	if err := repo.AutoMigrate(); err != nil {
+		return nil, err
+	}
+
+	return &KaryawanService{repo: repo}, nil
 }
 
 func (s *KaryawanService) Simpan(k *model.Karyawan) error {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-
-	if k.ID == 0 {
-		k.ID = s.nextID
-		s.nextID++
-	}
-
-	if _, exists := s.daftar[k.ID]; exists {
-		return ErrKaryawanExists
-	}
-
-	s.daftar[k.ID] = k
-	return nil
+	return s.repo.Simpan(k)
 }
 
 func (s *KaryawanService) Ambil(id int) (*model.Karyawan, error) {
-	s.mu.RLock()
-	defer s.mu.RUnlock()
-
-	k, ok := s.daftar[id]
-	if !ok {
-		return nil, ErrKaryawanNotFound
-	}
-
-	return k, nil
+	return s.repo.Ambil(id)
 }
 
 func (s *KaryawanService) Semua() []*model.Karyawan {
-	s.mu.RLock()
-	defer s.mu.RUnlock()
-
-	result := make([]*model.Karyawan, 0, len(s.daftar))
-	for _, k := range s.daftar {
-		result = append(result, k)
-	}
-
-	return result
+	list, _ := s.repo.Semua()
+	return list
 }
 
 func (s *KaryawanService) Hapus(id int) error {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-
-	if _, ok := s.daftar[id]; !ok {
-		return ErrKaryawanNotFound
-	}
-
-	delete(s.daftar, id)
-	return nil
+	return s.repo.Hapus(id)
 }
