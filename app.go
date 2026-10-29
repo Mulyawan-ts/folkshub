@@ -16,8 +16,13 @@ type App struct {
 
 // NewApp creates a new App application struct
 func NewApp() *App {
+	svc, err := service.NewKaryawanService("karyawan.db")
+	if err != nil {
+		panic(err)
+	}
+
 	return &App{
-		karyawanSvc: service.NewKaryawanService(),
+		karyawanSvc: svc,
 	}
 }
 
@@ -60,4 +65,9 @@ func (a *App) SemuaKaryawan() []*model.Karyawan {
 // HapusKaryawan menghapus data karyawan berdasarkan ID
 func (a *App) HapusKaryawan(id int) error {
 	return a.karyawanSvc.Hapus(id)
+}
+
+// UpdateKaryawan memperbarui data karyawan berdasarkan ID
+func (a *App) UpdateKaryawan(id int, nama, email, status string) (*model.Karyawan, error) {
+	return a.karyawanSvc.Update(id, nama, email, status)
 }
