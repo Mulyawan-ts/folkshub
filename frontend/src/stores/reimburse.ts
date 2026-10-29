@@ -5,14 +5,14 @@ export type StatusReimburse = 'draft' | 'submitted' | 'approved' | 'rejected' | 
 
 export interface Reimburse {
   id: number
-  karyawanId: number
+  karyawan_id: number
   tanggal: string
   jenis: string
   jumlah: number
   keterangan: string
   bukti: string
-  status: StatusReimburse
-  catatanApproval?: string
+  status: string
+  catatan_approval?: string
 }
 
 export const useReimburseStore = defineStore('reimburse', {
@@ -24,8 +24,8 @@ export const useReimburseStore = defineStore('reimburse', {
 
   getters: {
     itemById: (state) => (id: number) => state.items.find((r) => r.id === id),
-    byKaryawan: (state) => (karyawanId: number) =>
-      state.items.filter((r) => r.karyawanId === karyawanId),
+    byKaryawan: (state) => (karyawan_id: number) =>
+      state.items.filter((r) => r.karyawan_id === karyawan_id),
     byStatus: (state) => (status: StatusReimburse) =>
       state.items.filter((r) => r.status === status),
     totalDiajujkan: (state) =>
@@ -54,7 +54,7 @@ export const useReimburseStore = defineStore('reimburse', {
       this.error = ''
       try {
         const created = await SimpanReimburse(
-          reimburse.karyawanId,
+          reimburse.karyawan_id,
           reimburse.tanggal,
           reimburse.jenis,
           reimburse.keterangan,
@@ -92,7 +92,7 @@ export const useReimburseStore = defineStore('reimburse', {
       try {
         const updated = await UpdateReimburse(
           id,
-          reimburse.karyawanId,
+          reimburse.karyawan_id,
           reimburse.tanggal,
           reimburse.jenis,
           reimburse.keterangan,

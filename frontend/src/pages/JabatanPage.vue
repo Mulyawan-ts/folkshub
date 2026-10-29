@@ -32,7 +32,7 @@ async function handleSimpan() {
       kode: kode.value,
       nama: nama.value,
       departemen: departemen.value,
-      gajiPokok: Number(gajiPokok.value) || 0,
+      gaji_pokok: Number(gajiPokok.value) || 0,
       tunjangan: Number(tunjangan.value) || 0,
       deskripsi: deskripsi.value
     })
@@ -144,7 +144,7 @@ async function handleHapus(id: number) {
             <td>{{ j.kode }}</td>
             <td>{{ j.nama }}</td>
             <td>{{ j.departemen }}</td>
-            <td>{{ j.gajiPokok }}</td>
+            <td>{{ j.gaji_pokok }}</td>
             <td>{{ j.tunjangan }}</td>
             <td>{{ j.deskripsi || '-' }}</td>
             <td class="text-right">

@@ -5,11 +5,11 @@ export type StatusAbsensi = 'hadir' | 'izin' | 'sakit' | 'alfa' | 'lembur'
 
 export interface Absensi {
   id: number
-  karyawanId: number
+  karyawan_id: number
   tanggal: string
-  checkIn?: string
-  checkOut?: string
-  status: StatusAbsensi
+  check_in?: string
+  check_out?: string
+  status: string
   keterangan?: string
 }
 
@@ -22,8 +22,8 @@ export const useAbsensiStore = defineStore('absensi', {
 
   getters: {
     itemById: (state) => (id: number) => state.items.find((a) => a.id === id),
-    byKaryawan: (state) => (karyawanId: number) =>
-      state.items.filter((a) => a.karyawanId === karyawanId),
+    byKaryawan: (state) => (karyawan_id: number) =>
+      state.items.filter((a) => a.karyawan_id === karyawan_id),
     byTanggal: (state) => (tanggal: string) =>
       state.items.filter((a) => a.tanggal === tanggal),
     hadirCount: (state) => state.items.filter((a) => a.status === 'hadir').length,
@@ -48,10 +48,10 @@ export const useAbsensiStore = defineStore('absensi', {
       this.error = ''
       try {
         const created = await SimpanAbsensi(
-          absensi.karyawanId,
+          absensi.karyawan_id,
           absensi.tanggal,
-          absensi.checkIn || '',
-          absensi.checkOut || '',
+          absensi.check_in || '',
+          absensi.check_out || '',
           absensi.status,
           absensi.keterangan || ''
         )
@@ -85,10 +85,10 @@ export const useAbsensiStore = defineStore('absensi', {
       try {
         const updated = await UpdateAbsensi(
           id,
-          absensi.karyawanId,
+          absensi.karyawan_id,
           absensi.tanggal,
-          absensi.checkIn || '',
-          absensi.checkOut || '',
+          absensi.check_in || '',
+          absensi.check_out || '',
           absensi.status,
           absensi.keterangan || ''
         )

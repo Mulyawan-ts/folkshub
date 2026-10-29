@@ -5,14 +5,14 @@ export type StatusPelatihan = 'terjadwal' | 'berlangsung' | 'selesai' | 'dibatal
 
 export interface Pelatihan {
   id: number
-  karyawanId: number
+  karyawan_id: number
   nama: string
   jenis: string
-  tanggalMulai: string
-  tanggalSelesai: string
+  tanggal_mulai: string
+  tanggal_selesai: string
   lokasi: string
   biaya: number
-  status: StatusPelatihan
+  status: string
   sertifikat: string
   catatan: string
 }
@@ -26,8 +26,8 @@ export const usePelatihanStore = defineStore('pelatihan', {
 
   getters: {
     itemById: (state) => (id: number) => state.items.find((p) => p.id === id),
-    byKaryawan: (state) => (karyawanId: number) =>
-      state.items.filter((p) => p.karyawanId === karyawanId),
+    byKaryawan: (state) => (karyawan_id: number) =>
+      state.items.filter((p) => p.karyawan_id === karyawan_id),
     byStatus: (state) => (status: StatusPelatihan) =>
       state.items.filter((p) => p.status === status)
   },
@@ -50,11 +50,11 @@ export const usePelatihanStore = defineStore('pelatihan', {
       this.error = ''
       try {
         const created = await SimpanPelatihan(
-          pelatihan.karyawanId,
+          pelatihan.karyawan_id,
           pelatihan.nama,
           pelatihan.jenis,
-          pelatihan.tanggalMulai,
-          pelatihan.tanggalSelesai,
+          pelatihan.tanggal_mulai,
+          pelatihan.tanggal_selesai,
           pelatihan.lokasi,
           pelatihan.sertifikat,
           pelatihan.catatan,
@@ -91,11 +91,11 @@ export const usePelatihanStore = defineStore('pelatihan', {
       try {
         const updated = await UpdatePelatihan(
           id,
-          pelatihan.karyawanId,
+          pelatihan.karyawan_id,
           pelatihan.nama,
           pelatihan.jenis,
-          pelatihan.tanggalMulai,
-          pelatihan.tanggalSelesai,
+          pelatihan.tanggal_mulai,
+          pelatihan.tanggal_selesai,
           pelatihan.lokasi,
           pelatihan.sertifikat,
           pelatihan.catatan,

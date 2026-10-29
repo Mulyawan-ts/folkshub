@@ -44,9 +44,9 @@ async function handleSimpan() {
   }
   try {
     await gajiStore.simpan({
-      karyawanId: Number(karyawanId.value),
+      karyawan_id: Number(karyawanId.value),
       bulan: bulan.value,
-      gajiPokok: Number(gajiPokok.value),
+      gaji_pokok: Number(gajiPokok.value),
       tunjangan: Number(tunjangan.value) || 0,
       potongan: Number(potongan.value) || 0,
       status: 'draft'
@@ -149,9 +149,9 @@ async function handleHapus(id: number) {
         </thead>
         <tbody>
           <tr v-for="g in items" :key="g.id" class="border-b">
-            <td>{{ g.karyawanId }}</td>
+            <td>{{ g.karyawan_id }}</td>
             <td>{{ g.bulan }}</td>
-            <td>{{ g.gajiPokok }}</td>
+            <td>{{ g.gaji_pokok }}</td>
             <td>{{ g.tunjangan }}</td>
             <td>{{ g.potongan }}</td>
             <td class="font-bold">{{ g.total }}</td>

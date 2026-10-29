@@ -54,11 +54,11 @@ async function handleSimpan() {
   }
   try {
     await cutiStore.simpan({
-      karyawanId: Number(karyawanId.value),
+      karyawan_id: Number(karyawanId.value),
       jenis: jenis.value as any,
-      tanggalMulai: tanggalMulai.value,
-      tanggalSelesai: tanggalSelesai.value,
-      jumlahHari: Number(jumlahHari.value) || 0,
+      tanggal_mulai: tanggalMulai.value,
+      tanggal_selesai: tanggalSelesai.value,
+      jumlah_hari: Number(jumlahHari.value) || 0,
       keterangan: keterangan.value,
       status: 'draft'
     })
@@ -170,11 +170,11 @@ async function handleHapus(id: number) {
         </thead>
         <tbody>
           <tr v-for="c in items" :key="c.id" class="border-b">
-            <td>{{ c.karyawanId }}</td>
+            <td>{{ c.karyawan_id }}</td>
             <td>{{ c.jenis }}</td>
-            <td>{{ c.tanggalMulai }}</td>
-            <td>{{ c.tanggalSelesai }}</td>
-            <td>{{ c.jumlahHari }}</td>
+            <td>{{ c.tanggal_mulai }}</td>
+            <td>{{ c.tanggal_selesai }}</td>
+            <td>{{ c.jumlah_hari }}</td>
             <td>
               <AppBadge :variant="statusVariant(c.status)" size="sm">
                 {{ c.status }}

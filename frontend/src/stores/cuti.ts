@@ -7,15 +7,15 @@ export type JenisCuti = 'tahunan' | 'sakit' | 'izin' | 'melahirkan' | 'lainnya'
 
 export interface Cuti {
   id: number
-  karyawanId: number
-  jenis: JenisCuti
-  tanggalMulai: string
-  tanggalSelesai: string
-  jumlahHari: number
+  karyawan_id: number
+  jenis: string
+  tanggal_mulai: string
+  tanggal_selesai: string
+  jumlah_hari: number
   keterangan: string
-  status: StatusCuti
-  catatanApproval?: string
-  disetujuiOleh?: number
+  status: string
+  catatan_approval?: string
+  disetujui_oleh?: number
 }
 
 export const useCutiStore = defineStore('cuti', {
@@ -27,8 +27,8 @@ export const useCutiStore = defineStore('cuti', {
 
   getters: {
     itemById: (state) => (id: number) => state.items.find((c) => c.id === id),
-    byKaryawan: (state) => (karyawanId: number) =>
-      state.items.filter((c) => c.karyawanId === karyawanId),
+    byKaryawan: (state) => (karyawan_id: number) =>
+      state.items.filter((c) => c.karyawan_id === karyawan_id),
     byStatus: (state) => (status: StatusCuti) =>
       state.items.filter((c) => c.status === status),
     byJenis: (state) => (jenis: JenisCuti) =>
@@ -57,13 +57,13 @@ export const useCutiStore = defineStore('cuti', {
       this.error = ''
       try {
         const created = await SimpanCuti(
-          cuti.karyawanId,
+          cuti.karyawan_id,
           cuti.jenis,
-          cuti.tanggalMulai,
-          cuti.tanggalSelesai,
+          cuti.tanggal_mulai,
+          cuti.tanggal_selesai,
           cuti.keterangan,
           cuti.status,
-          cuti.jumlahHari
+          cuti.jumlah_hari
         )
         this.items.push(created)
         return created
@@ -95,13 +95,13 @@ export const useCutiStore = defineStore('cuti', {
       try {
         const updated = await UpdateCuti(
           id,
-          cuti.karyawanId,
+          cuti.karyawan_id,
           cuti.jenis,
-          cuti.tanggalMulai,
-          cuti.tanggalSelesai,
+          cuti.tanggal_mulai,
+          cuti.tanggal_selesai,
           cuti.keterangan,
           cuti.status,
-          cuti.jumlahHari
+          cuti.jumlah_hari
         )
         const index = this.items.findIndex((c) => c.id === id)
         if (index !== -1) {

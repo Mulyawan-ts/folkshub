@@ -5,14 +5,14 @@ export type StatusGaji = 'draft' | 'diproses' | 'dibayar' | 'ditolak'
 
 export interface Gaji {
   id: number
-  karyawanId: number
+  karyawan_id: number
   bulan: string
-  gajiPokok: number
+  gaji_pokok: number
   tunjangan: number
   potongan: number
   total?: number
-  status: StatusGaji
-  tanggalBayar?: string
+  status: string
+  tanggal_bayar?: string
   keterangan?: string
 }
 
@@ -25,8 +25,8 @@ export const useGajiStore = defineStore('gaji', {
 
   getters: {
     itemById: (state) => (id: number) => state.items.find((g) => g.id === id),
-    byKaryawan: (state) => (karyawanId: number) =>
-      state.items.filter((g) => g.karyawanId === karyawanId),
+    byKaryawan: (state) => (karyawan_id: number) =>
+      state.items.filter((g) => g.karyawan_id === karyawan_id),
     byBulan: (state) => (bulan: string) =>
       state.items.filter((g) => g.bulan === bulan),
     byStatus: (state) => (status: StatusGaji) =>
@@ -59,9 +59,9 @@ export const useGajiStore = defineStore('gaji', {
       this.error = ''
       try {
         const created = await SimpanGaji(
-          gaji.karyawanId,
+          gaji.karyawan_id,
           gaji.bulan,
-          gaji.gajiPokok,
+          gaji.gaji_pokok,
           gaji.tunjangan,
           gaji.potongan,
           gaji.status
@@ -96,9 +96,9 @@ export const useGajiStore = defineStore('gaji', {
       try {
         const updated = await UpdateGaji(
           id,
-          gaji.karyawanId,
+          gaji.karyawan_id,
           gaji.bulan,
-          gaji.gajiPokok,
+          gaji.gaji_pokok,
           gaji.tunjangan,
           gaji.potongan,
           gaji.status
@@ -129,7 +129,7 @@ export const useGajiStore = defineStore('gaji', {
       }
     },
 
-    async setStatus(id: number, status: StatusGaji, tanggalBayar?: string) {
+    async setStatus(id: number, status: string) {
       this.loading = true
       this.error = ''
       try {

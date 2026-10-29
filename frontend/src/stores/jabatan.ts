@@ -6,7 +6,7 @@ export interface Jabatan {
   kode: string
   nama: string
   departemen: string
-  gajiPokok: number
+  gaji_pokok: number
   tunjangan: number
   deskripsi: string
 }
@@ -46,7 +46,7 @@ export const useJabatanStore = defineStore('jabatan', {
           jabatan.nama,
           jabatan.departemen,
           jabatan.deskripsi,
-          jabatan.gajiPokok,
+          jabatan.gaji_pokok,
           jabatan.tunjangan
         )
         this.items.push(created)
@@ -83,7 +83,7 @@ export const useJabatanStore = defineStore('jabatan', {
           jabatan.nama,
           jabatan.departemen,
           jabatan.deskripsi,
-          jabatan.gajiPokok,
+          jabatan.gaji_pokok,
           jabatan.tunjangan
         )
         const index = this.items.findIndex((j) => j.id === id)

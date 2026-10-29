@@ -54,10 +54,10 @@ async function handleSimpan() {
   }
   try {
     await absensiStore.simpan({
-      karyawanId: Number(karyawanId.value),
+      karyawan_id: Number(karyawanId.value),
       tanggal: tanggal.value,
-      checkIn: checkIn.value || undefined,
-      checkOut: checkOut.value || undefined,
+      check_in: checkIn.value || undefined,
+      check_out: checkOut.value || undefined,
       status: status.value as any,
       keterangan: keterangan.value
     })
@@ -169,10 +169,10 @@ async function handleHapus(id: number) {
         </thead>
         <tbody>
           <tr v-for="a in items" :key="a.id" class="border-b">
-            <td>{{ a.karyawanId }}</td>
+            <td>{{ a.karyawan_id }}</td>
             <td>{{ a.tanggal }}</td>
-            <td>{{ a.checkIn || '-' }}</td>
-            <td>{{ a.checkOut || '-' }}</td>
+            <td>{{ a.check_in || '-' }}</td>
+            <td>{{ a.check_out || '-' }}</td>
             <td>
               <AppBadge :variant="statusVariant(a.status)" size="sm">
                 {{ a.status }}

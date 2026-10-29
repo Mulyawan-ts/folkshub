@@ -46,7 +46,7 @@ async function handleSimpan() {
   }
   try {
     await reimburseStore.simpan({
-      karyawanId: Number(karyawanId.value),
+      karyawan_id: Number(karyawanId.value),
       tanggal: tanggal.value,
       jenis: jenis.value,
       jumlah: Number(jumlah.value),
@@ -159,7 +159,7 @@ async function handleHapus(id: number) {
         </thead>
         <tbody>
           <tr v-for="r in items" :key="r.id" class="border-b">
-            <td>{{ r.karyawanId }}</td>
+            <td>{{ r.karyawan_id }}</td>
             <td>{{ r.tanggal }}</td>
             <td>{{ r.jenis }}</td>
             <td>{{ r.jumlah }}</td>

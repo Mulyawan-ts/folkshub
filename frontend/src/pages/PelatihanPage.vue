@@ -43,11 +43,11 @@ async function handleSimpan() {
   }
   try {
     await pelatihanStore.simpan({
-      karyawanId: Number(karyawanId.value),
+      karyawan_id: Number(karyawanId.value),
       nama: nama.value,
       jenis: jenis.value,
-      tanggalMulai: tanggalMulai.value,
-      tanggalSelesai: tanggalSelesai.value,
+      tanggal_mulai: tanggalMulai.value,
+      tanggal_selesai: tanggalSelesai.value,
       lokasi: lokasi.value,
       biaya: Number(biaya.value) || 0,
       status: 'terjadwal',
@@ -184,11 +184,11 @@ async function handleHapus(id: number) {
         </thead>
         <tbody>
           <tr v-for="p in items" :key="p.id" class="border-b">
-            <td>{{ p.karyawanId }}</td>
+            <td>{{ p.karyawan_id }}</td>
             <td>{{ p.nama }}</td>
             <td>{{ p.jenis || '-' }}</td>
-            <td>{{ p.tanggalMulai }}</td>
-            <td>{{ p.tanggalSelesai || '-' }}</td>
+            <td>{{ p.tanggal_mulai }}</td>
+            <td>{{ p.tanggal_selesai || '-' }}</td>
             <td>{{ p.biaya }}</td>
             <td>
               <AppBadge :variant="statusVariant(p.status)" size="sm">
