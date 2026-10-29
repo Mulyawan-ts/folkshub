@@ -10,5 +10,23 @@ import (
 var ErrInvalidInput = errors.New("data tidak valid")
 
 func Open(path string) (*gorm.DB, error) {
-	return gorm.Open(sqlite.Open(path), &gorm.Config{})
+	db, err := gorm.Open(sqlite.Open(path), &gorm.Config{})
+	if err != nil {
+		return nil, err
+	}
+	sqlDB, err := db.DB()
+	if err != nil {
+		return nil, err
+	}
+	sqlDB.SetMaxOpenConns(1)
+	for _, pragma := range []string{
+		"PRAGMA foreign_keys = ON",
+		"PRAGMA journal_mode = WAL",
+		"PRAGMA busy_timeout = 5000",
+	} {
+		if err := db.Exec(pragma).Error; err != nil {
+			return nil, err
+		}
+	}
+	return db, nil
 }
