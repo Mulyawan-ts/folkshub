@@ -1,19 +1,80 @@
-# README
+# folkshub
 
-## About
+Aplikasi desktop manajemen karyawan berbasis Wails (Go + Vue 3 + Pinia). Data disimpan dalam file JSON per modul di direktori aplikasi.
 
-This is the official Wails Vue template.
+## Fitur
 
-You can configure the project by editing `wails.json`. More information about the project settings can be found
-here: https://wails.io/docs/reference/project-config
+- **Karyawan**: CRUD data karyawan
+- **Absensi**: absensi masuk/keluar per karyawan
+- **Cuti**: pengajuan dan persetujuan cuti
+- **Reimburse**: pengajuan pengeluaran dan bukti
+- **Gaji**: perhitungan gaji pokok, tunjangan, potongan
+- **Jabatan**: master jabatan dengan gaji pokok & tunjangan
+- **Departemen**: master departemen dan kepala
+- **Pelatihan**: pelatihan karyawan (jenis, tanggal, lokasi, biaya, sertifikat, status)
 
-## Live Development
+## Struktur
 
-To run in live development mode, run `wails dev` in the project directory. This will run a Vite development
-server that will provide very fast hot reload of your frontend changes. If you want to develop in a browser
-and have access to your Go methods, there is also a dev server that runs on http://localhost:34115. Connect
-to this in your browser, and you can call your Go code from devtools.
+```
+app.go              # Titik masuk Wails, pendaftaran semua service & binding endpoint
+main.go             # Inisialisasi aplikasi Wails
+go.mod / go.sum     # Dependensi Go
+internal/
+  model/            # Struct domain + TableName()
+  service/          # Service per modul (CRUD berbasis JSON file)
+frontend/
+  src/
+    stores/         # Pinia store per modul
+    wailsjs/        # Binding Go yang di-generate ke TypeScript
+wails.json          # Konfigurasi project Wails
+build/              # Hasil build per platform
+```
 
-## Building
+## Persiapan
 
-To build a redistributable, production mode package, use `wails build`.
+- [Go](https://go.dev/) (untuk backend)
+- [Node.js](https://nodejs.org/) + npm (untuk frontend)
+- [Wails CLI](https://wails.io/docs/gettingstarted/installation) (opsional, untuk `wails dev`/`wails build`)
+
+## Menjalankan
+
+Backend (Go):
+
+```sh
+go build ./...
+go vet ./...
+go test ./...
+```
+
+Frontend (type-check):
+
+```sh
+cd frontend
+npm install
+npm run type-check
+```
+
+Menjalankan dalam mode development:
+
+```sh
+wails dev
+```
+
+Build produksi:
+
+```sh
+wails build
+```
+
+Hasil build tersedia di `build/bin`, `build/darwin`, atau `build/windows` sesuai platform.
+
+## Data
+
+Setiap modul menyimpan data ke file JSON sendiri di direktori aplikasi:
+
+- `karyawan.db`, `absensi.db`, `cuti.db`, `reimburse.db`
+- `gaji.db`, `jabatan.db`, `departemen.db`, `pelatihan.db`
+
+## Lisensi
+
+Tidak ditetapkan.
