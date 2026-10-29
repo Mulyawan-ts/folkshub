@@ -1,13 +1,10 @@
 package service
 
 import (
-	"encoding/json"
 	"errors"
-	"os"
-	"path/filepath"
-	"sync"
 
 	"app/internal/model"
+	"gorm.io/gorm"
 )
 
 var (
@@ -15,64 +12,19 @@ var (
 )
 
 type DepartemenService struct {
-	mu     sync.RWMutex
-	path   string
-	daftar map[int]*model.Departemen
-	nextID int
+	mu sync.RWMutex
+	db *gorm.DB
 }
 
 func NewDepartemenService(dbPath string) (*DepartemenService, error) {
-	abs, err := filepath.Abs(dbPath)
+	db, err := Open(dbPath)
 	if err != nil {
 		return nil, err
 	}
-
-	s := &DepartemenService{
-		path:   abs,
-		daftar: make(map[int]*model.Departemen),
-		nextID: 1,
-	}
-
-	if err := s.load(); err != nil && !errors.Is(err, os.ErrNotExist) {
+	if err := db.AutoMigrate(&model.Departemen{}); err != nil {
 		return nil, err
 	}
-
-	return s, nil
-}
-
-func (s *DepartemenService) load() error {
-	data, err := os.ReadFile(s.path)
-	if err != nil {
-		return err
-	}
-
-	var list []*model.Departemen
-	if err := json.Unmarshal(data, &list); err != nil {
-		return err
-	}
-
-	for _, d := range list {
-		s.daftar[d.ID] = d
-		if d.ID >= s.nextID {
-			s.nextID = d.ID + 1
-		}
-	}
-
-	return nil
-}
-
-func (s *DepartemenService) save() error {
-	list := make([]*model.Departemen, 0, len(s.daftar))
-	for _, d := range s.daftar {
-		list = append(list, d)
-	}
-
-	data, err := json.MarshalIndent(list, "", "  ")
-	if err != nil {
-		return err
-	}
-
-	return os.WriteFile(s.path, data, 0644)
+	return &DepartemenService{db: db}, nil
 }
 
 func (s *DepartemenService) Simpan(d *model.Departemen) error {
@@ -80,60 +32,53 @@ func (s *DepartemenService) Simpan(d *model.Departemen) error {
 	defer s.mu.Unlock()
 
 	if d.ID == 0 {
-		d.ID = s.nextID
-		s.nextID++
+		return s.db.Create(d).Error
 	}
 
-	if _, exists := s.daftar[d.ID]; exists {
+	var existing model.Departemen
+	if err := s.db.First(&existing, d.ID).Error; err == nil {
 		return errors.New("departemen sudah ada")
 	}
-
-	s.daftar[d.ID] = d
-	return s.save()
+	return s.db.Create(d).Error
 }
 
 func (s *DepartemenService) Ambil(id int) (*model.Departemen, error) {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 
-	d, ok := s.daftar[id]
-	if !ok {
+	var d model.Departemen
+	if err := s.db.First(&d, id).Error; err != nil {
 		return nil, ErrDepartemenNotFound
 	}
-
-	return d, nil
+	return &d, nil
 }
 
 func (s *DepartemenService) Semua() []*model.Departemen {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 
-	result := make([]*model.Departemen, 0, len(s.daftar))
-	for _, d := range s.daftar {
-		result = append(result, d)
-	}
-
-	return result
+	var list []*model.Departemen
+	s.db.Find(&list)
+	return list
 }
 
 func (s *DepartemenService) Hapus(id int) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	if _, ok := s.daftar[id]; !ok {
+	var d model.Departemen
+	if err := s.db.First(&d, id).Error; err != nil {
 		return ErrDepartemenNotFound
 	}
-
-	delete(s.daftar, id)
-	return s.save()
+	return s.db.Delete(&d).Error
 }
 
 func (s *DepartemenService) Update(id int, kode, nama, kepala, deskripsi string) (*model.Departemen, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	d, ok := s.daftar[id]
-	if !ok {
+	var d model.Departemen
+	if err := s.db.First(&d, id).Error; err != nil {
 		return nil, ErrDepartemenNotFound
 	}
 
@@ -142,10 +87,8 @@ func (s *DepartemenService) Update(id int, kode, nama, kepala, deskripsi string)
 	d.Kepala = kepala
 	d.Deskripsi = deskripsi
 
-	s.daftar[id] = d
-	if err := s.save(); err != nil {
+	if err := s.db.Save(&d).Error; err != nil {
 		return nil, err
 	}
-
-	return d, nil
+	return &d, nil
 }

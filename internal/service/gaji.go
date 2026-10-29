@@ -1,13 +1,10 @@
 package service
 
 import (
-	"encoding/json"
 	"errors"
-	"os"
-	"path/filepath"
-	"sync"
 
 	"app/internal/model"
+	"gorm.io/gorm"
 )
 
 var (
@@ -15,126 +12,75 @@ var (
 )
 
 type GajiService struct {
-	mu     sync.RWMutex
-	path   string
-	daftar map[int]*model.Gaji
-	nextID int
+	mu sync.RWMutex
+	db *gorm.DB
 }
 
 func NewGajiService(dbPath string) (*GajiService, error) {
-	abs, err := filepath.Abs(dbPath)
+	db, err := Open(dbPath)
 	if err != nil {
 		return nil, err
 	}
-
-	s := &GajiService{
-		path:   abs,
-		daftar: make(map[int]*model.Gaji),
-		nextID: 1,
-	}
-
-	if err := s.load(); err != nil && !errors.Is(err, os.ErrNotExist) {
+	if err := db.AutoMigrate(&model.Gaji{}); err != nil {
 		return nil, err
 	}
-
-	return s, nil
-}
-
-func (s *GajiService) load() error {
-	data, err := os.ReadFile(s.path)
-	if err != nil {
-		return err
-	}
-
-	var list []*model.Gaji
-	if err := json.Unmarshal(data, &list); err != nil {
-		return err
-	}
-
-	for _, g := range list {
-		s.daftar[g.ID] = g
-		if g.ID >= s.nextID {
-			s.nextID = g.ID + 1
-		}
-	}
-
-	return nil
-}
-
-func (s *GajiService) save() error {
-	list := make([]*model.Gaji, 0, len(s.daftar))
-	for _, g := range s.daftar {
-		list = append(list, g)
-	}
-
-	data, err := json.MarshalIndent(list, "", "  ")
-	if err != nil {
-		return err
-	}
-
-	return os.WriteFile(s.path, data, 0644)
+	return &GajiService{db: db}, nil
 }
 
 func (s *GajiService) Simpan(g *model.Gaji) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
+	g.Total = g.GajiPokok + g.Tunjangan - g.Potongan
+
 	if g.ID == 0 {
-		g.ID = s.nextID
-		s.nextID++
+		return s.db.Create(g).Error
 	}
 
-	if _, exists := s.daftar[g.ID]; exists {
+	var existing model.Gaji
+	if err := s.db.First(&existing, g.ID).Error; err == nil {
 		return errors.New("gaji sudah ada")
 	}
-
-	g.Total = g.GajiPokok + g.Tunjangan - g.Potongan
-	s.daftar[g.ID] = g
-	return s.save()
+	return s.db.Create(g).Error
 }
 
 func (s *GajiService) Ambil(id int) (*model.Gaji, error) {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 
-	g, ok := s.daftar[id]
-	if !ok {
+	var g model.Gaji
+	if err := s.db.First(&g, id).Error; err != nil {
 		return nil, ErrGajiNotFound
 	}
-
-	return g, nil
+	return &g, nil
 }
 
 func (s *GajiService) Semua() []*model.Gaji {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 
-	result := make([]*model.Gaji, 0, len(s.daftar))
-	for _, g := range s.daftar {
-		result = append(result, g)
-	}
-
-	return result
+	var list []*model.Gaji
+	s.db.Find(&list)
+	return list
 }
 
 func (s *GajiService) Hapus(id int) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	if _, ok := s.daftar[id]; !ok {
+	var g model.Gaji
+	if err := s.db.First(&g, id).Error; err != nil {
 		return ErrGajiNotFound
 	}
-
-	delete(s.daftar, id)
-	return s.save()
+	return s.db.Delete(&g).Error
 }
 
 func (s *GajiService) Update(id int, karyawanId int, bulan string, gajiPokok, tunjangan, potongan int, status string) (*model.Gaji, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	g, ok := s.daftar[id]
-	if !ok {
+	var g model.Gaji
+	if err := s.db.First(&g, id).Error; err != nil {
 		return nil, ErrGajiNotFound
 	}
 
@@ -146,10 +92,8 @@ func (s *GajiService) Update(id int, karyawanId int, bulan string, gajiPokok, tu
 	g.Total = gajiPokok + tunjangan - potongan
 	g.Status = status
 
-	s.daftar[id] = g
-	if err := s.save(); err != nil {
+	if err := s.db.Save(&g).Error; err != nil {
 		return nil, err
 	}
-
-	return g, nil
+	return &g, nil
 }
