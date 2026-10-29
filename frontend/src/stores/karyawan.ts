@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { SimpanKaryawan, AmbilKaryawan, SemuaKaryawan, HapusKaryawan } from '../../wailsjs/go/main/App'
+import { SimpanKaryawan, SemuaKaryawan, HapusKaryawan } from '../../wailsjs/go/main/App'
 
 export interface Karyawan {
   id: number
