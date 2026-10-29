@@ -146,8 +146,12 @@ func (a *App) UpdateAbsensi(id int, karyawanID int, tanggal, checkIn, checkOut, 
 
 // Cuti
 func (a *App) SimpanCuti(karyawanID int, jenis, tanggalMulai, tanggalSelesai, keterangan, status string, jumlahHari int) (*model.Cuti, error) {
+	if _, err := a.karyawanSvc.Ambil(karyawanID); err != nil {
+		return nil, err
+	}
+
 	c := &model.Cuti{
-		KaryawanId:  karyawanID,
+		KaryawanId:    karyawanID,
 		Jenis:       jenis,
 		TanggalMulai: tanggalMulai,
 		TanggalSelesai: tanggalSelesai,
@@ -176,6 +180,9 @@ func (a *App) HapusCuti(id int) error {
 }
 
 func (a *App) UpdateCuti(id int, karyawanID int, jenis, tanggalMulai, tanggalSelesai, keterangan, status string, jumlahHari int) (*model.Cuti, error) {
+	if _, err := a.karyawanSvc.Ambil(karyawanID); err != nil {
+		return nil, err
+	}
 	return a.cutiSvc.Update(id, karyawanID, jenis, tanggalMulai, tanggalSelesai, keterangan, status, jumlahHari)
 }
 

@@ -11,7 +11,24 @@ import (
 var (
 	ErrCutiNotFound = errors.New("cuti tidak ditemukan")
 	ErrCutiExists   = errors.New("cuti sudah ada")
+	ErrCutiOverlap  = errors.New("cuti bertumpuk dengan pengajuan lain")
+	ErrCutiInvalid  = errors.New("data cuti tidak valid")
 )
+var validCutiStatus = map[string]bool{
+	"draft":      true,
+	"submitted":  true,
+	"approved":   true,
+	"rejected":   true,
+	"cancelled":  true,
+}
+
+var validCutiJenis = map[string]bool{
+	"tahunan":    true,
+	"sakit":      true,
+	"izin":       true,
+	"melahirkan": true,
+	"lainnya":    true,
+}
 
 type CutiService struct {
 	mu sync.RWMutex
@@ -35,6 +52,25 @@ func (s *CutiService) Simpan(c *model.Cuti) error {
 
 	if c == nil || c.KaryawanId <= 0 || c.Jenis == "" || c.TanggalMulai == "" || c.TanggalSelesai == "" {
 		return ErrInvalidInput
+	}
+	if !validCutiJenis[c.Jenis] {
+		return ErrCutiInvalid
+	}
+	if c.Status == "" {
+		c.Status = "draft"
+	}
+	if !validCutiStatus[c.Status] {
+		return ErrCutiInvalid
+	}
+	if c.TanggalMulai > c.TanggalSelesai {
+		return ErrCutiInvalid
+	}
+	if c.JumlahHari <= 0 {
+		return ErrCutiInvalid
+	}
+
+	if s.hasOverlap(c.KaryawanId, c.TanggalMulai, c.TanggalSelesai, 0) {
+		return ErrCutiOverlap
 	}
 
 	if c.ID == 0 {
@@ -96,6 +132,21 @@ func (s *CutiService) Update(id int, karyawanId int, jenis, tanggalMulai, tangga
 	if karyawanId <= 0 || jenis == "" || tanggalMulai == "" || tanggalSelesai == "" {
 		return nil, ErrInvalidInput
 	}
+	if !validCutiJenis[jenis] {
+		return nil, ErrCutiInvalid
+	}
+	if status == "" {
+		status = "draft"
+	}
+	if !validCutiStatus[status] {
+		return nil, ErrCutiInvalid
+	}
+	if tanggalMulai > tanggalSelesai {
+		return nil, ErrCutiInvalid
+	}
+	if jumlahHari <= 0 {
+		return nil, ErrCutiInvalid
+	}
 
 	var c model.Cuti
 	if err := s.db.First(&c, id).Error; err != nil {
@@ -103,6 +154,10 @@ func (s *CutiService) Update(id int, karyawanId int, jenis, tanggalMulai, tangga
 			return nil, ErrCutiNotFound
 		}
 		return nil, err
+	}
+
+	if s.hasOverlap(karyawanId, tanggalMulai, tanggalSelesai, id) {
+		return nil, ErrCutiOverlap
 	}
 
 	c.KaryawanId = karyawanId
@@ -117,4 +172,15 @@ func (s *CutiService) Update(id int, karyawanId int, jenis, tanggalMulai, tangga
 		return nil, err
 	}
 	return &c, nil
+}
+func (s *CutiService) hasOverlap(karyawanId int, start, end string, excludeID int) bool {
+	var count int64
+	q := s.db.Model(&model.Cuti{}).
+		Where("karyawan_id = ? AND status IN ? AND NOT (tanggal_selesai < ? OR tanggal_mulai > ?)",
+			karyawanId, []string{"submitted", "approved"}, start, end)
+	if excludeID > 0 {
+		q = q.Where("id <> ?", excludeID)
+	}
+	q.Count(&count)
+	return count > 0
 }
