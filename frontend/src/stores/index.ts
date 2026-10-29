@@ -19,5 +19,8 @@ export type { Jabatan } from './jabatan'
 export { useDepartemenStore } from './departemen'
 export type { Departemen } from './departemen'
 
+export { usePelatihanStore } from './pelatihan'
+export type { Pelatihan, StatusPelatihan } from './pelatihan'
+
 export { useToastStore } from './toast'
 export type { ToastItem, ToastType, ToastOptions, ToastAction } from './toast'

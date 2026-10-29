@@ -9,6 +9,7 @@ import CutiPage from './pages/CutiPage.vue'
 import ReimbursePage from './pages/ReimbursePage.vue'
 import GajiPage from './pages/GajiPage.vue'
 import JabatanPage from './pages/JabatanPage.vue'
+import PelatihanPage from './pages/PelatihanPage.vue'
 import DepartemenPage from './pages/DepartemenPage.vue'
 
 const toastStore = useToastStore()
@@ -21,7 +22,8 @@ const pages = [
   { id: 'reimburse', label: 'Reimburse', component: ReimbursePage },
   { id: 'gaji', label: 'Gaji', component: GajiPage },
   { id: 'jabatan', label: 'Jabatan', component: JabatanPage },
-  { id: 'departemen', label: 'Departemen', component: DepartemenPage }
+  { id: 'departemen', label: 'Departemen', component: DepartemenPage },
+  { id: 'pelatihan', label: 'Pelatihan', component: PelatihanPage }
 ]
 
 const activePage = ref('karyawan')
