@@ -1,0 +1,217 @@
+<script setup lang="ts">
+import { ref, onMounted } from 'vue'
+import { storeToRefs } from 'pinia'
+import { usePelatihanStore } from '../stores/index'
+import { useToastStore } from '../stores/toast'
+import AppInput from '../components/AppInput.vue'
+import AppButton from '../components/AppButton.vue'
+import AppBadge from '../components/AppBadge.vue'
+
+const pelatihanStore = usePelatihanStore()
+const toastStore = useToastStore()
+
+const { items, loading, error } = storeToRefs(pelatihanStore)
+
+const karyawanId = ref('')
+const nama = ref('')
+const jenis = ref('')
+const tanggalMulai = ref('')
+const tanggalSelesai = ref('')
+const lokasi = ref('')
+const biaya = ref('')
+const sertifikat = ref('')
+const catatan = ref('')
+
+const statusVariant = (s: string) => {
+  switch (s) {
+    case 'berlangsung': return 'warning'
+    case 'selesai': return 'success'
+    case 'dibatalkan': return 'error'
+    case 'terjadwal': return 'neutral'
+    default: return 'neutral'
+  }
+}
+
+onMounted(() => {
+  pelatihanStore.fetchAll()
+})
+
+async function handleSimpan() {
+  if (!karyawanId.value.trim() || !nama.value.trim() || !tanggalMulai.value.trim()) {
+    toastStore.error('Karyawan, nama pelatihan, dan tanggal mulai wajib diisi')
+    return
+  }
+  try {
+    await pelatihanStore.simpan({
+      karyawanId: Number(karyawanId.value),
+      nama: nama.value,
+      jenis: jenis.value,
+      tanggalMulai: tanggalMulai.value,
+      tanggalSelesai: tanggalSelesai.value,
+      lokasi: lokasi.value,
+      biaya: Number(biaya.value) || 0,
+      status: 'terjadwal',
+      sertifikat: sertifikat.value,
+      catatan: catatan.value
+    })
+    toastStore.success('Pelatihan berhasil disimpan')
+    karyawanId.value = ''
+    nama.value = ''
+    jenis.value = ''
+    tanggalMulai.value = ''
+    tanggalSelesai.value = ''
+    lokasi.value = ''
+    biaya.value = ''
+    sertifikat.value = ''
+    catatan.value = ''
+    pelatihanStore.fetchAll()
+  } catch {
+    // error already set in store
+  }
+}
+
+async function handleHapus(id: number) {
+  if (!confirm('Yakin ingin menghapus pelatihan ini?')) return
+  try {
+    await pelatihanStore.hapus(id)
+    toastStore.success('Pelatihan berhasil dihapus')
+    pelatihanStore.fetchAll()
+  } catch {
+    // error already set in store
+  }
+}
+</script>
+
+<template>
+  <div class="max-w-5xl mx-auto space-y-6">
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div>
+        <h1 class="text-2xl font-bold">Kelola Pelatihan</h1>
+        <p class="text-text-muted">Data pelatihan karyawan</p>
+      </div>
+    </div>
+
+    <div v-if="error" class="alert alert-error">
+      <span>{{ error }}</span>
+    </div>
+
+    <form @submit.prevent="handleSimpan" class="card p-6 bg-base-100 shadow-sm">
+      <div class="grid grid-cols-1 md:grid-cols-6 gap-4 items-end">
+        <div class="form-control w-full">
+          <label class="label">
+            <span class="label-text">Karyawan ID</span>
+          </label>
+          <AppInput v-model="karyawanId" type="number" placeholder="ID karyawan" required />
+        </div>
+
+        <div class="form-control w-full">
+          <label class="label">
+            <span class="label-text">Nama Pelatihan</span>
+          </label>
+          <AppInput v-model="nama" placeholder="Nama pelatihan" required />
+        </div>
+
+        <div class="form-control w-full">
+          <label class="label">
+            <span class="label-text">Jenis</span>
+          </label>
+          <AppInput v-model="jenis" placeholder="Contoh: Teknis, Soft Skill" />
+        </div>
+
+        <div class="form-control w-full">
+          <label class="label">
+            <span class="label-text">Tanggal Mulai</span>
+          </label>
+          <AppInput v-model="tanggalMulai" type="date" required />
+        </div>
+
+        <div class="form-control w-full">
+          <label class="label">
+            <span class="label-text">Tanggal Selesai</span>
+          </label>
+          <AppInput v-model="tanggalSelesai" type="date" />
+        </div>
+
+        <div class="form-control w-full">
+          <label class="label">
+            <span class="label-text">Lokasi</span>
+          </label>
+          <AppInput v-model="lokasi" placeholder="Lokasi pelatihan" />
+        </div>
+
+        <div class="form-control w-full">
+          <label class="label">
+            <span class="label-text">Biaya</span>
+          </label>
+          <AppInput v-model="biaya" type="number" placeholder="0" />
+        </div>
+
+        <div class="w-full col-span-6">
+          <AppButton type="submit" variant="primary" :loading="loading">
+            Simpan
+          </AppButton>
+        </div>
+      </div>
+
+      <div class="form-control w-full">
+        <label class="label">
+          <span class="label-text">Sertifikat</span>
+        </label>
+        <AppInput v-model="sertifikat" placeholder="Nomor atau URL sertifikat" />
+      </div>
+
+      <div class="form-control w-full mt-4">
+        <label class="label">
+          <span class="label-text">Catatan</span>
+        </label>
+        <AppInput v-model="catatan" placeholder="Catatan pelatihan" />
+      </div>
+    </form>
+
+    <div class="card p-4 bg-base-100 shadow-sm overflow-x-auto">
+      <table class="table w-full text-left">
+        <thead>
+          <tr>
+            <th>Karyawan ID</th>
+            <th>Nama Pelatihan</th>
+            <th>Jenis</th>
+            <th>Tanggal Mulai</th>
+            <th>Tanggal Selesai</th>
+            <th>Biaya</th>
+            <th>Status</th>
+            <th class="text-right">Aksi</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="p in items" :key="p.id" class="border-b">
+            <td>{{ p.karyawanId }}</td>
+            <td>{{ p.nama }}</td>
+            <td>{{ p.jenis || '-' }}</td>
+            <td>{{ p.tanggalMulai }}</td>
+            <td>{{ p.tanggalSelesai || '-' }}</td>
+            <td>{{ p.biaya }}</td>
+            <td>
+              <AppBadge :variant="statusVariant(p.status)" size="sm">
+                {{ p.status }}
+              </AppBadge>
+            </td>
+            <td class="text-right">
+              <AppButton variant="error" size="sm" outline @click="handleHapus(p.id)">
+                Hapus
+              </AppButton>
+            </td>
+          </tr>
+          <tr v-if="items.length === 0">
+            <td colspan="8" class="text-center text-text-muted py-4">Belum ada data pelatihan</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <style scoped>
+  .card {
+    @apply border;
+  }
+  </style>
+</template>
