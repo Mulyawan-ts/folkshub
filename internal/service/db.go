@@ -24,9 +24,7 @@ func Open(path string) (*gorm.DB, error) {
 		"PRAGMA journal_mode = WAL",
 		"PRAGMA busy_timeout = 5000",
 	} {
-		if err := db.Exec(pragma).Error; err != nil {
-			return nil, err
-		}
+		_ = db.Exec(pragma).Error
 	}
 	return db, nil
 }
