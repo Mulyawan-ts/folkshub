@@ -9,7 +9,7 @@ export interface Gaji {
   gajiPokok: number
   tunjangan: number
   potongan: number
-  total: number
+  total?: number
   status: StatusGaji
   tanggalBayar?: string
   keterangan?: string
@@ -33,11 +33,11 @@ export const useGajiStore = defineStore('gaji', {
     byStatus: (state) => (status: StatusGaji) =>
       state.items.filter((g) => g.status === status),
     totalGaji: (state) =>
-      state.items.reduce((acc, g) => acc + g.total, 0),
+      state.items.reduce((acc, g) => acc + (g.total ?? 0), 0),
     totalDibayar: (state) =>
       state.items
         .filter((g) => g.status === 'dibayar')
-        .reduce((acc, g) => acc + g.total, 0),
+        .reduce((acc, g) => acc + (g.total ?? 0), 0),
     belumDibayarCount: (state) =>
       state.items.filter((g) => g.status !== 'dibayar').length
   },
