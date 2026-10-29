@@ -51,7 +51,6 @@ async function handleSimpan() {
     nama.value = ''
     email.value = ''
     status.value = 'tetap'
-    await karyawanStore.fetchAll()
   } catch {
     // error already set in store
   }
@@ -154,4 +153,4 @@ async function handleHapus(id: number) {
 .card {
   @apply border;
 }
-</template>
+</style>
