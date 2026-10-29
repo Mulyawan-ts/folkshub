@@ -2,6 +2,7 @@ package service
 
 import (
 	"errors"
+	"sync"
 
 	"app/internal/model"
 	"gorm.io/gorm"
@@ -9,6 +10,7 @@ import (
 
 var (
 	ErrReimburseNotFound = errors.New("reimburse tidak ditemukan")
+	ErrReimburseExists   = errors.New("reimburse sudah ada")
 )
 
 type ReimburseService struct {
@@ -31,13 +33,19 @@ func (s *ReimburseService) Simpan(r *model.Reimburse) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
+	if r == nil || r.KaryawanId <= 0 || r.Jenis == "" || r.Tanggal == "" {
+		return ErrInvalidInput
+	}
+
 	if r.ID == 0 {
 		return s.db.Create(r).Error
 	}
 
 	var existing model.Reimburse
 	if err := s.db.First(&existing, r.ID).Error; err == nil {
-		return errors.New("reimburse sudah ada")
+		return ErrReimburseExists
+	} else if !errors.Is(err, gorm.ErrRecordNotFound) {
+		return err
 	}
 	return s.db.Create(r).Error
 }
@@ -48,18 +56,23 @@ func (s *ReimburseService) Ambil(id int) (*model.Reimburse, error) {
 
 	var r model.Reimburse
 	if err := s.db.First(&r, id).Error; err != nil {
-		return nil, ErrReimburseNotFound
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, ErrReimburseNotFound
+		}
+		return nil, err
 	}
 	return &r, nil
 }
 
-func (s *ReimburseService) Semua() []*model.Reimburse {
+func (s *ReimburseService) Semua() ([]*model.Reimburse, error) {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 
 	var list []*model.Reimburse
-	s.db.Find(&list)
-	return list
+	if err := s.db.Find(&list).Error; err != nil {
+		return nil, err
+	}
+	return list, nil
 }
 
 func (s *ReimburseService) Hapus(id int) error {
@@ -68,7 +81,10 @@ func (s *ReimburseService) Hapus(id int) error {
 
 	var r model.Reimburse
 	if err := s.db.First(&r, id).Error; err != nil {
-		return ErrReimburseNotFound
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return ErrReimburseNotFound
+		}
+		return err
 	}
 	return s.db.Delete(&r).Error
 }
@@ -77,9 +93,16 @@ func (s *ReimburseService) Update(id int, karyawanId int, tanggal, jenis, ketera
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
+	if karyawanId <= 0 || jenis == "" || tanggal == "" {
+		return nil, ErrInvalidInput
+	}
+
 	var r model.Reimburse
 	if err := s.db.First(&r, id).Error; err != nil {
-		return nil, ErrReimburseNotFound
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, ErrReimburseNotFound
+		}
+		return nil, err
 	}
 
 	r.KaryawanId = karyawanId

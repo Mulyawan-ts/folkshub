@@ -2,6 +2,7 @@ package service
 
 import (
 	"errors"
+	"sync"
 
 	"app/internal/model"
 	"gorm.io/gorm"
@@ -9,6 +10,7 @@ import (
 
 var (
 	ErrCutiNotFound = errors.New("cuti tidak ditemukan")
+	ErrCutiExists   = errors.New("cuti sudah ada")
 )
 
 type CutiService struct {
@@ -31,13 +33,19 @@ func (s *CutiService) Simpan(c *model.Cuti) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
+	if c == nil || c.KaryawanId <= 0 || c.Jenis == "" || c.TanggalMulai == "" || c.TanggalSelesai == "" {
+		return ErrInvalidInput
+	}
+
 	if c.ID == 0 {
 		return s.db.Create(c).Error
 	}
 
 	var existing model.Cuti
 	if err := s.db.First(&existing, c.ID).Error; err == nil {
-		return errors.New("cuti sudah ada")
+		return ErrCutiExists
+	} else if !errors.Is(err, gorm.ErrRecordNotFound) {
+		return err
 	}
 	return s.db.Create(c).Error
 }
@@ -48,18 +56,23 @@ func (s *CutiService) Ambil(id int) (*model.Cuti, error) {
 
 	var c model.Cuti
 	if err := s.db.First(&c, id).Error; err != nil {
-		return nil, ErrCutiNotFound
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, ErrCutiNotFound
+		}
+		return nil, err
 	}
 	return &c, nil
 }
 
-func (s *CutiService) Semua() []*model.Cuti {
+func (s *CutiService) Semua() ([]*model.Cuti, error) {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 
 	var list []*model.Cuti
-	s.db.Find(&list)
-	return list
+	if err := s.db.Find(&list).Error; err != nil {
+		return nil, err
+	}
+	return list, nil
 }
 
 func (s *CutiService) Hapus(id int) error {
@@ -68,7 +81,10 @@ func (s *CutiService) Hapus(id int) error {
 
 	var c model.Cuti
 	if err := s.db.First(&c, id).Error; err != nil {
-		return ErrCutiNotFound
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return ErrCutiNotFound
+		}
+		return err
 	}
 	return s.db.Delete(&c).Error
 }
@@ -77,9 +93,16 @@ func (s *CutiService) Update(id int, karyawanId int, jenis, tanggalMulai, tangga
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
+	if karyawanId <= 0 || jenis == "" || tanggalMulai == "" || tanggalSelesai == "" {
+		return nil, ErrInvalidInput
+	}
+
 	var c model.Cuti
 	if err := s.db.First(&c, id).Error; err != nil {
-		return nil, ErrCutiNotFound
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, ErrCutiNotFound
+		}
+		return nil, err
 	}
 
 	c.KaryawanId = karyawanId

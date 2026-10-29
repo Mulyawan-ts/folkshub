@@ -98,7 +98,7 @@ func (a *App) AmbilKaryawan(id int) (*model.Karyawan, error) {
 	return a.karyawanSvc.Ambil(id)
 }
 
-func (a *App) SemuaKaryawan() []*model.Karyawan {
+func (a *App) SemuaKaryawan() ([]*model.Karyawan, error) {
 	return a.karyawanSvc.Semua()
 }
 
@@ -132,7 +132,7 @@ func (a *App) AmbilAbsensi(id int) (*model.Absensi, error) {
 	return a.absensiSvc.Ambil(id)
 }
 
-func (a *App) SemuaAbsensi() []*model.Absensi {
+func (a *App) SemuaAbsensi() ([]*model.Absensi, error) {
 	return a.absensiSvc.Semua()
 }
 
@@ -167,7 +167,7 @@ func (a *App) AmbilCuti(id int) (*model.Cuti, error) {
 	return a.cutiSvc.Ambil(id)
 }
 
-func (a *App) SemuaCuti() []*model.Cuti {
+func (a *App) SemuaCuti() ([]*model.Cuti, error) {
 	return a.cutiSvc.Semua()
 }
 
@@ -202,7 +202,7 @@ func (a *App) AmbilReimburse(id int) (*model.Reimburse, error) {
 	return a.reimburseSvc.Ambil(id)
 }
 
-func (a *App) SemuaReimburse() []*model.Reimburse {
+func (a *App) SemuaReimburse() ([]*model.Reimburse, error) {
 	return a.reimburseSvc.Semua()
 }
 
@@ -236,7 +236,7 @@ func (a *App) AmbilGaji(id int) (*model.Gaji, error) {
 	return a.gajiSvc.Ambil(id)
 }
 
-func (a *App) SemuaGaji() []*model.Gaji {
+func (a *App) SemuaGaji() ([]*model.Gaji, error) {
 	return a.gajiSvc.Semua()
 }
 
@@ -270,7 +270,7 @@ func (a *App) AmbilJabatan(id int) (*model.Jabatan, error) {
 	return a.jabatanSvc.Ambil(id)
 }
 
-func (a *App) SemuaJabatan() []*model.Jabatan {
+func (a *App) SemuaJabatan() ([]*model.Jabatan, error) {
 	return a.jabatanSvc.Semua()
 }
 
@@ -302,7 +302,7 @@ func (a *App) AmbilDepartemen(id int) (*model.Departemen, error) {
 	return a.departemenSvc.Ambil(id)
 }
 
-func (a *App) SemuaDepartemen() []*model.Departemen {
+func (a *App) SemuaDepartemen() ([]*model.Departemen, error) {
 	return a.departemenSvc.Semua()
 }
 
@@ -340,7 +340,7 @@ func (a *App) AmbilPelatihan(id int) (*model.Pelatihan, error) {
 	return a.pelatihanSvc.Ambil(id)
 }
 
-func (a *App) SemuaPelatihan() []*model.Pelatihan {
+func (a *App) SemuaPelatihan() ([]*model.Pelatihan, error) {
 	return a.pelatihanSvc.Semua()
 }
 

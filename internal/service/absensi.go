@@ -2,6 +2,7 @@ package service
 
 import (
 	"errors"
+	"sync"
 
 	"app/internal/model"
 	"gorm.io/gorm"
@@ -9,6 +10,7 @@ import (
 
 var (
 	ErrAbsensiNotFound = errors.New("absensi tidak ditemukan")
+	ErrAbsensiExists   = errors.New("absensi sudah ada")
 )
 
 type AbsensiService struct {
@@ -31,13 +33,19 @@ func (s *AbsensiService) Simpan(a *model.Absensi) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
+	if a == nil || a.KaryawanId <= 0 || a.Tanggal == "" {
+		return ErrInvalidInput
+	}
+
 	if a.ID == 0 {
 		return s.db.Create(a).Error
 	}
 
 	var existing model.Absensi
 	if err := s.db.First(&existing, a.ID).Error; err == nil {
-		return errors.New("absensi sudah ada")
+		return ErrAbsensiExists
+	} else if !errors.Is(err, gorm.ErrRecordNotFound) {
+		return err
 	}
 	return s.db.Create(a).Error
 }
@@ -48,18 +56,23 @@ func (s *AbsensiService) Ambil(id int) (*model.Absensi, error) {
 
 	var a model.Absensi
 	if err := s.db.First(&a, id).Error; err != nil {
-		return nil, ErrAbsensiNotFound
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, ErrAbsensiNotFound
+		}
+		return nil, err
 	}
 	return &a, nil
 }
 
-func (s *AbsensiService) Semua() []*model.Absensi {
+func (s *AbsensiService) Semua() ([]*model.Absensi, error) {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 
 	var list []*model.Absensi
-	s.db.Find(&list)
-	return list
+	if err := s.db.Find(&list).Error; err != nil {
+		return nil, err
+	}
+	return list, nil
 }
 
 func (s *AbsensiService) Hapus(id int) error {
@@ -68,7 +81,10 @@ func (s *AbsensiService) Hapus(id int) error {
 
 	var a model.Absensi
 	if err := s.db.First(&a, id).Error; err != nil {
-		return ErrAbsensiNotFound
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return ErrAbsensiNotFound
+		}
+		return err
 	}
 	return s.db.Delete(&a).Error
 }
@@ -77,9 +93,16 @@ func (s *AbsensiService) Update(id int, karyawanId int, tanggal, checkIn, checkO
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
+	if karyawanId <= 0 || tanggal == "" {
+		return nil, ErrInvalidInput
+	}
+
 	var a model.Absensi
 	if err := s.db.First(&a, id).Error; err != nil {
-		return nil, ErrAbsensiNotFound
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, ErrAbsensiNotFound
+		}
+		return nil, err
 	}
 
 	a.KaryawanId = karyawanId

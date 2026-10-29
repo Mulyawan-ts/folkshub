@@ -2,6 +2,7 @@ package service
 
 import (
 	"errors"
+	"sync"
 
 	"app/internal/model"
 	"gorm.io/gorm"
@@ -9,6 +10,7 @@ import (
 
 var (
 	ErrPelatihanNotFound = errors.New("pelatihan tidak ditemukan")
+	ErrPelatihanExists   = errors.New("pelatihan sudah ada")
 )
 
 type PelatihanService struct {
@@ -31,13 +33,19 @@ func (s *PelatihanService) Simpan(p *model.Pelatihan) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
+	if p == nil || p.KaryawanId <= 0 || p.Nama == "" {
+		return ErrInvalidInput
+	}
+
 	if p.ID == 0 {
 		return s.db.Create(p).Error
 	}
 
 	var existing model.Pelatihan
 	if err := s.db.First(&existing, p.ID).Error; err == nil {
-		return errors.New("pelatihan sudah ada")
+		return ErrPelatihanExists
+	} else if !errors.Is(err, gorm.ErrRecordNotFound) {
+		return err
 	}
 	return s.db.Create(p).Error
 }
@@ -48,18 +56,23 @@ func (s *PelatihanService) Ambil(id int) (*model.Pelatihan, error) {
 
 	var p model.Pelatihan
 	if err := s.db.First(&p, id).Error; err != nil {
-		return nil, ErrPelatihanNotFound
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, ErrPelatihanNotFound
+		}
+		return nil, err
 	}
 	return &p, nil
 }
 
-func (s *PelatihanService) Semua() []*model.Pelatihan {
+func (s *PelatihanService) Semua() ([]*model.Pelatihan, error) {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 
 	var list []*model.Pelatihan
-	s.db.Find(&list)
-	return list
+	if err := s.db.Find(&list).Error; err != nil {
+		return nil, err
+	}
+	return list, nil
 }
 
 func (s *PelatihanService) Hapus(id int) error {
@@ -68,7 +81,10 @@ func (s *PelatihanService) Hapus(id int) error {
 
 	var p model.Pelatihan
 	if err := s.db.First(&p, id).Error; err != nil {
-		return ErrPelatihanNotFound
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return ErrPelatihanNotFound
+		}
+		return err
 	}
 	return s.db.Delete(&p).Error
 }
@@ -77,9 +93,16 @@ func (s *PelatihanService) Update(id int, karyawanId int, nama, jenis, tanggalMu
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
+	if karyawanId <= 0 || nama == "" {
+		return nil, ErrInvalidInput
+	}
+
 	var p model.Pelatihan
 	if err := s.db.First(&p, id).Error; err != nil {
-		return nil, ErrPelatihanNotFound
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, ErrPelatihanNotFound
+		}
+		return nil, err
 	}
 
 	p.KaryawanId = karyawanId
