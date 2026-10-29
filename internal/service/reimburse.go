@@ -128,7 +128,7 @@ func (s *ReimburseService) Hapus(id int) error {
 	return s.save()
 }
 
-func (s *ReimburseService) Update(id int, karyawanID int, tanggal, jenis, keterangan, bukti, status string, jumlah int) (*model.Reimburse, error) {
+func (s *ReimburseService) Update(id int, karyawanId int, tanggal, jenis, keterangan, bukti, status string, jumlah int) (*model.Reimburse, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
@@ -137,7 +137,7 @@ func (s *ReimburseService) Update(id int, karyawanID int, tanggal, jenis, ketera
 		return nil, ErrReimburseNotFound
 	}
 
-	r.KaryawanID = karyawanID
+	r.KaryawanId = karyawanId
 	r.Tanggal = tanggal
 	r.Jenis = jenis
 	r.Jumlah = jumlah

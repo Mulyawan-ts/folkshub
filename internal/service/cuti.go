@@ -128,7 +128,7 @@ func (s *CutiService) Hapus(id int) error {
 	return s.save()
 }
 
-func (s *CutiService) Update(id int, karyawanID int, jenis, tanggalMulai, tanggalSelesai, keterangan, status string, jumlahHari int) (*model.Cuti, error) {
+func (s *CutiService) Update(id int, karyawanId int, jenis, tanggalMulai, tanggalSelesai, keterangan, status string, jumlahHari int) (*model.Cuti, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
@@ -137,7 +137,7 @@ func (s *CutiService) Update(id int, karyawanID int, jenis, tanggalMulai, tangga
 		return nil, ErrCutiNotFound
 	}
 
-	c.KaryawanID = karyawanID
+	c.KaryawanId = karyawanId
 	c.Jenis = jenis
 	c.TanggalMulai = tanggalMulai
 	c.TanggalSelesai = tanggalSelesai

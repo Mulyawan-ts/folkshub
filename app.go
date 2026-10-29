@@ -113,7 +113,7 @@ func (a *App) UpdateKaryawan(id int, nama, email, status string) (*model.Karyawa
 // Absensi
 func (a *App) SimpanAbsensi(karyawanID int, tanggal, checkIn, checkOut, status, keterangan string) (*model.Absensi, error) {
 	a2 := &model.Absensi{
-		KaryawanID: karyawanID,
+		KaryawanId: karyawanID,
 		Tanggal:    tanggal,
 		CheckIn:    checkIn,
 		CheckOut:   checkOut,
@@ -147,7 +147,7 @@ func (a *App) UpdateAbsensi(id int, karyawanID int, tanggal, checkIn, checkOut, 
 // Cuti
 func (a *App) SimpanCuti(karyawanID int, jenis, tanggalMulai, tanggalSelesai, keterangan, status string, jumlahHari int) (*model.Cuti, error) {
 	c := &model.Cuti{
-		KaryawanID:  karyawanID,
+		KaryawanId:  karyawanID,
 		Jenis:       jenis,
 		TanggalMulai: tanggalMulai,
 		TanggalSelesai: tanggalSelesai,
@@ -182,7 +182,7 @@ func (a *App) UpdateCuti(id int, karyawanID int, jenis, tanggalMulai, tanggalSel
 // Reimburse
 func (a *App) SimpanReimburse(karyawanID int, tanggal, jenis, keterangan, bukti, status string, jumlah int) (*model.Reimburse, error) {
 	r := &model.Reimburse{
-		KaryawanID: karyawanID,
+		KaryawanId: karyawanID,
 		Tanggal:    tanggal,
 		Jenis:      jenis,
 		Jumlah:     jumlah,
@@ -217,7 +217,7 @@ func (a *App) UpdateReimburse(id int, karyawanID int, tanggal, jenis, keterangan
 // Gaji
 func (a *App) SimpanGaji(karyawanID int, bulan string, gajiPokok, tunjangan, potongan int, status string) (*model.Gaji, error) {
 	g := &model.Gaji{
-		KaryawanID: karyawanID,
+		KaryawanId: karyawanID,
 		Bulan:      bulan,
 		GajiPokok:  gajiPokok,
 		Tunjangan:  tunjangan,
@@ -317,7 +317,7 @@ func (a *App) UpdateDepartemen(id int, kode, nama, kepala, deskripsi string) (*m
 // Pelatihan
 func (a *App) SimpanPelatihan(karyawanID int, nama, jenis, tanggalMulai, tanggalSelesai, lokasi, sertifikat, catatan, status string, biaya int) (*model.Pelatihan, error) {
 	p := &model.Pelatihan{
-		KaryawanID:   karyawanID,
+		KaryawanId:   karyawanID,
 		Nama:         nama,
 		Jenis:        jenis,
 		TanggalMulai: tanggalMulai,

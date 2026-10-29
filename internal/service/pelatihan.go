@@ -128,7 +128,7 @@ func (s *PelatihanService) Hapus(id int) error {
 	return s.save()
 }
 
-func (s *PelatihanService) Update(id int, karyawanID int, nama, jenis, tanggalMulai, tanggalSelesai, lokasi, sertifikat, catatan, status string, biaya int) (*model.Pelatihan, error) {
+func (s *PelatihanService) Update(id int, karyawanId int, nama, jenis, tanggalMulai, tanggalSelesai, lokasi, sertifikat, catatan, status string, biaya int) (*model.Pelatihan, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
@@ -137,7 +137,7 @@ func (s *PelatihanService) Update(id int, karyawanID int, nama, jenis, tanggalMu
 		return nil, ErrPelatihanNotFound
 	}
 
-	p.KaryawanID = karyawanID
+	p.KaryawanId = karyawanId
 	p.Nama = nama
 	p.Jenis = jenis
 	p.TanggalMulai = tanggalMulai

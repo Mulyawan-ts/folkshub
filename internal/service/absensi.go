@@ -128,7 +128,7 @@ func (s *AbsensiService) Hapus(id int) error {
 	return s.save()
 }
 
-func (s *AbsensiService) Update(id int, karyawanID int, tanggal, checkIn, checkOut, status, keterangan string) (*model.Absensi, error) {
+func (s *AbsensiService) Update(id int, karyawanId int, tanggal, checkIn, checkOut, status, keterangan string) (*model.Absensi, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
@@ -137,7 +137,7 @@ func (s *AbsensiService) Update(id int, karyawanID int, tanggal, checkIn, checkO
 		return nil, ErrAbsensiNotFound
 	}
 
-	a.KaryawanID = karyawanID
+	a.KaryawanId = karyawanId
 	a.Tanggal = tanggal
 	a.CheckIn = checkIn
 	a.CheckOut = checkOut

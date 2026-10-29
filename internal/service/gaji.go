@@ -129,7 +129,7 @@ func (s *GajiService) Hapus(id int) error {
 	return s.save()
 }
 
-func (s *GajiService) Update(id int, karyawanID int, bulan string, gajiPokok, tunjangan, potongan int, status string) (*model.Gaji, error) {
+func (s *GajiService) Update(id int, karyawanId int, bulan string, gajiPokok, tunjangan, potongan int, status string) (*model.Gaji, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
@@ -138,7 +138,7 @@ func (s *GajiService) Update(id int, karyawanID int, bulan string, gajiPokok, tu
 		return nil, ErrGajiNotFound
 	}
 
-	g.KaryawanID = karyawanID
+	g.KaryawanId = karyawanId
 	g.Bulan = bulan
 	g.GajiPokok = gajiPokok
 	g.Tunjangan = tunjangan
