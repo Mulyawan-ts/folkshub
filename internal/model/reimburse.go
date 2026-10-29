@@ -2,7 +2,7 @@ package model
 
 type Reimburse struct {
 	ID             int    `json:"id"`
-	KaryawanID     int    `json:"karyawan_id"`
+	KaryawanId    int    `json:"karyawan_id"`
 	Tanggal        string `json:"tanggal"`
 	Jenis          string `json:"jenis"`
 	Jumlah         int    `json:"jumlah"`

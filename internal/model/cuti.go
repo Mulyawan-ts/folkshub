@@ -2,7 +2,7 @@ package model
 
 type Cuti struct {
 	ID          int    `json:"id"`
-	KaryawanID  int    `json:"karyawan_id"`
+	KaryawanId  int    `json:"karyawan_id"`
 	Jenis       string `json:"jenis"` // tahunan, sakit, izin, melahirkan, lainnya
 	TanggalMulai string `json:"tanggal_mulai"`
 	TanggalSelesai string `json:"tanggal_selesai"`

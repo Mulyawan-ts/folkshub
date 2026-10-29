@@ -2,7 +2,7 @@ package model
 
 type Gaji struct {
 	ID         int    `json:"id"`
-	KaryawanID int    `json:"karyawan_id"`
+	KaryawanId int `json:"karyawan_id"`
 	Bulan      string `json:"bulan"`
 	GajiPokok  int    `json:"gaji_pokok"`
 	Tunjangan  int    `json:"tunjangan"`

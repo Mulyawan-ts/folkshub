@@ -2,7 +2,7 @@ package model
 
 type Pelatihan struct {
 	ID           int    `json:"id"`
-	KaryawanID   int    `json:"karyawan_id"`
+	KaryawanId   int `json:"karyawan_id"`
 	Nama         string `json:"nama"`
 	Jenis        string `json:"jenis"`
 	TanggalMulai string `json:"tanggal_mulai"`
