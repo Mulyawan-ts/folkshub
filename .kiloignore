@@ -1,4 +1,5 @@
 node_modules/
 dist/
+legacy-python/
 .git/
 package-lock.json
