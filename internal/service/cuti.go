@@ -15,11 +15,11 @@ var (
 	ErrCutiInvalid  = errors.New("data cuti tidak valid")
 )
 var validCutiStatus = map[string]bool{
-	"draft":      true,
-	"submitted":  true,
-	"approved":   true,
-	"rejected":   true,
-	"cancelled":  true,
+	"draft":     true,
+	"submitted": true,
+	"approved":  true,
+	"rejected":  true,
+	"cancelled": true,
 }
 
 var validCutiJenis = map[string]bool{
@@ -167,7 +167,6 @@ func (s *CutiService) Update(id int, karyawanId int, jenis, tanggalMulai, tangga
 	if s.hasOverlap(karyawanId, tanggalMulai, tanggalSelesai, id) {
 		return nil, ErrCutiOverlap
 	}
-
 
 	c.KaryawanId = karyawanId
 	c.Jenis = jenis

@@ -1,49 +1,57 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import { storeToRefs } from 'pinia'
-import {
-  useReimburseStore,
-  useKaryawanStore
-} from '../stores/index'
-import { useToastStore } from '../stores/toast'
-import AppInput from '../components/AppInput.vue'
-import AppButton from '../components/AppButton.vue'
-import AppBadge from '../components/AppBadge.vue'
-import { formatTanggal } from '../utils/tanggal'
+import { ref, onMounted } from "vue";
+import { storeToRefs } from "pinia";
+import { useReimburseStore, useKaryawanStore } from "../stores/index";
+import { useToastStore } from "../stores/toast";
+import AppInput from "../components/AppInput.vue";
+import AppButton from "../components/AppButton.vue";
+import AppBadge from "../components/AppBadge.vue";
+import { formatTanggal } from "../utils/tanggal";
 
-const reimburseStore = useReimburseStore()
-const karyawanStore = useKaryawanStore()
-const toastStore = useToastStore()
+const reimburseStore = useReimburseStore();
+const karyawanStore = useKaryawanStore();
+const toastStore = useToastStore();
 
-const { items, loading, error } = storeToRefs(reimburseStore)
+const { items, loading, error } = storeToRefs(reimburseStore);
 
-const karyawanId = ref('')
-const tanggal = ref('')
-const jenis = ref('')
-const jumlah = ref('')
-const keterangan = ref('')
-const bukti = ref('')
+const karyawanId = ref("");
+const tanggal = ref("");
+const jenis = ref("");
+const jumlah = ref("");
+const keterangan = ref("");
+const bukti = ref("");
 
 const statusVariant = (s: string) => {
   switch (s) {
-    case 'submitted': return 'warning'
-    case 'approved': return 'success'
-    case 'rejected': return 'error'
-    case 'paid': return 'success'
-    case 'draft': return 'neutral'
-    default: return 'neutral'
+    case "submitted":
+      return "warning";
+    case "approved":
+      return "success";
+    case "rejected":
+      return "error";
+    case "paid":
+      return "success";
+    case "draft":
+      return "neutral";
+    default:
+      return "neutral";
   }
-}
+};
 
 onMounted(() => {
-  karyawanStore.fetchAll()
-  reimburseStore.fetchAll()
-})
+  karyawanStore.fetchAll();
+  reimburseStore.fetchAll();
+});
 
 async function handleSimpan() {
-  if (!karyawanId.value.trim() || !tanggal.value.trim() || !jenis.value.trim() || !jumlah.value.trim()) {
-    toastStore.error('Karyawan, tanggal, jenis, dan jumlah wajib diisi')
-    return
+  if (
+    !karyawanId.value.trim() ||
+    !tanggal.value.trim() ||
+    !jenis.value.trim() ||
+    !jumlah.value.trim()
+  ) {
+    toastStore.error("Karyawan, tanggal, jenis, dan jumlah wajib diisi");
+    return;
   }
   try {
     await reimburseStore.simpan({
@@ -53,27 +61,27 @@ async function handleSimpan() {
       jumlah: Number(jumlah.value),
       keterangan: keterangan.value,
       bukti: bukti.value,
-      status: 'draft'
-    })
-    toastStore.success('Reimburse berhasil diajukan')
-    karyawanId.value = ''
-    tanggal.value = ''
-    jenis.value = ''
-    jumlah.value = ''
-    keterangan.value = ''
-    bukti.value = ''
-    reimburseStore.fetchAll()
+      status: "draft",
+    });
+    toastStore.success("Reimburse berhasil diajukan");
+    karyawanId.value = "";
+    tanggal.value = "";
+    jenis.value = "";
+    jumlah.value = "";
+    keterangan.value = "";
+    bukti.value = "";
+    reimburseStore.fetchAll();
   } catch {
     // error already set in store
   }
 }
 
 async function handleHapus(id: number) {
-  if (!confirm('Yakin ingin menghapus reimburse ini?')) return
+  if (!confirm("Yakin ingin menghapus reimburse ini?")) return;
   try {
-    await reimburseStore.hapus(id)
-    toastStore.success('Reimburse berhasil dihapus')
-    reimburseStore.fetchAll()
+    await reimburseStore.hapus(id);
+    toastStore.success("Reimburse berhasil dihapus");
+    reimburseStore.fetchAll();
   } catch {
     // error already set in store
   }
@@ -82,7 +90,9 @@ async function handleHapus(id: number) {
 
 <template>
   <div class="max-w-5xl mx-auto space-y-6">
-    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div
+      class="flex flex-col md:flex-row md:items-center justify-between gap-4"
+    >
       <div>
         <h1 class="text-2xl font-bold">Kelola Reimburse</h1>
         <p class="text-text-muted">Klaim biaya karyawan</p>
@@ -99,7 +109,12 @@ async function handleHapus(id: number) {
           <label class="label">
             <span class="label-text">Karyawan ID</span>
           </label>
-          <AppInput v-model="karyawanId" type="number" placeholder="ID karyawan" required />
+          <AppInput
+            v-model="karyawanId"
+            type="number"
+            placeholder="ID karyawan"
+            required
+          />
         </div>
 
         <div class="form-control w-full">
@@ -113,7 +128,11 @@ async function handleHapus(id: number) {
           <label class="label">
             <span class="label-text">Jenis Biaya</span>
           </label>
-          <AppInput v-model="jenis" placeholder="Contoh: Transport, Makan, Akomodasi" required />
+          <AppInput
+            v-model="jenis"
+            placeholder="Contoh: Transport, Makan, Akomodasi"
+            required
+          />
         </div>
 
         <div class="form-control w-full">
@@ -141,7 +160,10 @@ async function handleHapus(id: number) {
         <label class="label">
           <span class="label-text">Keterangan</span>
         </label>
-        <AppInput v-model="keterangan" placeholder="Alasan pengajuan reimburse" />
+        <AppInput
+          v-model="keterangan"
+          placeholder="Alasan pengajuan reimburse"
+        />
       </div>
     </form>
 
@@ -164,20 +186,27 @@ async function handleHapus(id: number) {
             <td>{{ formatTanggal(r.tanggal) }}</td>
             <td>{{ r.jenis }}</td>
             <td>{{ r.jumlah }}</td>
-            <td>{{ r.bukti || '-' }}</td>
+            <td>{{ r.bukti || "-" }}</td>
             <td>
               <AppBadge :variant="statusVariant(r.status)" size="sm">
                 {{ r.status }}
               </AppBadge>
             </td>
             <td class="text-right">
-              <AppButton variant="error" size="sm" outline @click="handleHapus(r.id)">
+              <AppButton
+                variant="error"
+                size="sm"
+                outline
+                @click="handleHapus(r.id)"
+              >
                 Hapus
               </AppButton>
             </td>
           </tr>
           <tr v-if="items.length === 0">
-            <td colspan="7" class="text-center text-text-muted py-4">Belum ada data reimburse</td>
+            <td colspan="7" class="text-center text-text-muted py-4">
+              Belum ada data reimburse
+            </td>
           </tr>
         </tbody>
       </table>
@@ -185,8 +214,8 @@ async function handleHapus(id: number) {
   </div>
 
   <style scoped>
-  .card {
-    @apply border;
-  }
+    .card {
+      @apply border;
+    }
   </style>
 </template>

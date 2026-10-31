@@ -170,13 +170,13 @@ func (a *App) SimpanCuti(karyawanID int, jenis, tanggalMulai, tanggalSelesai, ke
 	}
 
 	c := &model.Cuti{
-		KaryawanId:    karyawanID,
-		Jenis:       jenis,
-		TanggalMulai: tanggalMulai,
+		KaryawanId:     karyawanID,
+		Jenis:          jenis,
+		TanggalMulai:   tanggalMulai,
 		TanggalSelesai: tanggalSelesai,
-		JumlahHari:  jumlahHari,
-		Keterangan:  keterangan,
-		Status:      status,
+		JumlahHari:     jumlahHari,
+		Keterangan:     keterangan,
+		Status:         status,
 	}
 
 	if err := a.cutiSvc.Simpan(c); err != nil {
@@ -289,12 +289,12 @@ func (a *App) UpdateGaji(id int, karyawanID int, bulan string, gajiPokok, tunjan
 // Jabatan
 func (a *App) SimpanJabatan(kode, nama, departemen, deskripsi string, gajiPokok, tunjangan int) (*model.Jabatan, error) {
 	j := &model.Jabatan{
-		Kode:        kode,
-		Nama:        nama,
-		Departemen:  departemen,
-		GajiPokok:   gajiPokok,
-		Tunjangan:   tunjangan,
-		Deskripsi:   deskripsi,
+		Kode:       kode,
+		Nama:       nama,
+		Departemen: departemen,
+		GajiPokok:  gajiPokok,
+		Tunjangan:  tunjangan,
+		Deskripsi:  deskripsi,
 	}
 
 	if err := a.jabatanSvc.Simpan(j); err != nil {
@@ -358,16 +358,16 @@ func (a *App) SimpanPelatihan(karyawanID int, nama, jenis, tanggalMulai, tanggal
 		return nil, err
 	}
 	p := &model.Pelatihan{
-		KaryawanId:   karyawanID,
-		Nama:         nama,
-		Jenis:        jenis,
-		TanggalMulai: tanggalMulai,
+		KaryawanId:     karyawanID,
+		Nama:           nama,
+		Jenis:          jenis,
+		TanggalMulai:   tanggalMulai,
 		TanggalSelesai: tanggalSelesai,
-		Lokasi:       lokasi,
-		Biaya:        biaya,
-		Status:       status,
-		Sertifikat:   sertifikat,
-		Catatan:      catatan,
+		Lokasi:         lokasi,
+		Biaya:          biaya,
+		Status:         status,
+		Sertifikat:     sertifikat,
+		Catatan:        catatan,
 	}
 
 	if err := a.pelatihanSvc.Simpan(p); err != nil {

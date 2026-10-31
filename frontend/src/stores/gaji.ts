@@ -1,26 +1,32 @@
-import { defineStore } from 'pinia'
-import { SimpanGaji, SemuaGaji, HapusGaji, UpdateGaji, AmbilGaji } from '../../wailsjs/go/main/App'
+import { defineStore } from "pinia";
+import {
+  SimpanGaji,
+  SemuaGaji,
+  HapusGaji,
+  UpdateGaji,
+  AmbilGaji,
+} from "../../wailsjs/go/main/App";
 
-export type StatusGaji = 'draft' | 'diproses' | 'dibayar' | 'ditolak'
+export type StatusGaji = "draft" | "diproses" | "dibayar" | "ditolak";
 
 export interface Gaji {
-  id: number
-  karyawan_id: number
-  bulan: string
-  gaji_pokok: number
-  tunjangan: number
-  potongan: number
-  total?: number
-  status: string
-  tanggal_bayar?: string
-  keterangan?: string
+  id: number;
+  karyawan_id: number;
+  bulan: string;
+  gaji_pokok: number;
+  tunjangan: number;
+  potongan: number;
+  total?: number;
+  status: string;
+  tanggal_bayar?: string;
+  keterangan?: string;
 }
 
-export const useGajiStore = defineStore('gaji', {
+export const useGajiStore = defineStore("gaji", {
   state: () => ({
     items: [] as Gaji[],
     loading: false,
-    error: '' as string
+    error: "" as string,
   }),
 
   getters: {
@@ -35,28 +41,28 @@ export const useGajiStore = defineStore('gaji', {
       state.items.reduce((acc, g) => acc + (g.total ?? 0), 0),
     totalDibayar: (state) =>
       state.items
-        .filter((g) => g.status === 'dibayar')
+        .filter((g) => g.status === "dibayar")
         .reduce((acc, g) => acc + (g.total ?? 0), 0),
     belumDibayarCount: (state) =>
-      state.items.filter((g) => g.status !== 'dibayar').length
+      state.items.filter((g) => g.status !== "dibayar").length,
   },
 
   actions: {
     async fetchAll() {
-      this.loading = true
-      this.error = ''
+      this.loading = true;
+      this.error = "";
       try {
-        this.items = await SemuaGaji()
+        this.items = await SemuaGaji();
       } catch (err: any) {
-        this.error = err?.message || 'Gagal memuat data gaji'
+        this.error = err?.message || "Gagal memuat data gaji";
       } finally {
-        this.loading = false
+        this.loading = false;
       }
     },
 
-    async simpan(gaji: Omit<Gaji, 'id'>) {
-      this.loading = true
-      this.error = ''
+    async simpan(gaji: Omit<Gaji, "id">) {
+      this.loading = true;
+      this.error = "";
       try {
         const created = await SimpanGaji(
           gaji.karyawan_id,
@@ -64,35 +70,35 @@ export const useGajiStore = defineStore('gaji', {
           gaji.gaji_pokok,
           gaji.tunjangan,
           gaji.potongan,
-          gaji.status
-        )
-        this.items.push(created)
-        return created
+          gaji.status,
+        );
+        this.items.push(created);
+        return created;
       } catch (err: any) {
-        this.error = err?.message || 'Gagal menyimpan gaji'
-        throw err
+        this.error = err?.message || "Gagal menyimpan gaji";
+        throw err;
       } finally {
-        this.loading = false
+        this.loading = false;
       }
     },
 
     async hapus(id: number) {
-      this.loading = true
-      this.error = ''
+      this.loading = true;
+      this.error = "";
       try {
-        await HapusGaji(id)
-        this.items = this.items.filter((g) => g.id !== id)
+        await HapusGaji(id);
+        this.items = this.items.filter((g) => g.id !== id);
       } catch (err: any) {
-        this.error = err?.message || 'Gagal menghapus gaji'
-        throw err
+        this.error = err?.message || "Gagal menghapus gaji";
+        throw err;
       } finally {
-        this.loading = false
+        this.loading = false;
       }
     },
 
-    async update(id: number, gaji: Omit<Gaji, 'id'>) {
-      this.loading = true
-      this.error = ''
+    async update(id: number, gaji: Omit<Gaji, "id">) {
+      this.loading = true;
+      this.error = "";
       try {
         const updated = await UpdateGaji(
           id,
@@ -101,58 +107,50 @@ export const useGajiStore = defineStore('gaji', {
           gaji.gaji_pokok,
           gaji.tunjangan,
           gaji.potongan,
-          gaji.status
-        )
-        const index = this.items.findIndex((g) => g.id === id)
+          gaji.status,
+        );
+        const index = this.items.findIndex((g) => g.id === id);
         if (index !== -1) {
-          this.items[index] = updated
+          this.items[index] = updated;
         }
-        return updated
+        return updated;
       } catch (err: any) {
-        this.error = err?.message || 'Gagal mengupdate gaji'
-        throw err
+        this.error = err?.message || "Gagal mengupdate gaji";
+        throw err;
       } finally {
-        this.loading = false
+        this.loading = false;
       }
     },
 
     async ambil(id: number) {
-      this.loading = true
-      this.error = ''
+      this.loading = true;
+      this.error = "";
       try {
-        return await AmbilGaji(id)
+        return await AmbilGaji(id);
       } catch (err: any) {
-        this.error = err?.message || 'Gagal memuat detail gaji'
-        throw err
+        this.error = err?.message || "Gagal memuat detail gaji";
+        throw err;
       } finally {
-        this.loading = false
+        this.loading = false;
       }
     },
 
     async setStatus(id: number, status: string) {
-      this.loading = true
-      this.error = ''
+      this.loading = true;
+      this.error = "";
       try {
-        const updated = await UpdateGaji(
-          id,
-          0,
-          '',
-          0,
-          0,
-          0,
-          status
-        )
-        const index = this.items.findIndex((g) => g.id === id)
+        const updated = await UpdateGaji(id, 0, "", 0, 0, 0, status);
+        const index = this.items.findIndex((g) => g.id === id);
         if (index !== -1) {
-          this.items[index] = updated
+          this.items[index] = updated;
         }
-        return this.items[index]
+        return this.items[index];
       } catch (err: any) {
-        this.error = err?.message || 'Gagal mengupdate status gaji'
-        throw err
+        this.error = err?.message || "Gagal mengupdate status gaji";
+        throw err;
       } finally {
-        this.loading = false
+        this.loading = false;
       }
-    }
-  }
-})
+    },
+  },
+});

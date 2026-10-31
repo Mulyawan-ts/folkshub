@@ -1,46 +1,55 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import { storeToRefs } from 'pinia'
-import { usePelatihanStore } from '../stores/index'
-import { useToastStore } from '../stores/toast'
-import AppInput from '../components/AppInput.vue'
-import AppButton from '../components/AppButton.vue'
-import AppBadge from '../components/AppBadge.vue'
-import { formatTanggal } from '../utils/tanggal'
+import { ref, onMounted } from "vue";
+import { storeToRefs } from "pinia";
+import { usePelatihanStore } from "../stores/index";
+import { useToastStore } from "../stores/toast";
+import AppInput from "../components/AppInput.vue";
+import AppButton from "../components/AppButton.vue";
+import AppBadge from "../components/AppBadge.vue";
+import { formatTanggal } from "../utils/tanggal";
 
-const pelatihanStore = usePelatihanStore()
-const toastStore = useToastStore()
+const pelatihanStore = usePelatihanStore();
+const toastStore = useToastStore();
 
-const { items, loading, error } = storeToRefs(pelatihanStore)
+const { items, loading, error } = storeToRefs(pelatihanStore);
 
-const karyawanId = ref('')
-const nama = ref('')
-const jenis = ref('')
-const tanggalMulai = ref('')
-const tanggalSelesai = ref('')
-const lokasi = ref('')
-const biaya = ref('')
-const sertifikat = ref('')
-const catatan = ref('')
+const karyawanId = ref("");
+const nama = ref("");
+const jenis = ref("");
+const tanggalMulai = ref("");
+const tanggalSelesai = ref("");
+const lokasi = ref("");
+const biaya = ref("");
+const sertifikat = ref("");
+const catatan = ref("");
 
 const statusVariant = (s: string) => {
   switch (s) {
-    case 'berlangsung': return 'warning'
-    case 'selesai': return 'success'
-    case 'dibatalkan': return 'error'
-    case 'terjadwal': return 'neutral'
-    default: return 'neutral'
+    case "berlangsung":
+      return "warning";
+    case "selesai":
+      return "success";
+    case "dibatalkan":
+      return "error";
+    case "terjadwal":
+      return "neutral";
+    default:
+      return "neutral";
   }
-}
+};
 
 onMounted(() => {
-  pelatihanStore.fetchAll()
-})
+  pelatihanStore.fetchAll();
+});
 
 async function handleSimpan() {
-  if (!karyawanId.value.trim() || !nama.value.trim() || !tanggalMulai.value.trim()) {
-    toastStore.error('Karyawan, nama pelatihan, dan tanggal mulai wajib diisi')
-    return
+  if (
+    !karyawanId.value.trim() ||
+    !nama.value.trim() ||
+    !tanggalMulai.value.trim()
+  ) {
+    toastStore.error("Karyawan, nama pelatihan, dan tanggal mulai wajib diisi");
+    return;
   }
   try {
     await pelatihanStore.simpan({
@@ -51,32 +60,32 @@ async function handleSimpan() {
       tanggal_selesai: tanggalSelesai.value,
       lokasi: lokasi.value,
       biaya: Number(biaya.value) || 0,
-      status: 'terjadwal',
+      status: "terjadwal",
       sertifikat: sertifikat.value,
-      catatan: catatan.value
-    })
-    toastStore.success('Pelatihan berhasil disimpan')
-    karyawanId.value = ''
-    nama.value = ''
-    jenis.value = ''
-    tanggalMulai.value = ''
-    tanggalSelesai.value = ''
-    lokasi.value = ''
-    biaya.value = ''
-    sertifikat.value = ''
-    catatan.value = ''
-    pelatihanStore.fetchAll()
+      catatan: catatan.value,
+    });
+    toastStore.success("Pelatihan berhasil disimpan");
+    karyawanId.value = "";
+    nama.value = "";
+    jenis.value = "";
+    tanggalMulai.value = "";
+    tanggalSelesai.value = "";
+    lokasi.value = "";
+    biaya.value = "";
+    sertifikat.value = "";
+    catatan.value = "";
+    pelatihanStore.fetchAll();
   } catch {
     // error already set in store
   }
 }
 
 async function handleHapus(id: number) {
-  if (!confirm('Yakin ingin menghapus pelatihan ini?')) return
+  if (!confirm("Yakin ingin menghapus pelatihan ini?")) return;
   try {
-    await pelatihanStore.hapus(id)
-    toastStore.success('Pelatihan berhasil dihapus')
-    pelatihanStore.fetchAll()
+    await pelatihanStore.hapus(id);
+    toastStore.success("Pelatihan berhasil dihapus");
+    pelatihanStore.fetchAll();
   } catch {
     // error already set in store
   }
@@ -85,7 +94,9 @@ async function handleHapus(id: number) {
 
 <template>
   <div class="max-w-5xl mx-auto space-y-6">
-    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div
+      class="flex flex-col md:flex-row md:items-center justify-between gap-4"
+    >
       <div>
         <h1 class="text-2xl font-bold">Kelola Pelatihan</h1>
         <p class="text-text-muted">Data pelatihan karyawan</p>
@@ -102,7 +113,12 @@ async function handleHapus(id: number) {
           <label class="label">
             <span class="label-text">Karyawan ID</span>
           </label>
-          <AppInput v-model="karyawanId" type="number" placeholder="ID karyawan" required />
+          <AppInput
+            v-model="karyawanId"
+            type="number"
+            placeholder="ID karyawan"
+            required
+          />
         </div>
 
         <div class="form-control w-full">
@@ -158,7 +174,10 @@ async function handleHapus(id: number) {
         <label class="label">
           <span class="label-text">Sertifikat</span>
         </label>
-        <AppInput v-model="sertifikat" placeholder="Nomor atau URL sertifikat" />
+        <AppInput
+          v-model="sertifikat"
+          placeholder="Nomor atau URL sertifikat"
+        />
       </div>
 
       <div class="form-control w-full mt-4">
@@ -187,9 +206,11 @@ async function handleHapus(id: number) {
           <tr v-for="p in items" :key="p.id" class="border-b">
             <td>{{ p.karyawan_id }}</td>
             <td>{{ p.nama }}</td>
-            <td>{{ p.jenis || '-' }}</td>
+            <td>{{ p.jenis || "-" }}</td>
             <td>{{ formatTanggal(p.tanggal_mulai) }}</td>
-            <td>{{ p.tanggal_selesai ? formatTanggal(p.tanggal_selesai) : '-' }}</td>
+            <td>
+              {{ p.tanggal_selesai ? formatTanggal(p.tanggal_selesai) : "-" }}
+            </td>
             <td>{{ p.biaya }}</td>
             <td>
               <AppBadge :variant="statusVariant(p.status)" size="sm">
@@ -197,13 +218,20 @@ async function handleHapus(id: number) {
               </AppBadge>
             </td>
             <td class="text-right">
-              <AppButton variant="error" size="sm" outline @click="handleHapus(p.id)">
+              <AppButton
+                variant="error"
+                size="sm"
+                outline
+                @click="handleHapus(p.id)"
+              >
                 Hapus
               </AppButton>
             </td>
           </tr>
           <tr v-if="items.length === 0">
-            <td colspan="8" class="text-center text-text-muted py-4">Belum ada data pelatihan</td>
+            <td colspan="8" class="text-center text-text-muted py-4">
+              Belum ada data pelatihan
+            </td>
           </tr>
         </tbody>
       </table>
@@ -211,8 +239,8 @@ async function handleHapus(id: number) {
   </div>
 
   <style scoped>
-  .card {
-    @apply border;
-  }
+    .card {
+      @apply border;
+    }
   </style>
 </template>

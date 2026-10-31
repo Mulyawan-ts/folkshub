@@ -1,64 +1,65 @@
 <script setup lang="ts">
-import { computed, useId } from 'vue'
-import type { Size } from '../types/ui'
+import { computed, useId } from "vue";
+import type { Size } from "../types/ui";
 
 const props = withDefaults(
   defineProps<{
-    modelValue?: string | number
-    type?: string
-    variant?: 'default' | 'filled' | 'ghost'
-    size?: Size
-    placeholder?: string
-    label?: string
-    hint?: string
-    error?: string
-    disabled?: boolean
-    readonly?: boolean
-    required?: boolean
-    maxlength?: number
+    modelValue?: string | number;
+    type?: string;
+    variant?: "default" | "filled" | "ghost";
+    size?: Size;
+    placeholder?: string;
+    label?: string;
+    hint?: string;
+    error?: string;
+    disabled?: boolean;
+    readonly?: boolean;
+    required?: boolean;
+    maxlength?: number;
   }>(),
   {
-    modelValue: '',
-    type: 'text',
-    variant: 'default',
-    size: 'md',
-    placeholder: '',
-    label: '',
-    hint: '',
-    error: '',
+    modelValue: "",
+    type: "text",
+    variant: "default",
+    size: "md",
+    placeholder: "",
+    label: "",
+    hint: "",
+    error: "",
     disabled: false,
     readonly: false,
     required: false,
-    maxlength: undefined
-  }
-)
+    maxlength: undefined,
+  },
+);
 
 const emit = defineEmits<{
-  'update:modelValue': [value: string | number]
-  enter: [value: string | number]
-}>()
+  "update:modelValue": [value: string | number];
+  enter: [value: string | number];
+}>();
 
-const inputId = useId()
+const inputId = useId();
 
-const hasError = computed(() => props.error !== '')
+const hasError = computed(() => props.error !== "");
 
 const inputClasses = computed(() => {
-  const classes = ['input']
+  const classes = ["input"];
 
-  if (props.variant === 'filled') classes.push('input-filled')
-  if (props.variant === 'ghost') classes.push('input-ghost')
-  if (props.size !== 'md') classes.push(`input-${props.size}`)
-  if (hasError.value) classes.push('input-error')
+  if (props.variant === "filled") classes.push("input-filled");
+  if (props.variant === "ghost") classes.push("input-ghost");
+  if (props.size !== "md") classes.push(`input-${props.size}`);
+  if (hasError.value) classes.push("input-error");
 
-  return classes.join(' ')
-})
+  return classes.join(" ");
+});
 
 function onInput(event: Event) {
-  emit('update:modelValue', (event.target as HTMLInputElement).value)
+  emit("update:modelValue", (event.target as HTMLInputElement).value);
 }
 
 function onKeydown(event: KeyboardEvent) {
-  if (event.key === 'Enter') emit('enter', (event.target as HTMLInputElement).value)
+  if (event.key === "Enter")
+    emit("enter", (event.target as HTMLInputElement).value);
 }
 </script>
 

@@ -1,57 +1,66 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import { storeToRefs } from 'pinia'
-import {
-  useCutiStore,
-  useKaryawanStore
-} from '../stores/index'
-import { useToastStore } from '../stores/toast'
-import AppInput from '../components/AppInput.vue'
-import AppButton from '../components/AppButton.vue'
-import AppBadge from '../components/AppBadge.vue'
-import { formatTanggal } from '../utils/tanggal'
+import { ref, onMounted } from "vue";
+import { storeToRefs } from "pinia";
+import { useCutiStore, useKaryawanStore } from "../stores/index";
+import { useToastStore } from "../stores/toast";
+import AppInput from "../components/AppInput.vue";
+import AppButton from "../components/AppButton.vue";
+import AppBadge from "../components/AppBadge.vue";
+import { formatTanggal } from "../utils/tanggal";
 
-const cutiStore = useCutiStore()
-const karyawanStore = useKaryawanStore()
-const toastStore = useToastStore()
+const cutiStore = useCutiStore();
+const karyawanStore = useKaryawanStore();
+const toastStore = useToastStore();
 
-const { items, loading, error } = storeToRefs(cutiStore)
+const { items, loading, error } = storeToRefs(cutiStore);
 
-const karyawanId = ref('')
-const jenis = ref('tahunan')
-const tanggalMulai = ref('')
-const tanggalSelesai = ref('')
-const jumlahHari = ref('')
-const keterangan = ref('')
+const karyawanId = ref("");
+const jenis = ref("tahunan");
+const tanggalMulai = ref("");
+const tanggalSelesai = ref("");
+const jumlahHari = ref("");
+const keterangan = ref("");
 
 const jenisOptions = [
-  { value: 'tahunan', label: 'Tahunan' },
-  { value: 'sakit', label: 'Sakit' },
-  { value: 'izin', label: 'Izin' },
-  { value: 'melahirkan', label: 'Melahirkan' },
-  { value: 'lainnya', label: 'Lainnya' }
-]
+  { value: "tahunan", label: "Tahunan" },
+  { value: "sakit", label: "Sakit" },
+  { value: "izin", label: "Izin" },
+  { value: "melahirkan", label: "Melahirkan" },
+  { value: "lainnya", label: "Lainnya" },
+];
 
 const statusVariant = (s: string) => {
   switch (s) {
-    case 'submitted': return 'warning'
-    case 'approved': return 'success'
-    case 'rejected': return 'error'
-    case 'cancelled': return 'neutral'
-    case 'draft': return 'neutral'
-    default: return 'neutral'
+    case "submitted":
+      return "warning";
+    case "approved":
+      return "success";
+    case "rejected":
+      return "error";
+    case "cancelled":
+      return "neutral";
+    case "draft":
+      return "neutral";
+    default:
+      return "neutral";
   }
-}
+};
 
 onMounted(() => {
-  karyawanStore.fetchAll()
-  cutiStore.fetchAll()
-})
+  karyawanStore.fetchAll();
+  cutiStore.fetchAll();
+});
 
 async function handleSimpan() {
-  if (!karyawanId.value.trim() || !tanggalMulai.value.trim() || !tanggalSelesai.value.trim()) {
-    toastStore.error('Karyawan, tanggal mulai, dan tanggal selesai wajib diisi')
-    return
+  if (
+    !karyawanId.value.trim() ||
+    !tanggalMulai.value.trim() ||
+    !tanggalSelesai.value.trim()
+  ) {
+    toastStore.error(
+      "Karyawan, tanggal mulai, dan tanggal selesai wajib diisi",
+    );
+    return;
   }
   try {
     await cutiStore.simpan({
@@ -61,26 +70,26 @@ async function handleSimpan() {
       tanggal_selesai: tanggalSelesai.value,
       jumlah_hari: Number(jumlahHari.value) || 0,
       keterangan: keterangan.value,
-      status: 'draft'
-    })
-    toastStore.success('Cuti berhasil diajukan')
-    karyawanId.value = ''
-    tanggalMulai.value = ''
-    tanggalSelesai.value = ''
-    jumlahHari.value = ''
-    keterangan.value = ''
-    cutiStore.fetchAll()
+      status: "draft",
+    });
+    toastStore.success("Cuti berhasil diajukan");
+    karyawanId.value = "";
+    tanggalMulai.value = "";
+    tanggalSelesai.value = "";
+    jumlahHari.value = "";
+    keterangan.value = "";
+    cutiStore.fetchAll();
   } catch {
     // error already set in store
   }
 }
 
 async function handleHapus(id: number) {
-  if (!confirm('Yakin ingin menghapus pengajuan cuti ini?')) return
+  if (!confirm("Yakin ingin menghapus pengajuan cuti ini?")) return;
   try {
-    await cutiStore.hapus(id)
-    toastStore.success('Cuti berhasil dihapus')
-    cutiStore.fetchAll()
+    await cutiStore.hapus(id);
+    toastStore.success("Cuti berhasil dihapus");
+    cutiStore.fetchAll();
   } catch {
     // error already set in store
   }
@@ -89,7 +98,9 @@ async function handleHapus(id: number) {
 
 <template>
   <div class="max-w-5xl mx-auto space-y-6">
-    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div
+      class="flex flex-col md:flex-row md:items-center justify-between gap-4"
+    >
       <div>
         <h1 class="text-2xl font-bold">Kelola Cuti</h1>
         <p class="text-text-muted">Pengajuan cuti karyawan</p>
@@ -106,7 +117,12 @@ async function handleHapus(id: number) {
           <label class="label">
             <span class="label-text">Karyawan ID</span>
           </label>
-          <AppInput v-model="karyawanId" type="number" placeholder="ID karyawan" required />
+          <AppInput
+            v-model="karyawanId"
+            type="number"
+            placeholder="ID karyawan"
+            required
+          />
         </div>
 
         <div class="form-control w-full">
@@ -114,7 +130,11 @@ async function handleHapus(id: number) {
             <span class="label-text">Jenis Cuti</span>
           </label>
           <select v-model="jenis" class="select select-bordered w-full">
-            <option v-for="opt in jenisOptions" :key="opt.value" :value="opt.value">
+            <option
+              v-for="opt in jenisOptions"
+              :key="opt.value"
+              :value="opt.value"
+            >
               {{ opt.label }}
             </option>
           </select>
@@ -182,13 +202,20 @@ async function handleHapus(id: number) {
               </AppBadge>
             </td>
             <td class="text-right">
-              <AppButton variant="error" size="sm" outline @click="handleHapus(c.id)">
+              <AppButton
+                variant="error"
+                size="sm"
+                outline
+                @click="handleHapus(c.id)"
+              >
                 Hapus
               </AppButton>
             </td>
           </tr>
           <tr v-if="items.length === 0">
-            <td colspan="7" class="text-center text-text-muted py-4">Belum ada data cuti</td>
+            <td colspan="7" class="text-center text-text-muted py-4">
+              Belum ada data cuti
+            </td>
           </tr>
         </tbody>
       </table>
@@ -196,8 +223,8 @@ async function handleHapus(id: number) {
   </div>
 
   <style scoped>
-  .card {
-    @apply border;
-  }
+    .card {
+      @apply border;
+    }
   </style>
 </template>

@@ -1,54 +1,54 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import { storeToRefs } from 'pinia'
-import { useDepartemenStore } from '../stores/index'
-import { useToastStore } from '../stores/toast'
-import AppInput from '../components/AppInput.vue'
-import AppButton from '../components/AppButton.vue'
+import { ref, onMounted } from "vue";
+import { storeToRefs } from "pinia";
+import { useDepartemenStore } from "../stores/index";
+import { useToastStore } from "../stores/toast";
+import AppInput from "../components/AppInput.vue";
+import AppButton from "../components/AppButton.vue";
 
-const departemenStore = useDepartemenStore()
-const toastStore = useToastStore()
+const departemenStore = useDepartemenStore();
+const toastStore = useToastStore();
 
-const { items, loading, error } = storeToRefs(departemenStore)
+const { items, loading, error } = storeToRefs(departemenStore);
 
-const kode = ref('')
-const nama = ref('')
-const kepala = ref('')
-const deskripsi = ref('')
+const kode = ref("");
+const nama = ref("");
+const kepala = ref("");
+const deskripsi = ref("");
 
 onMounted(() => {
-  departemenStore.fetchAll()
-})
+  departemenStore.fetchAll();
+});
 
 async function handleSimpan() {
   if (!kode.value.trim() || !nama.value.trim()) {
-    toastStore.error('Kode dan nama departemen wajib diisi')
-    return
+    toastStore.error("Kode dan nama departemen wajib diisi");
+    return;
   }
   try {
     await departemenStore.simpan({
       kode: kode.value,
       nama: nama.value,
       kepala: kepala.value,
-      deskripsi: deskripsi.value
-    })
-    toastStore.success('Departemen berhasil disimpan')
-    kode.value = ''
-    nama.value = ''
-    kepala.value = ''
-    deskripsi.value = ''
-    departemenStore.fetchAll()
+      deskripsi: deskripsi.value,
+    });
+    toastStore.success("Departemen berhasil disimpan");
+    kode.value = "";
+    nama.value = "";
+    kepala.value = "";
+    deskripsi.value = "";
+    departemenStore.fetchAll();
   } catch {
     // error already set in store
   }
 }
 
 async function handleHapus(id: number) {
-  if (!confirm('Yakin ingin menghapus departemen ini?')) return
+  if (!confirm("Yakin ingin menghapus departemen ini?")) return;
   try {
-    await departemenStore.hapus(id)
-    toastStore.success('Departemen berhasil dihapus')
-    departemenStore.fetchAll()
+    await departemenStore.hapus(id);
+    toastStore.success("Departemen berhasil dihapus");
+    departemenStore.fetchAll();
   } catch {
     // error already set in store
   }
@@ -57,7 +57,9 @@ async function handleHapus(id: number) {
 
 <template>
   <div class="max-w-5xl mx-auto space-y-6">
-    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div
+      class="flex flex-col md:flex-row md:items-center justify-between gap-4"
+    >
       <div>
         <h1 class="text-2xl font-bold">Kelola Departemen</h1>
         <p class="text-text-muted">Data departemen organisasi</p>
@@ -81,7 +83,11 @@ async function handleHapus(id: number) {
           <label class="label">
             <span class="label-text">Nama Departemen</span>
           </label>
-          <AppInput v-model="nama" placeholder="Contoh: Human Resources" required />
+          <AppInput
+            v-model="nama"
+            placeholder="Contoh: Human Resources"
+            required
+          />
         </div>
 
         <div class="form-control w-full">
@@ -121,16 +127,23 @@ async function handleHapus(id: number) {
           <tr v-for="d in items" :key="d.id" class="border-b">
             <td>{{ d.kode }}</td>
             <td>{{ d.nama }}</td>
-            <td>{{ d.kepala || '-' }}</td>
-            <td>{{ d.deskripsi || '-' }}</td>
+            <td>{{ d.kepala || "-" }}</td>
+            <td>{{ d.deskripsi || "-" }}</td>
             <td class="text-right">
-              <AppButton variant="error" size="sm" outline @click="handleHapus(d.id)">
+              <AppButton
+                variant="error"
+                size="sm"
+                outline
+                @click="handleHapus(d.id)"
+              >
                 Hapus
               </AppButton>
             </td>
           </tr>
           <tr v-if="items.length === 0">
-            <td colspan="5" class="text-center text-text-muted py-4">Belum ada data departemen</td>
+            <td colspan="5" class="text-center text-text-muted py-4">
+              Belum ada data departemen
+            </td>
           </tr>
         </tbody>
       </table>
@@ -138,8 +151,8 @@ async function handleHapus(id: number) {
   </div>
 
   <style scoped>
-  .card {
-    @apply border;
-  }
+    .card {
+      @apply border;
+    }
   </style>
 </template>

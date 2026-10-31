@@ -1,66 +1,70 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import { storeToRefs } from 'pinia'
-import { useKaryawanStore } from '../stores/karyawan'
-import { useToastStore } from '../stores/toast'
-import AppInput from '../components/AppInput.vue'
-import AppButton from '../components/AppButton.vue'
-import AppBadge from '../components/AppBadge.vue'
+import { ref, onMounted } from "vue";
+import { storeToRefs } from "pinia";
+import { useKaryawanStore } from "../stores/karyawan";
+import { useToastStore } from "../stores/toast";
+import AppInput from "../components/AppInput.vue";
+import AppButton from "../components/AppButton.vue";
+import AppBadge from "../components/AppBadge.vue";
 
-const karyawanStore = useKaryawanStore()
-const toastStore = useToastStore()
+const karyawanStore = useKaryawanStore();
+const toastStore = useToastStore();
 
-const { items, loading, error } = storeToRefs(karyawanStore)
+const { items, loading, error } = storeToRefs(karyawanStore);
 
-const nama = ref('')
-const email = ref('')
-const status = ref('tetap')
+const nama = ref("");
+const email = ref("");
+const status = ref("tetap");
 
 const statusOptions = [
-  { value: 'tetap', label: 'Tetap' },
-  { value: 'outsourcing', label: 'Outsourcing' },
-  { value: 'magang', label: 'Magang' }
-]
+  { value: "tetap", label: "Tetap" },
+  { value: "outsourcing", label: "Outsourcing" },
+  { value: "magang", label: "Magang" },
+];
 
 const itemStatusVariant = (s: string) => {
   switch (s) {
-    case 'tetap': return 'success'
-    case 'outsourcing': return 'warning'
-    case 'magang': return 'info'
-    default: return 'neutral'
+    case "tetap":
+      return "success";
+    case "outsourcing":
+      return "warning";
+    case "magang":
+      return "info";
+    default:
+      return "neutral";
   }
-}
+};
 
 onMounted(() => {
-  karyawanStore.fetchAll()
-})
+  karyawanStore.fetchAll();
+});
 
 async function handleSimpan() {
   if (!nama.value.trim() || !email.value.trim()) {
-    toastStore.error('Nama dan email wajib diisi')
-    return
+    toastStore.error("Nama dan email wajib diisi");
+    return;
   }
 
   try {
     await karyawanStore.simpan({
       nama: nama.value.trim(),
       email: email.value.trim(),
-      status: status.value
-    })
-    toastStore.success('Karyawan berhasil disimpan')
-    nama.value = ''
-    email.value = ''
-    status.value = 'tetap'
+      status: status.value,
+    });
+    toastStore.success("Karyawan berhasil disimpan");
+    nama.value = "";
+    email.value = "";
+    status.value = "tetap";
   } catch {
     // error already set in store
   }
 }
 
 async function handleHapus(id: number) {
-  if (!confirm('Yakin ingin menghapus karyawan ini?')) return
+  if (!confirm("Yakin ingin menghapus karyawan ini?")) return;
   try {
-    await karyawanStore.hapus(id)
-    toastStore.success('Karyawan berhasil dihapus')
+    await karyawanStore.hapus(id);
+    toastStore.success("Karyawan berhasil dihapus");
   } catch {
     // error already set in store
   }
@@ -69,10 +73,14 @@ async function handleHapus(id: number) {
 
 <template>
   <div class="max-w-4xl mx-auto space-y-6">
-    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div
+      class="flex flex-col md:flex-row md:items-center justify-between gap-4"
+    >
       <div>
         <h1 class="text-2xl font-bold">Kelola Karyawan</h1>
-        <p class="text-text-muted">Data karyawan (tetap, outsourcing, magang)</p>
+        <p class="text-text-muted">
+          Data karyawan (tetap, outsourcing, magang)
+        </p>
       </div>
     </div>
 
@@ -93,7 +101,12 @@ async function handleHapus(id: number) {
           <label class="label">
             <span class="label-text">Email</span>
           </label>
-          <AppInput v-model="email" type="email" placeholder="nama@contoh.com" required />
+          <AppInput
+            v-model="email"
+            type="email"
+            placeholder="nama@contoh.com"
+            required
+          />
         </div>
 
         <div class="form-control w-full">
@@ -101,7 +114,11 @@ async function handleHapus(id: number) {
             <span class="label-text">Status</span>
           </label>
           <select v-model="status" class="select select-bordered w-full">
-            <option v-for="opt in statusOptions" :key="opt.value" :value="opt.value">
+            <option
+              v-for="opt in statusOptions"
+              :key="opt.value"
+              :value="opt.value"
+            >
               {{ opt.label }}
             </option>
           </select>
@@ -135,13 +152,20 @@ async function handleHapus(id: number) {
               </AppBadge>
             </td>
             <td class="text-right">
-              <AppButton variant="error" size="sm" outline @click="handleHapus(k.id)">
+              <AppButton
+                variant="error"
+                size="sm"
+                outline
+                @click="handleHapus(k.id)"
+              >
                 Hapus
               </AppButton>
             </td>
           </tr>
           <tr v-if="items.length === 0">
-            <td colspan="4" class="text-center text-text-muted py-4">Belum ada data karyawan</td>
+            <td colspan="4" class="text-center text-text-muted py-4">
+              Belum ada data karyawan
+            </td>
           </tr>
         </tbody>
       </table>

@@ -1,28 +1,35 @@
-import { defineStore } from 'pinia'
-import { SimpanCuti, SemuaCuti, HapusCuti, UpdateCuti, AmbilCuti } from '../../wailsjs/go/main/App'
+import { defineStore } from "pinia";
+import {
+  SimpanCuti,
+  SemuaCuti,
+  HapusCuti,
+  UpdateCuti,
+  AmbilCuti,
+} from "../../wailsjs/go/main/App";
 
-export type StatusCuti = 'draft' | 'submitted' | 'approved' | 'rejected' | 'cancelled'
+export type StatusCuti =
+  "draft" | "submitted" | "approved" | "rejected" | "cancelled";
 
-export type JenisCuti = 'tahunan' | 'sakit' | 'izin' | 'melahirkan' | 'lainnya'
+export type JenisCuti = "tahunan" | "sakit" | "izin" | "melahirkan" | "lainnya";
 
 export interface Cuti {
-  id: number
-  karyawan_id: number
-  jenis: string
-  tanggal_mulai: string
-  tanggal_selesai: string
-  jumlah_hari: number
-  keterangan: string
-  status: string
-  catatan_approval?: string
-  disetujui_oleh?: number
+  id: number;
+  karyawan_id: number;
+  jenis: string;
+  tanggal_mulai: string;
+  tanggal_selesai: string;
+  jumlah_hari: number;
+  keterangan: string;
+  status: string;
+  catatan_approval?: string;
+  disetujui_oleh?: number;
 }
 
-export const useCutiStore = defineStore('cuti', {
+export const useCutiStore = defineStore("cuti", {
   state: () => ({
     items: [] as Cuti[],
     loading: false,
-    error: '' as string
+    error: "" as string,
   }),
 
   getters: {
@@ -34,27 +41,27 @@ export const useCutiStore = defineStore('cuti', {
     byJenis: (state) => (jenis: JenisCuti) =>
       state.items.filter((c) => c.jenis === jenis),
     pendingCount: (state) =>
-      state.items.filter((c) => c.status === 'submitted').length,
+      state.items.filter((c) => c.status === "submitted").length,
     approvedCount: (state) =>
-      state.items.filter((c) => c.status === 'approved').length
+      state.items.filter((c) => c.status === "approved").length,
   },
 
   actions: {
     async fetchAll() {
-      this.loading = true
-      this.error = ''
+      this.loading = true;
+      this.error = "";
       try {
-        this.items = await SemuaCuti()
+        this.items = await SemuaCuti();
       } catch (err: any) {
-        this.error = err?.message || 'Gagal memuat data cuti'
+        this.error = err?.message || "Gagal memuat data cuti";
       } finally {
-        this.loading = false
+        this.loading = false;
       }
     },
 
-    async simpan(cuti: Omit<Cuti, 'id'>) {
-      this.loading = true
-      this.error = ''
+    async simpan(cuti: Omit<Cuti, "id">) {
+      this.loading = true;
+      this.error = "";
       try {
         const created = await SimpanCuti(
           cuti.karyawan_id,
@@ -63,35 +70,35 @@ export const useCutiStore = defineStore('cuti', {
           cuti.tanggal_selesai,
           cuti.keterangan,
           cuti.status,
-          cuti.jumlah_hari
-        )
-        this.items.push(created)
-        return created
+          cuti.jumlah_hari,
+        );
+        this.items.push(created);
+        return created;
       } catch (err: any) {
-        this.error = err?.message || 'Gagal menyimpan cuti'
-        throw err
+        this.error = err?.message || "Gagal menyimpan cuti";
+        throw err;
       } finally {
-        this.loading = false
+        this.loading = false;
       }
     },
 
     async hapus(id: number) {
-      this.loading = true
-      this.error = ''
+      this.loading = true;
+      this.error = "";
       try {
-        await HapusCuti(id)
-        this.items = this.items.filter((c) => c.id !== id)
+        await HapusCuti(id);
+        this.items = this.items.filter((c) => c.id !== id);
       } catch (err: any) {
-        this.error = err?.message || 'Gagal menghapus cuti'
-        throw err
+        this.error = err?.message || "Gagal menghapus cuti";
+        throw err;
       } finally {
-        this.loading = false
+        this.loading = false;
       }
     },
 
-    async update(id: number, cuti: Omit<Cuti, 'id'>) {
-      this.loading = true
-      this.error = ''
+    async update(id: number, cuti: Omit<Cuti, "id">) {
+      this.loading = true;
+      this.error = "";
       try {
         const updated = await UpdateCuti(
           id,
@@ -101,32 +108,32 @@ export const useCutiStore = defineStore('cuti', {
           cuti.tanggal_selesai,
           cuti.keterangan,
           cuti.status,
-          cuti.jumlah_hari
-        )
-        const index = this.items.findIndex((c) => c.id === id)
+          cuti.jumlah_hari,
+        );
+        const index = this.items.findIndex((c) => c.id === id);
         if (index !== -1) {
-          this.items[index] = updated
+          this.items[index] = updated;
         }
-        return updated
+        return updated;
       } catch (err: any) {
-        this.error = err?.message || 'Gagal mengupdate cuti'
-        throw err
+        this.error = err?.message || "Gagal mengupdate cuti";
+        throw err;
       } finally {
-        this.loading = false
+        this.loading = false;
       }
     },
 
     async ambil(id: number) {
-      this.loading = true
-      this.error = ''
+      this.loading = true;
+      this.error = "";
       try {
-        return await AmbilCuti(id)
+        return await AmbilCuti(id);
       } catch (err: any) {
-        this.error = err?.message || 'Gagal memuat detail cuti'
-        throw err
+        this.error = err?.message || "Gagal memuat detail cuti";
+        throw err;
       } finally {
-        this.loading = false
+        this.loading = false;
       }
-    }
-  }
-})
+    },
+  },
+});
