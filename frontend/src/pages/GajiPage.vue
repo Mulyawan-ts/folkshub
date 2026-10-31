@@ -5,6 +5,7 @@ import { useGajiStore, useKaryawanStore } from "../stores/index";
 import { useToastStore } from "../stores/toast";
 import AppInput from "../components/AppInput.vue";
 import AppAlert from "../components/AppAlert.vue";
+import AppConfirm from "../components/AppConfirm.vue";
 import AppButton from "../components/AppButton.vue";
 import AppCard from "../components/AppCard.vue";
 import AppBadge from "../components/AppBadge.vue";
@@ -25,6 +26,8 @@ const bulan = ref("");
 const gajiPokok = ref("");
 const tunjangan = ref("");
 const potongan = ref("");
+const konfirmasiHapus = ref(false);
+const hapusId = ref<number | null>(null);
 const cari = ref("");
 
 const filteredItems = computed(() =>
@@ -75,8 +78,17 @@ async function handleSimpan() {
   }
 }
 
-async function handleHapus(id: number) {
-  if (!confirm("Yakin ingin menghapus data gaji ini?")) return;
+function mintaHapus(id: number) {
+  hapusId.value = id;
+  konfirmasiHapus.value = true;
+}
+
+async function jalankanHapus() {
+  const id = hapusId.value;
+  konfirmasiHapus.value = false;
+  hapusId.value = null;
+  if (id === null) return;
+
   try {
     await gajiStore.hapus(id);
     toastStore.success("Gaji berhasil dihapus");
@@ -193,7 +205,7 @@ async function handleHapus(id: number) {
             variant="error"
             size="sm"
             outline
-            @click="handleHapus(g.id)"
+            @click="mintaHapus(g.id)"
           >
             Hapus
           </AppButton>
@@ -208,5 +220,15 @@ async function handleHapus(id: number) {
         :mencari="!!cari"
       />
     </TabelData>
+
+    <AppConfirm
+      :terbuka="konfirmasiHapus"
+      judul="Hapus gaji"
+      pesan="Yakin ingin menghapus data gaji ini?"
+      confirm-label="Hapus"
+      variant="error"
+      @konfirmasi="jalankanHapus"
+      @batal="konfirmasiHapus = false"
+    />
   </div>
 </template>

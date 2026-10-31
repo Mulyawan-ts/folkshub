@@ -5,6 +5,7 @@ import { useDepartemenStore } from "../stores/index";
 import { useToastStore } from "../stores/toast";
 import AppInput from "../components/AppInput.vue";
 import AppAlert from "../components/AppAlert.vue";
+import AppConfirm from "../components/AppConfirm.vue";
 import AppButton from "../components/AppButton.vue";
 import AppCard from "../components/AppCard.vue";
 import TabelData from "../components/TabelData.vue";
@@ -20,6 +21,8 @@ const kode = ref("");
 const nama = ref("");
 const kepala = ref("");
 const deskripsi = ref("");
+const konfirmasiHapus = ref(false);
+const hapusId = ref<number | null>(null);
 const cari = ref("");
 
 const filteredItems = computed(() =>
@@ -55,8 +58,17 @@ async function handleSimpan() {
   }
 }
 
-async function handleHapus(id: number) {
-  if (!confirm("Yakin ingin menghapus departemen ini?")) return;
+function mintaHapus(id: number) {
+  hapusId.value = id;
+  konfirmasiHapus.value = true;
+}
+
+async function jalankanHapus() {
+  const id = hapusId.value;
+  konfirmasiHapus.value = false;
+  hapusId.value = null;
+  if (id === null) return;
+
   try {
     await departemenStore.hapus(id);
     toastStore.success("Departemen berhasil dihapus");
@@ -147,7 +159,7 @@ async function handleHapus(id: number) {
             variant="error"
             size="sm"
             outline
-            @click="handleHapus(d.id)"
+            @click="mintaHapus(d.id)"
           >
             Hapus
           </AppButton>
@@ -162,5 +174,15 @@ async function handleHapus(id: number) {
         :mencari="!!cari"
       />
     </TabelData>
+
+    <AppConfirm
+      :terbuka="konfirmasiHapus"
+      judul="Hapus departemen"
+      pesan="Yakin ingin menghapus departemen ini?"
+      confirm-label="Hapus"
+      variant="error"
+      @konfirmasi="jalankanHapus"
+      @batal="konfirmasiHapus = false"
+    />
   </div>
 </template>

@@ -5,6 +5,7 @@ import { useKaryawanStore } from "../stores/karyawan";
 import { useToastStore } from "../stores/toast";
 import AppInput from "../components/AppInput.vue";
 import AppAlert from "../components/AppAlert.vue";
+import AppConfirm from "../components/AppConfirm.vue";
 import AppButton from "../components/AppButton.vue";
 import AppCard from "../components/AppCard.vue";
 import AppCardItem from "../components/AppCardItem.vue";
@@ -21,6 +22,8 @@ const nama = ref("");
 const email = ref("");
 const status = ref("tetap");
 const cari = ref("");
+const konfirmasiHapus = ref(false);
+const hapusId = ref<number | null>(null);
 
 const filteredItems = computed(() =>
   items.value.filter((k) => cocok(cari.value, k.nama, k.email, k.status)),
@@ -57,8 +60,17 @@ async function handleSimpan() {
   }
 }
 
-async function handleHapus(id: number) {
-  if (!confirm("Yakin ingin menghapus karyawan ini?")) return;
+function mintaHapus(id: number) {
+  hapusId.value = id;
+  konfirmasiHapus.value = true;
+}
+
+async function jalankanHapus() {
+  const id = hapusId.value;
+  konfirmasiHapus.value = false;
+  hapusId.value = null;
+  if (id === null) return;
+
   try {
     await karyawanStore.hapus(id);
     toastStore.success("Karyawan berhasil dihapus");
@@ -148,8 +160,18 @@ async function handleHapus(id: number) {
         :status="k.status"
         :status-variant="statusVariant(k.status, KARYAWAN_STATUS)"
         hapus-label="Hapus"
-        @hapus="handleHapus(k.id)"
+        @hapus="mintaHapus(k.id)"
       />
     </DaftarData>
+
+    <AppConfirm
+      :terbuka="konfirmasiHapus"
+      judul="Hapus karyawan"
+      pesan="Yakin ingin menghapus karyawan ini?"
+      confirm-label="Hapus"
+      variant="error"
+      @konfirmasi="jalankanHapus"
+      @batal="konfirmasiHapus = false"
+    />
   </div>
 </template>
