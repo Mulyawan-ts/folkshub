@@ -4,6 +4,7 @@ import { storeToRefs } from "pinia";
 import { useKaryawanStore } from "../stores/karyawan";
 import { useToastStore } from "../stores/toast";
 import AppInput from "../components/AppInput.vue";
+import AppAlert from "../components/AppAlert.vue";
 import AppButton from "../components/AppButton.vue";
 import AppCard from "../components/AppCard.vue";
 import AppCardItem from "../components/AppCardItem.vue";
@@ -80,9 +81,13 @@ async function handleHapus(id: number) {
       </div>
     </div>
 
-    <div v-if="error" class="alert alert-error">
-      <span>{{ error }}</span>
-    </div>
+    <AppAlert
+      v-if="error"
+      variant="error"
+      :pesan="error"
+      dismissible
+      @dismiss="karyawanStore.bersihkanError"
+    />
 
     <AppCard as="form" padding="6" @submit.prevent="handleSimpan">
       <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
