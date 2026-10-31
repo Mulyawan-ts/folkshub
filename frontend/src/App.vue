@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watchEffect } from "vue";
+import { computed, ref, watchEffect } from "vue";
 import { storeToRefs } from "pinia";
 import AppToast from "./components/AppToast.vue";
 import AppSwitch from "./components/AppSwitch.vue";
@@ -29,8 +29,9 @@ const pages = [
 
 const activePage = ref("karyawan");
 
-const PageComponent =
-  pages.find((p) => p.id === activePage.value)?.component || KaryawanPage;
+const PageComponent = computed(
+  () => pages.find((p) => p.id === activePage.value)?.component || KaryawanPage,
+);
 
 const THEME_KEY = "folkshub-theme";
 const dark = ref(localStorage.getItem(THEME_KEY) === "business");
