@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"path/filepath"
 
 	"app/internal/model"
@@ -96,11 +95,6 @@ func (a *App) shutdown(_ context.Context) {
 	} {
 		_ = penutup.Close()
 	}
-}
-
-// Greet returns a greeting for the given name
-func (a *App) Greet(name string) string {
-	return fmt.Sprintf("Hello %s, It's show time!", name)
 }
 
 // Karyawan

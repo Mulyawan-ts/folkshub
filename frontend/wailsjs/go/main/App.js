@@ -34,10 +34,6 @@ export function AmbilReimburse(arg1) {
   return window['go']['main']['App']['AmbilReimburse'](arg1);
 }
 
-export function Greet(arg1) {
-  return window['go']['main']['App']['Greet'](arg1);
-}
-
 export function HapusAbsensi(arg1) {
   return window['go']['main']['App']['HapusAbsensi'](arg1);
 }

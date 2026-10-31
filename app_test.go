@@ -385,13 +385,6 @@ func TestAppPelatihan(t *testing.T) {
 	}
 }
 
-func TestAppGreet(t *testing.T) {
-	a := newTestApp(t)
-	if got := a.Greet("Andi"); got != "Hello Andi, It's show time!" {
-		t.Fatalf("greet: %q", got)
-	}
-}
-
 func TestShutdownMenutupSemuaKoneksi(t *testing.T) {
 	a, err := newApp(t.TempDir())
 	if err != nil {

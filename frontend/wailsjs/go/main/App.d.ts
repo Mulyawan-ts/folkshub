@@ -18,8 +18,6 @@ export function AmbilPelatihan(arg1:number):Promise<model.Pelatihan>;
 
 export function AmbilReimburse(arg1:number):Promise<model.Reimburse>;
 
-export function Greet(arg1:string):Promise<string>;
-
 export function HapusAbsensi(arg1:number):Promise<void>;
 
 export function HapusCuti(arg1:number):Promise<void>;
