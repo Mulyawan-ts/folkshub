@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import CariInput from "./CariInput.vue";
+import AppCard from "./AppCard.vue";
 
 withDefaults(
   defineProps<{
@@ -18,7 +19,7 @@ defineEmits<{
 </script>
 
 <template>
-  <div class="card p-4 bg-base-100 shadow-sm overflow-x-auto">
+  <AppCard scroll>
     <CariInput
       :model-value="cari"
       :placeholder="placeholder"
@@ -34,5 +35,5 @@ defineEmits<{
         <slot />
       </tbody>
     </table>
-  </div>
+  </AppCard>
 </template>

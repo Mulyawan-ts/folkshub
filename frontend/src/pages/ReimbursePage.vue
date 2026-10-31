@@ -5,6 +5,7 @@ import { useReimburseStore, useKaryawanStore } from "../stores/index";
 import { useToastStore } from "../stores/toast";
 import AppInput from "../components/AppInput.vue";
 import AppButton from "../components/AppButton.vue";
+import AppCard from "../components/AppCard.vue";
 import AppBadge from "../components/AppBadge.vue";
 import TabelData from "../components/TabelData.vue";
 import TabelKosong from "../components/TabelKosong.vue";
@@ -105,7 +106,7 @@ async function handleHapus(id: number) {
       <span>{{ error }}</span>
     </div>
 
-    <form @submit.prevent="handleSimpan" class="card p-6 bg-base-100 shadow-sm">
+    <AppCard as="form" padding="6" @submit.prevent="handleSimpan">
       <div class="grid grid-cols-1 md:grid-cols-6 gap-4 items-end">
         <div class="form-control w-full">
           <label class="label">
@@ -167,7 +168,7 @@ async function handleHapus(id: number) {
           placeholder="Alasan pengajuan reimburse"
         />
       </div>
-    </form>
+    </AppCard>
 
     <TabelData
       v-model:cari="cari"
