@@ -34,22 +34,22 @@ const form = useForm({
     sertifikat: "",
     catatan: "",
   },
-  validasi: (v) =>
-    !v.karyawanId.trim() || !v.nama.trim() || !v.tanggalMulai.trim()
+  validasi: (nilai) =>
+    !nilai.karyawanId.trim() || !nilai.nama.trim() || !nilai.tanggalMulai.trim()
       ? "Karyawan, nama pelatihan, dan tanggal mulai wajib diisi"
       : "",
-  aksi: (v) =>
+  aksi: (nilai) =>
     pelatihanStore.simpan({
-      karyawan_id: Number(v.karyawanId),
-      nama: v.nama,
-      jenis: v.jenis,
-      tanggal_mulai: v.tanggalMulai,
-      tanggal_selesai: v.tanggalSelesai,
-      lokasi: v.lokasi,
-      biaya: Number(v.biaya) || 0,
+      karyawan_id: Number(nilai.karyawanId),
+      nama: nilai.nama,
+      jenis: nilai.jenis,
+      tanggal_mulai: nilai.tanggalMulai,
+      tanggal_selesai: nilai.tanggalSelesai,
+      lokasi: nilai.lokasi,
+      biaya: Number(nilai.biaya) || 0,
       status: "terjadwal",
-      sertifikat: v.sertifikat,
-      catatan: v.catatan,
+      sertifikat: nilai.sertifikat,
+      catatan: nilai.catatan,
     }),
   pesanSukses: "Pelatihan berhasil disimpan",
   toast: toastStore,
@@ -60,17 +60,17 @@ const hapusId = ref<number | null>(null);
 const cari = ref("");
 
 const filteredItems = computed(() =>
-  items.value.filter((p) =>
+  items.value.filter((pelatihan) =>
     cocok(
       cari.value,
-      p.karyawan_id,
-      p.nama,
-      p.jenis,
-      p.lokasi,
-      p.status,
-      p.tanggal_mulai,
-      p.tanggal_selesai,
-      p.catatan,
+      pelatihan.karyawan_id,
+      pelatihan.nama,
+      pelatihan.jenis,
+      pelatihan.lokasi,
+      pelatihan.status,
+      pelatihan.tanggal_mulai,
+      pelatihan.tanggal_selesai,
+      pelatihan.catatan,
     ),
   ),
 );
@@ -214,24 +214,32 @@ async function jalankanHapus() {
         <th class="text-right">Aksi</th>
       </template>
 
-      <tr v-for="p in filteredItems" :key="p.id" class="border-b">
-        <td>{{ p.karyawan_id }}</td>
-        <td>{{ p.nama }}</td>
-        <td>{{ p.jenis || "-" }}</td>
-        <td>{{ formatTanggal(p.tanggal_mulai) }}</td>
+      <tr
+        v-for="pelatihan in filteredItems"
+        :key="pelatihan.id"
+        class="border-b"
+      >
+        <td>{{ pelatihan.karyawan_id }}</td>
+        <td>{{ pelatihan.nama }}</td>
+        <td>{{ pelatihan.jenis || "-" }}</td>
+        <td>{{ formatTanggal(pelatihan.tanggal_mulai) }}</td>
         <td>
-          {{ p.tanggal_selesai ? formatTanggal(p.tanggal_selesai) : "-" }}
+          {{
+            pelatihan.tanggal_selesai
+              ? formatTanggal(pelatihan.tanggal_selesai)
+              : "-"
+          }}
         </td>
-        <td>{{ p.biaya }}</td>
+        <td>{{ pelatihan.biaya }}</td>
         <td>
-          <AppStatus :status="p.status" :map="PELATIHAN_STATUS" />
+          <AppStatus :status="pelatihan.status" :map="PELATIHAN_STATUS" />
         </td>
         <td class="text-right">
           <AppButton
             variant="error"
             size="sm"
             outline
-            @click="mintaHapus(p.id)"
+            @click="mintaHapus(pelatihan.id)"
           >
             Hapus
           </AppButton>

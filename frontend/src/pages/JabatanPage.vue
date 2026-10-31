@@ -28,16 +28,18 @@ const form = useForm({
     tunjangan: "",
     deskripsi: "",
   },
-  validasi: (v) =>
-    !v.kode.trim() || !v.nama.trim() ? "Kode dan nama jabatan wajib diisi" : "",
-  aksi: (v) =>
+  validasi: (nilai) =>
+    !nilai.kode.trim() || !nilai.nama.trim()
+      ? "Kode dan nama jabatan wajib diisi"
+      : "",
+  aksi: (nilai) =>
     jabatanStore.simpan({
-      kode: v.kode,
-      nama: v.nama,
-      departemen: v.departemen,
-      deskripsi: v.deskripsi,
-      gaji_pokok: Number(v.gajiPokok) || 0,
-      tunjangan: Number(v.tunjangan) || 0,
+      kode: nilai.kode,
+      nama: nilai.nama,
+      departemen: nilai.departemen,
+      deskripsi: nilai.deskripsi,
+      gaji_pokok: Number(nilai.gajiPokok) || 0,
+      tunjangan: Number(nilai.tunjangan) || 0,
     }),
   pesanSukses: "Jabatan berhasil disimpan",
   toast: toastStore,
@@ -48,8 +50,14 @@ const hapusId = ref<number | null>(null);
 const cari = ref("");
 
 const filteredItems = computed(() =>
-  items.value.filter((j) =>
-    cocok(cari.value, j.kode, j.nama, j.departemen, j.deskripsi),
+  items.value.filter((jabatan) =>
+    cocok(
+      cari.value,
+      jabatan.kode,
+      jabatan.nama,
+      jabatan.departemen,
+      jabatan.deskripsi,
+    ),
   ),
 );
 
@@ -178,19 +186,19 @@ async function jalankanHapus() {
         <th class="text-right">Aksi</th>
       </template>
 
-      <tr v-for="j in filteredItems" :key="j.id" class="border-b">
-        <td>{{ j.kode }}</td>
-        <td>{{ j.nama }}</td>
-        <td>{{ j.departemen }}</td>
-        <td>{{ j.gaji_pokok }}</td>
-        <td>{{ j.tunjangan }}</td>
-        <td>{{ j.deskripsi || "-" }}</td>
+      <tr v-for="jabatan in filteredItems" :key="jabatan.id" class="border-b">
+        <td>{{ jabatan.kode }}</td>
+        <td>{{ jabatan.nama }}</td>
+        <td>{{ jabatan.departemen }}</td>
+        <td>{{ jabatan.gaji_pokok }}</td>
+        <td>{{ jabatan.tunjangan }}</td>
+        <td>{{ jabatan.deskripsi || "-" }}</td>
         <td class="text-right">
           <AppButton
             variant="error"
             size="sm"
             outline
-            @click="mintaHapus(j.id)"
+            @click="mintaHapus(jabatan.id)"
           >
             Hapus
           </AppButton>

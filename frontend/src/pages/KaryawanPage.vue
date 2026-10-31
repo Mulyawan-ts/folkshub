@@ -22,13 +22,15 @@ const { items, error } = storeToRefs(karyawanStore);
 
 const form = useForm({
   awal: { nama: "", email: "", status: "tetap" },
-  validasi: (v) =>
-    !v.nama.trim() || !v.email.trim() ? "Nama dan email wajib diisi" : "",
-  aksi: (v) =>
+  validasi: (nilai) =>
+    !nilai.nama.trim() || !nilai.email.trim()
+      ? "Nama dan email wajib diisi"
+      : "",
+  aksi: (nilai) =>
     karyawanStore.simpan({
-      nama: v.nama.trim(),
-      email: v.email.trim(),
-      status: v.status,
+      nama: nilai.nama.trim(),
+      email: nilai.email.trim(),
+      status: nilai.status,
     }),
   pesanSukses: "Karyawan berhasil disimpan",
   toast: toastStore,
@@ -39,7 +41,9 @@ const konfirmasiHapus = ref(false);
 const hapusId = ref<number | null>(null);
 
 const filteredItems = computed(() =>
-  items.value.filter((k) => cocok(cari.value, k.nama, k.email, k.status)),
+  items.value.filter((karyawan) =>
+    cocok(cari.value, karyawan.nama, karyawan.email, karyawan.status),
+  ),
 );
 
 const statusOptions = [
@@ -150,14 +154,14 @@ async function jalankanHapus() {
       :jumlah="filteredItems.length"
     >
       <AppCardItem
-        v-for="k in filteredItems"
-        :key="k.id"
-        :judul="k.nama"
-        :subjudul="k.email"
-        :status="k.status"
-        :status-variant="statusVariant(k.status, KARYAWAN_STATUS)"
+        v-for="karyawan in filteredItems"
+        :key="karyawan.id"
+        :judul="karyawan.nama"
+        :subjudul="karyawan.email"
+        :status="karyawan.status"
+        :status-variant="statusVariant(karyawan.status, KARYAWAN_STATUS)"
         hapus-label="Hapus"
-        @hapus="mintaHapus(k.id)"
+        @hapus="mintaHapus(karyawan.id)"
       />
     </DaftarData>
 

@@ -21,16 +21,16 @@ const { items, error } = storeToRefs(departemenStore);
 
 const form = useForm({
   awal: { kode: "", nama: "", kepala: "", deskripsi: "" },
-  validasi: (v) =>
-    !v.kode.trim() || !v.nama.trim()
+  validasi: (nilai) =>
+    !nilai.kode.trim() || !nilai.nama.trim()
       ? "Kode dan nama departemen wajib diisi"
       : "",
-  aksi: (v) =>
+  aksi: (nilai) =>
     departemenStore.simpan({
-      kode: v.kode,
-      nama: v.nama,
-      kepala: v.kepala,
-      deskripsi: v.deskripsi,
+      kode: nilai.kode,
+      nama: nilai.nama,
+      kepala: nilai.kepala,
+      deskripsi: nilai.deskripsi,
     }),
   pesanSukses: "Departemen berhasil disimpan",
   toast: toastStore,
@@ -41,8 +41,14 @@ const hapusId = ref<number | null>(null);
 const cari = ref("");
 
 const filteredItems = computed(() =>
-  items.value.filter((d) =>
-    cocok(cari.value, d.kode, d.nama, d.kepala, d.deskripsi),
+  items.value.filter((departemen) =>
+    cocok(
+      cari.value,
+      departemen.kode,
+      departemen.nama,
+      departemen.kepala,
+      departemen.deskripsi,
+    ),
   ),
 );
 
@@ -147,17 +153,21 @@ async function jalankanHapus() {
         <th class="text-right">Aksi</th>
       </template>
 
-      <tr v-for="d in filteredItems" :key="d.id" class="border-b">
-        <td>{{ d.kode }}</td>
-        <td>{{ d.nama }}</td>
-        <td>{{ d.kepala || "-" }}</td>
-        <td>{{ d.deskripsi || "-" }}</td>
+      <tr
+        v-for="departemen in filteredItems"
+        :key="departemen.id"
+        class="border-b"
+      >
+        <td>{{ departemen.kode }}</td>
+        <td>{{ departemen.nama }}</td>
+        <td>{{ departemen.kepala || "-" }}</td>
+        <td>{{ departemen.deskripsi || "-" }}</td>
         <td class="text-right">
           <AppButton
             variant="error"
             size="sm"
             outline
-            @click="mintaHapus(d.id)"
+            @click="mintaHapus(departemen.id)"
           >
             Hapus
           </AppButton>

@@ -32,18 +32,18 @@ const form = useForm({
     status: "hadir",
     keterangan: "",
   },
-  validasi: (v) =>
-    !v.karyawanId.trim() || !v.tanggal.trim()
+  validasi: (nilai) =>
+    !nilai.karyawanId.trim() || !nilai.tanggal.trim()
       ? "Karyawan dan tanggal wajib diisi"
       : "",
-  aksi: (v) =>
+  aksi: (nilai) =>
     absensiStore.simpan({
-      karyawan_id: Number(v.karyawanId),
-      tanggal: v.tanggal,
-      check_in: v.checkIn || undefined,
-      check_out: v.checkOut || undefined,
-      status: v.status as any,
-      keterangan: v.keterangan,
+      karyawan_id: Number(nilai.karyawanId),
+      tanggal: nilai.tanggal,
+      check_in: nilai.checkIn || undefined,
+      check_out: nilai.checkOut || undefined,
+      status: nilai.status as any,
+      keterangan: nilai.keterangan,
     }),
   pesanSukses: "Absensi berhasil disimpan",
   toast: toastStore,
@@ -54,14 +54,14 @@ const hapusId = ref<number | null>(null);
 const cari = ref("");
 
 const filteredItems = computed(() =>
-  items.value.filter((a) =>
+  items.value.filter((absensi) =>
     cocok(
       cari.value,
-      a.karyawan_id,
-      a.tanggal,
-      formatTanggal(a.tanggal),
-      a.status,
-      a.keterangan,
+      absensi.karyawan_id,
+      absensi.tanggal,
+      formatTanggal(absensi.tanggal),
+      absensi.status,
+      absensi.keterangan,
     ),
   ),
 );
@@ -195,20 +195,20 @@ async function jalankanHapus() {
         <th class="text-right">Aksi</th>
       </template>
 
-      <tr v-for="a in filteredItems" :key="a.id" class="border-b">
-        <td>{{ a.karyawan_id }}</td>
-        <td>{{ formatTanggal(a.tanggal) }}</td>
-        <td>{{ a.check_in || "-" }}</td>
-        <td>{{ a.check_out || "-" }}</td>
+      <tr v-for="absensi in filteredItems" :key="absensi.id" class="border-b">
+        <td>{{ absensi.karyawan_id }}</td>
+        <td>{{ formatTanggal(absensi.tanggal) }}</td>
+        <td>{{ absensi.check_in || "-" }}</td>
+        <td>{{ absensi.check_out || "-" }}</td>
         <td>
-          <AppStatus :status="a.status" :map="ABSENSI_STATUS" />
+          <AppStatus :status="absensi.status" :map="ABSENSI_STATUS" />
         </td>
         <td class="text-right">
           <AppButton
             variant="error"
             size="sm"
             outline
-            @click="mintaHapus(a.id)"
+            @click="mintaHapus(absensi.id)"
           >
             Hapus
           </AppButton>

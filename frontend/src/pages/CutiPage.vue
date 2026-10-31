@@ -32,18 +32,20 @@ const form = useForm({
     jumlahHari: "",
     keterangan: "",
   },
-  validasi: (v) =>
-    !v.karyawanId.trim() || !v.tanggalMulai.trim() || !v.tanggalSelesai.trim()
+  validasi: (nilai) =>
+    !nilai.karyawanId.trim() ||
+    !nilai.tanggalMulai.trim() ||
+    !nilai.tanggalSelesai.trim()
       ? "Karyawan, tanggal mulai, dan tanggal selesai wajib diisi"
       : "",
-  aksi: (v) =>
+  aksi: (nilai) =>
     cutiStore.simpan({
-      karyawan_id: Number(v.karyawanId),
-      jenis: v.jenis as any,
-      tanggal_mulai: v.tanggalMulai,
-      tanggal_selesai: v.tanggalSelesai,
-      jumlah_hari: Number(v.jumlahHari) || 0,
-      keterangan: v.keterangan,
+      karyawan_id: Number(nilai.karyawanId),
+      jenis: nilai.jenis as any,
+      tanggal_mulai: nilai.tanggalMulai,
+      tanggal_selesai: nilai.tanggalSelesai,
+      jumlah_hari: Number(nilai.jumlahHari) || 0,
+      keterangan: nilai.keterangan,
       status: "draft",
     }),
   pesanSukses: "Cuti berhasil diajukan",
@@ -55,15 +57,15 @@ const hapusId = ref<number | null>(null);
 const cari = ref("");
 
 const filteredItems = computed(() =>
-  items.value.filter((c) =>
+  items.value.filter((cuti) =>
     cocok(
       cari.value,
-      c.karyawan_id,
-      c.jenis,
-      c.status,
-      c.tanggal_mulai,
-      c.tanggal_selesai,
-      c.keterangan,
+      cuti.karyawan_id,
+      cuti.jenis,
+      cuti.status,
+      cuti.tanggal_mulai,
+      cuti.tanggal_selesai,
+      cuti.keterangan,
     ),
   ),
 );
@@ -202,21 +204,21 @@ async function jalankanHapus() {
         <th class="text-right">Aksi</th>
       </template>
 
-      <tr v-for="c in filteredItems" :key="c.id" class="border-b">
-        <td>{{ c.karyawan_id }}</td>
-        <td>{{ c.jenis }}</td>
-        <td>{{ formatTanggal(c.tanggal_mulai) }}</td>
-        <td>{{ formatTanggal(c.tanggal_selesai) }}</td>
-        <td>{{ c.jumlah_hari }}</td>
+      <tr v-for="cuti in filteredItems" :key="cuti.id" class="border-b">
+        <td>{{ cuti.karyawan_id }}</td>
+        <td>{{ cuti.jenis }}</td>
+        <td>{{ formatTanggal(cuti.tanggal_mulai) }}</td>
+        <td>{{ formatTanggal(cuti.tanggal_selesai) }}</td>
+        <td>{{ cuti.jumlah_hari }}</td>
         <td>
-          <AppStatus :status="c.status" :map="CUTI_STATUS" />
+          <AppStatus :status="cuti.status" :map="CUTI_STATUS" />
         </td>
         <td class="text-right">
           <AppButton
             variant="error"
             size="sm"
             outline
-            @click="mintaHapus(c.id)"
+            @click="mintaHapus(cuti.id)"
           >
             Hapus
           </AppButton>

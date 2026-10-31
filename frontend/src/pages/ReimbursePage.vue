@@ -32,21 +32,21 @@ const form = useForm({
     keterangan: "",
     bukti: "",
   },
-  validasi: (v) =>
-    !v.karyawanId.trim() ||
-    !v.tanggal.trim() ||
-    !v.jenis.trim() ||
-    !v.jumlah.trim()
+  validasi: (nilai) =>
+    !nilai.karyawanId.trim() ||
+    !nilai.tanggal.trim() ||
+    !nilai.jenis.trim() ||
+    !nilai.jumlah.trim()
       ? "Karyawan, tanggal, jenis, dan jumlah wajib diisi"
       : "",
-  aksi: (v) =>
+  aksi: (nilai) =>
     reimburseStore.simpan({
-      karyawan_id: Number(v.karyawanId),
-      tanggal: v.tanggal,
-      jenis: v.jenis,
-      jumlah: Number(v.jumlah),
-      keterangan: v.keterangan,
-      bukti: v.bukti,
+      karyawan_id: Number(nilai.karyawanId),
+      tanggal: nilai.tanggal,
+      jenis: nilai.jenis,
+      jumlah: Number(nilai.jumlah),
+      keterangan: nilai.keterangan,
+      bukti: nilai.bukti,
       status: "draft",
     }),
   pesanSukses: "Reimburse berhasil diajukan",
@@ -58,15 +58,15 @@ const hapusId = ref<number | null>(null);
 const cari = ref("");
 
 const filteredItems = computed(() =>
-  items.value.filter((r) =>
+  items.value.filter((reimburse) =>
     cocok(
       cari.value,
-      r.karyawan_id,
-      r.tanggal,
-      r.jenis,
-      r.status,
-      r.keterangan,
-      r.bukti,
+      reimburse.karyawan_id,
+      reimburse.tanggal,
+      reimburse.jenis,
+      reimburse.status,
+      reimburse.keterangan,
+      reimburse.bukti,
     ),
   ),
 );
@@ -194,21 +194,25 @@ async function jalankanHapus() {
         <th class="text-right">Aksi</th>
       </template>
 
-      <tr v-for="r in filteredItems" :key="r.id" class="border-b">
-        <td>{{ r.karyawan_id }}</td>
-        <td>{{ formatTanggal(r.tanggal) }}</td>
-        <td>{{ r.jenis }}</td>
-        <td>{{ r.jumlah }}</td>
-        <td>{{ r.bukti || "-" }}</td>
+      <tr
+        v-for="reimburse in filteredItems"
+        :key="reimburse.id"
+        class="border-b"
+      >
+        <td>{{ reimburse.karyawan_id }}</td>
+        <td>{{ formatTanggal(reimburse.tanggal) }}</td>
+        <td>{{ reimburse.jenis }}</td>
+        <td>{{ reimburse.jumlah }}</td>
+        <td>{{ reimburse.bukti || "-" }}</td>
         <td>
-          <AppStatus :status="r.status" :map="REIMBURSE_STATUS" />
+          <AppStatus :status="reimburse.status" :map="REIMBURSE_STATUS" />
         </td>
         <td class="text-right">
           <AppButton
             variant="error"
             size="sm"
             outline
-            @click="mintaHapus(r.id)"
+            @click="mintaHapus(reimburse.id)"
           >
             Hapus
           </AppButton>

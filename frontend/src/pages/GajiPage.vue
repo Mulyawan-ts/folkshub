@@ -31,17 +31,17 @@ const form = useForm({
     tunjangan: "",
     potongan: "",
   },
-  validasi: (v) =>
-    !v.karyawanId.trim() || !v.bulan.trim() || !v.gajiPokok.trim()
+  validasi: (nilai) =>
+    !nilai.karyawanId.trim() || !nilai.bulan.trim() || !nilai.gajiPokok.trim()
       ? "Karyawan, bulan, dan gaji pokok wajib diisi"
       : "",
-  aksi: (v) =>
+  aksi: (nilai) =>
     gajiStore.simpan({
-      karyawan_id: Number(v.karyawanId),
-      bulan: v.bulan,
-      gaji_pokok: Number(v.gajiPokok),
-      tunjangan: Number(v.tunjangan) || 0,
-      potongan: Number(v.potongan) || 0,
+      karyawan_id: Number(nilai.karyawanId),
+      bulan: nilai.bulan,
+      gaji_pokok: Number(nilai.gajiPokok),
+      tunjangan: Number(nilai.tunjangan) || 0,
+      potongan: Number(nilai.potongan) || 0,
       status: "draft",
     }),
   pesanSukses: "Data gaji berhasil disimpan",
@@ -53,14 +53,14 @@ const hapusId = ref<number | null>(null);
 const cari = ref("");
 
 const filteredItems = computed(() =>
-  items.value.filter((g) =>
+  items.value.filter((gaji) =>
     cocok(
       cari.value,
-      g.karyawan_id,
-      g.bulan,
-      formatBulan(g.bulan),
-      g.status,
-      g.keterangan,
+      gaji.karyawan_id,
+      gaji.bulan,
+      formatBulan(gaji.bulan),
+      gaji.status,
+      gaji.keterangan,
     ),
   ),
 );
@@ -182,22 +182,22 @@ async function jalankanHapus() {
         <th class="text-right">Aksi</th>
       </template>
 
-      <tr v-for="g in filteredItems" :key="g.id" class="border-b">
-        <td>{{ g.karyawan_id }}</td>
-        <td>{{ formatBulan(g.bulan) }}</td>
-        <td>{{ g.gaji_pokok }}</td>
-        <td>{{ g.tunjangan }}</td>
-        <td>{{ g.potongan }}</td>
-        <td class="font-bold">{{ g.total }}</td>
+      <tr v-for="gaji in filteredItems" :key="gaji.id" class="border-b">
+        <td>{{ gaji.karyawan_id }}</td>
+        <td>{{ formatBulan(gaji.bulan) }}</td>
+        <td>{{ gaji.gaji_pokok }}</td>
+        <td>{{ gaji.tunjangan }}</td>
+        <td>{{ gaji.potongan }}</td>
+        <td class="font-bold">{{ gaji.total }}</td>
         <td>
-          <AppStatus :status="g.status" :map="GAJI_STATUS" />
+          <AppStatus :status="gaji.status" :map="GAJI_STATUS" />
         </td>
         <td class="text-right">
           <AppButton
             variant="error"
             size="sm"
             outline
-            @click="mintaHapus(g.id)"
+            @click="mintaHapus(gaji.id)"
           >
             Hapus
           </AppButton>
