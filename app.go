@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"path/filepath"
 
 	"app/internal/model"
 	"app/internal/service"
@@ -21,39 +22,51 @@ type App struct {
 	pelatihanSvc  *service.PelatihanService
 }
 
-// NewApp creates a new App application struct
+// NewApp creates a new App application struct storing its SQLite files in the
+// current working directory.
 func NewApp() *App {
-	karyawanSvc, err := service.NewKaryawanService("karyawan.db")
+	a, err := newApp(".")
 	if err != nil {
 		panic(err)
 	}
-	absensiSvc, err := service.NewAbsensiService("absensi.db")
+	return a
+}
+
+// newApp builds an App with every SQLite file placed inside dbDir.
+func newApp(dbDir string) (*App, error) {
+	p := func(name string) string { return filepath.Join(dbDir, name+".db") }
+
+	karyawanSvc, err := service.NewKaryawanService(p("karyawan"))
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
-	cutiSvc, err := service.NewCutiService("cuti.db")
+	absensiSvc, err := service.NewAbsensiService(p("absensi"))
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
-	reimburseSvc, err := service.NewReimburseService("reimburse.db")
+	cutiSvc, err := service.NewCutiService(p("cuti"))
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
-	gajiSvc, err := service.NewGajiService("gaji.db")
+	reimburseSvc, err := service.NewReimburseService(p("reimburse"))
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
-	jabatanSvc, err := service.NewJabatanService("jabatan.db")
+	gajiSvc, err := service.NewGajiService(p("gaji"))
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
-	departemenSvc, err := service.NewDepartemenService("departemen.db")
+	jabatanSvc, err := service.NewJabatanService(p("jabatan"))
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
-	pelatihanSvc, err := service.NewPelatihanService("pelatihan.db")
+	departemenSvc, err := service.NewDepartemenService(p("departemen"))
 	if err != nil {
-		panic(err)
+		return nil, err
+	}
+	pelatihanSvc, err := service.NewPelatihanService(p("pelatihan"))
+	if err != nil {
+		return nil, err
 	}
 
 	return &App{
@@ -65,7 +78,7 @@ func NewApp() *App {
 		jabatanSvc:    jabatanSvc,
 		departemenSvc: departemenSvc,
 		pelatihanSvc:  pelatihanSvc,
-	}
+	}, nil
 }
 
 // startup is called when the app starts. The context is saved

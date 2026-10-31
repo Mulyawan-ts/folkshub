@@ -1,6 +1,7 @@
 package main
 
 import (
+	"os"
 	"path/filepath"
 	"testing"
 
@@ -8,63 +9,56 @@ import (
 	"app/internal/service"
 )
 
-// newTestApp builds an App backed by per-test SQLite files in t.TempDir,
-// mirroring NewApp without the fixed working-directory paths.
+// newTestApp builds an App backed by per-test SQLite files in t.TempDir.
 func newTestApp(t *testing.T) *App {
 	t.Helper()
+	a, err := newApp(t.TempDir())
+	if err != nil {
+		t.Fatalf("newApp: %v", err)
+	}
+	t.Cleanup(func() {
+		for _, c := range []interface{ Close() error }{
+			a.karyawanSvc, a.absensiSvc, a.cutiSvc, a.reimburseSvc,
+			a.gajiSvc, a.jabatanSvc, a.departemenSvc, a.pelatihanSvc,
+		} {
+			_ = c.Close()
+		}
+	})
+	return a
+}
+
+func TestNewAppUsesWorkingDirectory(t *testing.T) {
 	dir := t.TempDir()
-	p := func(name string) string { return filepath.Join(dir, name+".db") }
+	wd, err := os.Getwd()
+	if err != nil {
+		t.Fatalf("getwd: %v", err)
+	}
+	if err := os.Chdir(dir); err != nil {
+		t.Fatalf("chdir: %v", err)
+	}
+	t.Cleanup(func() { _ = os.Chdir(wd) })
 
-	ks, err := service.NewKaryawanService(p("karyawan"))
-	if err != nil {
-		t.Fatalf("karyawan svc: %v", err)
-	}
-	t.Cleanup(func() { _ = ks.Close() })
-	as, err := service.NewAbsensiService(p("absensi"))
-	if err != nil {
-		t.Fatalf("absensi svc: %v", err)
-	}
-	t.Cleanup(func() { _ = as.Close() })
-	cs, err := service.NewCutiService(p("cuti"))
-	if err != nil {
-		t.Fatalf("cuti svc: %v", err)
-	}
-	t.Cleanup(func() { _ = cs.Close() })
-	rs, err := service.NewReimburseService(p("reimburse"))
-	if err != nil {
-		t.Fatalf("reimburse svc: %v", err)
-	}
-	t.Cleanup(func() { _ = rs.Close() })
-	gs, err := service.NewGajiService(p("gaji"))
-	if err != nil {
-		t.Fatalf("gaji svc: %v", err)
-	}
-	t.Cleanup(func() { _ = gs.Close() })
-	js, err := service.NewJabatanService(p("jabatan"))
-	if err != nil {
-		t.Fatalf("jabatan svc: %v", err)
-	}
-	t.Cleanup(func() { _ = js.Close() })
-	ds, err := service.NewDepartemenService(p("departemen"))
-	if err != nil {
-		t.Fatalf("departemen svc: %v", err)
-	}
-	t.Cleanup(func() { _ = ds.Close() })
-	ps, err := service.NewPelatihanService(p("pelatihan"))
-	if err != nil {
-		t.Fatalf("pelatihan svc: %v", err)
-	}
-	t.Cleanup(func() { _ = ps.Close() })
+	a := NewApp()
+	t.Cleanup(func() {
+		for _, c := range []interface{ Close() error }{
+			a.karyawanSvc, a.absensiSvc, a.cutiSvc, a.reimburseSvc,
+			a.gajiSvc, a.jabatanSvc, a.departemenSvc, a.pelatihanSvc,
+		} {
+			_ = c.Close()
+		}
+	})
 
-	return &App{
-		karyawanSvc:   ks,
-		absensiSvc:    as,
-		cutiSvc:       cs,
-		reimburseSvc:  rs,
-		gajiSvc:       gs,
-		jabatanSvc:    js,
-		departemenSvc: ds,
-		pelatihanSvc:  ps,
+	for _, name := range []string{
+		"karyawan", "absensi", "cuti", "reimburse",
+		"gaji", "jabatan", "departemen", "pelatihan",
+	} {
+		if _, err := os.Stat(filepath.Join(dir, name+".db")); err != nil {
+			t.Fatalf("%s.db tidak dibuat di working directory: %v", name, err)
+		}
+	}
+
+	if _, err := a.SimpanKaryawan("Andi", "andi@example.com", "tetap"); err != nil {
+		t.Fatalf("simpan karyawan via NewApp: %v", err)
 	}
 }
 
