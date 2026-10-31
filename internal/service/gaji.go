@@ -5,6 +5,7 @@ import (
 	"sync"
 
 	"app/internal/model"
+	"app/internal/utils"
 	"gorm.io/gorm"
 )
 
@@ -43,7 +44,7 @@ func (s *GajiService) Simpan(g *model.Gaji) error {
 	if g == nil || g.KaryawanId <= 0 || g.Bulan == "" {
 		return ErrInvalidInput
 	}
-	if !validMonth(g.Bulan) {
+	if !utils.ValidMonth(g.Bulan) {
 		return ErrInvalidInput
 	}
 	if g.Status != "" && !validGajiStatus[g.Status] {
@@ -120,7 +121,7 @@ func (s *GajiService) Update(id int, karyawanId int, bulan string, gajiPokok, tu
 		return nil, err
 	}
 
-	if !validMonth(bulan) {
+	if !utils.ValidMonth(bulan) {
 		return nil, ErrInvalidInput
 	}
 	if status != "" && !validGajiStatus[status] {
@@ -139,6 +140,13 @@ func (s *GajiService) Update(id int, karyawanId int, bulan string, gajiPokok, tu
 		return nil, err
 	}
 	return &g, nil
+}
+
+func (s *GajiService) FormatTotal(g *model.Gaji) string {
+	if g == nil {
+		return utils.FormatRupiah(0)
+	}
+	return utils.FormatRupiah(g.Total)
 }
 
 func (s *GajiService) Close() error {
