@@ -13,6 +13,13 @@ var (
 	ErrKaryawanExists   = errors.New("karyawan sudah terdaftar")
 )
 
+// validStatus maps the only accepted karyawan status values.
+var validStatus = map[string]bool{
+	model.StatusTetap:       true,
+	model.StatusOutsourcing: true,
+	model.StatusMagang:      true,
+}
+
 type KaryawanService struct {
 	mu sync.RWMutex
 	db *gorm.DB
@@ -34,6 +41,9 @@ func (s *KaryawanService) Simpan(k *model.Karyawan) error {
 	defer s.mu.Unlock()
 
 	if k == nil || k.Nama == "" || k.Email == "" {
+		return ErrInvalidInput
+	}
+	if !validStatus[k.Status] {
 		return ErrInvalidInput
 	}
 
@@ -103,6 +113,10 @@ func (s *KaryawanService) Update(id int, nama, email, status string) (*model.Kar
 			return nil, ErrKaryawanNotFound
 		}
 		return nil, err
+	}
+
+	if !validStatus[status] {
+		return nil, ErrInvalidInput
 	}
 
 	k.Nama = nama

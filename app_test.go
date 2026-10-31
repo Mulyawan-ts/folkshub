@@ -89,8 +89,8 @@ func TestAppKaryawan(t *testing.T) {
 		t.Fatalf("semua: %v / %d", err, len(list))
 	}
 
-	upd, err := a.UpdateKaryawan(k.ID, "Andi S", "andi2@example.com", "kontrak")
-	if err != nil || upd.Nama != "Andi S" || upd.Status != "kontrak" {
+	upd, err := a.UpdateKaryawan(k.ID, "Andi S", "andi2@example.com", "magang")
+	if err != nil || upd.Nama != "Andi S" || upd.Status != "magang" {
 		t.Fatalf("update: %v / %+v", err, upd)
 	}
 
@@ -101,8 +101,14 @@ func TestAppKaryawan(t *testing.T) {
 		t.Fatalf("expected not found, got %v", err)
 	}
 
-	if _, err := a.SimpanKaryawan("", "x@y.com", ""); err != service.ErrInvalidInput {
+	if _, err := a.SimpanKaryawan("", "x@y.com", "tetap"); err != service.ErrInvalidInput {
 		t.Fatalf("expected invalid input, got %v", err)
+	}
+	if _, err := a.SimpanKaryawan("C", "c@y.com", "honorer"); err != service.ErrInvalidInput {
+		t.Fatalf("expected invalid input (status), got %v", err)
+	}
+	if _, err := a.UpdateKaryawan(999, "C", "c@y.com", "honorer"); err != service.ErrKaryawanNotFound {
+		t.Fatalf("expected not found before status check, got %v", err)
 	}
 }
 
