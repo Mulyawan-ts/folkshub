@@ -112,6 +112,9 @@ func (a *App) UpdateKaryawan(id int, nama, email, status string) (*model.Karyawa
 
 // Absensi
 func (a *App) SimpanAbsensi(karyawanID int, tanggal, checkIn, checkOut, status, keterangan string) (*model.Absensi, error) {
+	if _, err := a.karyawanSvc.Ambil(karyawanID); err != nil {
+		return nil, err
+	}
 	a2 := &model.Absensi{
 		KaryawanId: karyawanID,
 		Tanggal:    tanggal,
@@ -141,6 +144,9 @@ func (a *App) HapusAbsensi(id int) error {
 }
 
 func (a *App) UpdateAbsensi(id int, karyawanID int, tanggal, checkIn, checkOut, status, keterangan string) (*model.Absensi, error) {
+	if _, err := a.karyawanSvc.Ambil(karyawanID); err != nil {
+		return nil, err
+	}
 	return a.absensiSvc.Update(id, karyawanID, tanggal, checkIn, checkOut, status, keterangan)
 }
 
@@ -188,6 +194,9 @@ func (a *App) UpdateCuti(id int, karyawanID int, jenis, tanggalMulai, tanggalSel
 
 // Reimburse
 func (a *App) SimpanReimburse(karyawanID int, tanggal, jenis, keterangan, bukti, status string, jumlah int) (*model.Reimburse, error) {
+	if _, err := a.karyawanSvc.Ambil(karyawanID); err != nil {
+		return nil, err
+	}
 	r := &model.Reimburse{
 		KaryawanId: karyawanID,
 		Tanggal:    tanggal,
@@ -218,11 +227,17 @@ func (a *App) HapusReimburse(id int) error {
 }
 
 func (a *App) UpdateReimburse(id int, karyawanID int, tanggal, jenis, keterangan, bukti, status string, jumlah int) (*model.Reimburse, error) {
+	if _, err := a.karyawanSvc.Ambil(karyawanID); err != nil {
+		return nil, err
+	}
 	return a.reimburseSvc.Update(id, karyawanID, tanggal, jenis, keterangan, bukti, status, jumlah)
 }
 
 // Gaji
 func (a *App) SimpanGaji(karyawanID int, bulan string, gajiPokok, tunjangan, potongan int, status string) (*model.Gaji, error) {
+	if _, err := a.karyawanSvc.Ambil(karyawanID); err != nil {
+		return nil, err
+	}
 	g := &model.Gaji{
 		KaryawanId: karyawanID,
 		Bulan:      bulan,
@@ -252,6 +267,9 @@ func (a *App) HapusGaji(id int) error {
 }
 
 func (a *App) UpdateGaji(id int, karyawanID int, bulan string, gajiPokok, tunjangan, potongan int, status string) (*model.Gaji, error) {
+	if _, err := a.karyawanSvc.Ambil(karyawanID); err != nil {
+		return nil, err
+	}
 	return a.gajiSvc.Update(id, karyawanID, bulan, gajiPokok, tunjangan, potongan, status)
 }
 
@@ -323,6 +341,9 @@ func (a *App) UpdateDepartemen(id int, kode, nama, kepala, deskripsi string) (*m
 
 // Pelatihan
 func (a *App) SimpanPelatihan(karyawanID int, nama, jenis, tanggalMulai, tanggalSelesai, lokasi, sertifikat, catatan, status string, biaya int) (*model.Pelatihan, error) {
+	if _, err := a.karyawanSvc.Ambil(karyawanID); err != nil {
+		return nil, err
+	}
 	p := &model.Pelatihan{
 		KaryawanId:   karyawanID,
 		Nama:         nama,
@@ -356,5 +377,8 @@ func (a *App) HapusPelatihan(id int) error {
 }
 
 func (a *App) UpdatePelatihan(id int, karyawanID int, nama, jenis, tanggalMulai, tanggalSelesai, lokasi, sertifikat, catatan, status string, biaya int) (*model.Pelatihan, error) {
+	if _, err := a.karyawanSvc.Ambil(karyawanID); err != nil {
+		return nil, err
+	}
 	return a.pelatihanSvc.Update(id, karyawanID, nama, jenis, tanggalMulai, tanggalSelesai, lokasi, sertifikat, catatan, status, biaya)
 }

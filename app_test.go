@@ -4,6 +4,7 @@ import (
 	"path/filepath"
 	"testing"
 
+	"app/internal/model"
 	"app/internal/service"
 )
 
@@ -67,6 +68,15 @@ func newTestApp(t *testing.T) *App {
 	}
 }
 
+func simpanKaryawan(t *testing.T, a *App, nama, email string) *model.Karyawan {
+	t.Helper()
+	k, err := a.SimpanKaryawan(nama, email, "tetap")
+	if err != nil {
+		t.Fatalf("simpan karyawan %q: %v", nama, err)
+	}
+	return k
+}
+
 func TestAppKaryawan(t *testing.T) {
 	a := newTestApp(t)
 
@@ -105,13 +115,19 @@ func TestAppKaryawan(t *testing.T) {
 func TestAppAbsensi(t *testing.T) {
 	a := newTestApp(t)
 
-	ab, err := a.SimpanAbsensi(1, "2026-10-01", "08:00", "17:00", "hadir", "ok")
-	if err != nil || ab.ID == 0 || ab.CheckIn != "08:00" {
+	if _, err := a.SimpanAbsensi(99, "2026-10-01", "", "", "", ""); err != service.ErrKaryawanNotFound {
+		t.Fatalf("expected karyawan not found, got %v", err)
+	}
+	k1 := simpanKaryawan(t, a, "Andi", "andi@example.com")
+	k2 := simpanKaryawan(t, a, "Budi", "budi@example.com")
+
+	ab, err := a.SimpanAbsensi(k1.ID, "2026-10-01", "08:00", "17:00", "hadir", "ok")
+	if err != nil || ab.ID == 0 || ab.CheckIn != "08:00" || ab.KaryawanId != k1.ID {
 		t.Fatalf("simpan: %v / %+v", err, ab)
 	}
 
 	got, err := a.AmbilAbsensi(ab.ID)
-	if err != nil || got.KaryawanId != 1 {
+	if err != nil || got.KaryawanId != k1.ID {
 		t.Fatalf("ambil: %v / %+v", err, got)
 	}
 
@@ -120,9 +136,13 @@ func TestAppAbsensi(t *testing.T) {
 		t.Fatalf("semua: %v / %d", err, len(list))
 	}
 
-	upd, err := a.UpdateAbsensi(ab.ID, 2, "2026-10-02", "09:00", "18:00", "hadir", "telat")
-	if err != nil || upd.KaryawanId != 2 || upd.CheckIn != "09:00" {
+	upd, err := a.UpdateAbsensi(ab.ID, k2.ID, "2026-10-02", "09:00", "18:00", "hadir", "telat")
+	if err != nil || upd.KaryawanId != k2.ID || upd.CheckIn != "09:00" {
 		t.Fatalf("update: %v / %+v", err, upd)
+	}
+
+	if _, err := a.UpdateAbsensi(ab.ID, 99, "2026-10-02", "", "", "", ""); err != service.ErrKaryawanNotFound {
+		t.Fatalf("expected karyawan not found on update, got %v", err)
 	}
 
 	if err := a.HapusAbsensi(ab.ID); err != nil {
@@ -132,7 +152,7 @@ func TestAppAbsensi(t *testing.T) {
 		t.Fatalf("expected not found, got %v", err)
 	}
 
-	if _, err := a.SimpanAbsensi(0, "x", "", "", "", ""); err != service.ErrInvalidInput {
+	if _, err := a.SimpanAbsensi(k1.ID, "", "", "", "", ""); err != service.ErrInvalidInput {
 		t.Fatalf("expected invalid input, got %v", err)
 	}
 }
@@ -190,8 +210,14 @@ func TestAppCutiValidatesKaryawan(t *testing.T) {
 func TestAppReimburse(t *testing.T) {
 	a := newTestApp(t)
 
-	r, err := a.SimpanReimburse(1, "2026-10-15", "transport", "Dinas", "bukti.pdf", "submitted", 250000)
-	if err != nil || r.ID == 0 || r.Jumlah != 250000 {
+	if _, err := a.SimpanReimburse(99, "2026-10-15", "transport", "", "", "", 1); err != service.ErrKaryawanNotFound {
+		t.Fatalf("expected karyawan not found, got %v", err)
+	}
+	k1 := simpanKaryawan(t, a, "Andi", "andi@example.com")
+	k2 := simpanKaryawan(t, a, "Budi", "budi@example.com")
+
+	r, err := a.SimpanReimburse(k1.ID, "2026-10-15", "transport", "Dinas", "bukti.pdf", "submitted", 250000)
+	if err != nil || r.ID == 0 || r.Jumlah != 250000 || r.KaryawanId != k1.ID {
 		t.Fatalf("simpan: %v / %+v", err, r)
 	}
 
@@ -205,9 +231,13 @@ func TestAppReimburse(t *testing.T) {
 		t.Fatalf("semua: %v / %d", err, len(list))
 	}
 
-	upd, err := a.UpdateReimburse(r.ID, 2, "2026-10-20", "kesehatan", "Gigi", "b2.pdf", "approved", 500000)
-	if err != nil || upd.Jenis != "kesehatan" || upd.Jumlah != 500000 {
+	upd, err := a.UpdateReimburse(r.ID, k2.ID, "2026-10-20", "kesehatan", "Gigi", "b2.pdf", "approved", 500000)
+	if err != nil || upd.Jenis != "kesehatan" || upd.Jumlah != 500000 || upd.KaryawanId != k2.ID {
 		t.Fatalf("update: %v / %+v", err, upd)
+	}
+
+	if _, err := a.UpdateReimburse(r.ID, 99, "2026-10-20", "kesehatan", "", "", "", 1); err != service.ErrKaryawanNotFound {
+		t.Fatalf("expected karyawan not found on update, got %v", err)
 	}
 
 	if err := a.HapusReimburse(r.ID); err != nil {
@@ -221,8 +251,13 @@ func TestAppReimburse(t *testing.T) {
 func TestAppGaji(t *testing.T) {
 	a := newTestApp(t)
 
-	g, err := a.SimpanGaji(1, "2026-11", 5000000, 1000000, 500000, "draft")
-	if err != nil || g.ID == 0 || g.Total != 5500000 {
+	if _, err := a.SimpanGaji(99, "2026-11", 1, 0, 0, "draft"); err != service.ErrKaryawanNotFound {
+		t.Fatalf("expected karyawan not found, got %v", err)
+	}
+	k1 := simpanKaryawan(t, a, "Andi", "andi@example.com")
+
+	g, err := a.SimpanGaji(k1.ID, "2026-11", 5000000, 1000000, 500000, "draft")
+	if err != nil || g.ID == 0 || g.Total != 5500000 || g.KaryawanId != k1.ID {
 		t.Fatalf("simpan: %v / %+v", err, g)
 	}
 
@@ -236,9 +271,13 @@ func TestAppGaji(t *testing.T) {
 		t.Fatalf("semua: %v / %d", err, len(list))
 	}
 
-	upd, err := a.UpdateGaji(g.ID, 1, "2026-11", 2000000, 300, 100, "diproses")
+	upd, err := a.UpdateGaji(g.ID, k1.ID, "2026-11", 2000000, 300, 100, "diproses")
 	if err != nil || upd.Total != 2000200 {
 		t.Fatalf("update: %v / %d", err, upd.Total)
+	}
+
+	if _, err := a.UpdateGaji(g.ID, 99, "2026-11", 1, 0, 0, ""); err != service.ErrKaryawanNotFound {
+		t.Fatalf("expected karyawan not found on update, got %v", err)
 	}
 
 	if err := a.HapusGaji(g.ID); err != nil {
@@ -314,8 +353,14 @@ func TestAppDepartemen(t *testing.T) {
 func TestAppPelatihan(t *testing.T) {
 	a := newTestApp(t)
 
-	p, err := a.SimpanPelatihan(1, "Kepemimpinan", "internal", "2026-11-01", "2026-11-03", "Jakarta", "CERT-1", "lulus", "terjadwal", 1500000)
-	if err != nil || p.ID == 0 || p.Biaya != 1500000 {
+	if _, err := a.SimpanPelatihan(99, "X", "", "2026-11-01", "", "", "", "", "", 0); err != service.ErrKaryawanNotFound {
+		t.Fatalf("expected karyawan not found, got %v", err)
+	}
+	k1 := simpanKaryawan(t, a, "Andi", "andi@example.com")
+	k2 := simpanKaryawan(t, a, "Budi", "budi@example.com")
+
+	p, err := a.SimpanPelatihan(k1.ID, "Kepemimpinan", "internal", "2026-11-01", "2026-11-03", "Jakarta", "CERT-1", "lulus", "terjadwal", 1500000)
+	if err != nil || p.ID == 0 || p.Biaya != 1500000 || p.KaryawanId != k1.ID {
 		t.Fatalf("simpan: %v / %+v", err, p)
 	}
 
@@ -329,9 +374,13 @@ func TestAppPelatihan(t *testing.T) {
 		t.Fatalf("semua: %v / %d", err, len(list))
 	}
 
-	upd, err := a.UpdatePelatihan(p.ID, 2, "K3", "eksternal", "2026-12-01", "2026-12-02", "Bandung", "CERT-2", "selesai", "selesai", 2000000)
-	if err != nil || upd.KaryawanId != 2 || upd.Biaya != 2000000 || upd.Sertifikat != "CERT-2" {
+	upd, err := a.UpdatePelatihan(p.ID, k2.ID, "K3", "eksternal", "2026-12-01", "2026-12-02", "Bandung", "CERT-2", "selesai", "selesai", 2000000)
+	if err != nil || upd.KaryawanId != k2.ID || upd.Biaya != 2000000 || upd.Sertifikat != "CERT-2" {
 		t.Fatalf("update: %v / %+v", err, upd)
+	}
+
+	if _, err := a.UpdatePelatihan(p.ID, 99, "K3", "", "2026-12-01", "", "", "", "", "", 0); err != service.ErrKaryawanNotFound {
+		t.Fatalf("expected karyawan not found on update, got %v", err)
 	}
 
 	if err := a.HapusPelatihan(p.ID); err != nil {
