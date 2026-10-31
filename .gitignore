@@ -13,3 +13,6 @@ frontend/wailsjs/
 *.db-shm
 *.db-wal
 *.db-journal
+
+# konfigurasi kilo
+.kilo/
