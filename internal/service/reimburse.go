@@ -13,6 +13,14 @@ var (
 	ErrReimburseExists   = errors.New("reimburse sudah ada")
 )
 
+var validReimburseStatus = map[string]bool{
+	"draft":     true,
+	"submitted": true,
+	"approved":  true,
+	"rejected":  true,
+	"paid":      true,
+}
+
 type ReimburseService struct {
 	mu sync.RWMutex
 	db *gorm.DB
@@ -37,6 +45,9 @@ func (s *ReimburseService) Simpan(r *model.Reimburse) error {
 		return ErrInvalidInput
 	}
 	if !validDate(r.Tanggal) {
+		return ErrInvalidInput
+	}
+	if r.Status != "" && !validReimburseStatus[r.Status] {
 		return ErrInvalidInput
 	}
 
@@ -109,6 +120,9 @@ func (s *ReimburseService) Update(id int, karyawanId int, tanggal, jenis, ketera
 	}
 
 	if !validDate(tanggal) {
+		return nil, ErrInvalidInput
+	}
+	if status != "" && !validReimburseStatus[status] {
 		return nil, ErrInvalidInput
 	}
 

@@ -104,3 +104,44 @@ func TestReimburseServiceDateValidation(t *testing.T) {
 		t.Fatalf("expected not found before date check on update, got %v", err)
 	}
 }
+
+func TestReimburseServiceStatusValidation(t *testing.T) {
+	svc, err := NewReimburseService(":memory:")
+	if err != nil {
+		t.Fatalf("new service: %v", err)
+	}
+
+	for _, status := range []string{"draft2", "DRAFT", "selesai", "approved "} {
+		err := svc.Simpan(&model.Reimburse{KaryawanId: 1, Tanggal: "2026-10-15", Jenis: "transport", Status: status})
+		if err != ErrInvalidInput {
+			t.Fatalf("status %q: expected invalid input, got %v", status, err)
+		}
+	}
+
+	for _, status := range []string{"draft", "submitted", "approved", "rejected", "paid"} {
+		r := &model.Reimburse{KaryawanId: 1, Tanggal: "2026-10-15", Jenis: "transport", Status: status}
+		if err := svc.Simpan(r); err != nil {
+			t.Fatalf("status %q ditolak: %v", status, err)
+		}
+	}
+
+	// status kosong diterima (dipakai service saat field tidak diisi)
+	if err := svc.Simpan(&model.Reimburse{KaryawanId: 1, Tanggal: "2026-10-20", Jenis: "transport"}); err != nil {
+		t.Fatalf("status kosong ditolak: %v", err)
+	}
+
+	r := &model.Reimburse{KaryawanId: 1, Tanggal: "2026-10-25", Jenis: "kesehatan", Status: "draft"}
+	if err := svc.Simpan(r); err != nil {
+		t.Fatalf("simpan: %v", err)
+	}
+	if _, err := svc.Update(r.ID, 1, "2026-10-25", "kesehatan", "", "", "selesai", 0); err != ErrInvalidInput {
+		t.Fatalf("expected invalid input on update, got %v", err)
+	}
+	if _, err := svc.Update(999, 1, "2026-10-25", "kesehatan", "", "", "selesai", 0); err != ErrReimburseNotFound {
+		t.Fatalf("expected not found before status check on update, got %v", err)
+	}
+	upd, err := svc.Update(r.ID, 1, "2026-10-25", "kesehatan", "", "", "approved", 100000)
+	if err != nil || upd.Status != "approved" || upd.Jumlah != 100000 {
+		t.Fatalf("update status valid: %v / %+v", err, upd)
+	}
+}
