@@ -4,7 +4,6 @@ import {
   SemuaAbsensi,
   HapusAbsensi,
   UpdateAbsensi,
-  AmbilAbsensi,
 } from "../../wailsjs/go/main/App";
 
 export type StatusAbsensi = "hadir" | "izin" | "sakit" | "alfa" | "lembur";
@@ -25,17 +24,6 @@ export const useAbsensiStore = defineStore("absensi", {
     loading: false,
     error: "" as string,
   }),
-
-  getters: {
-    itemById: (state) => (id: number) => state.items.find((a) => a.id === id),
-    byKaryawan: (state) => (karyawan_id: number) =>
-      state.items.filter((a) => a.karyawan_id === karyawan_id),
-    byTanggal: (state) => (tanggal: string) =>
-      state.items.filter((a) => a.tanggal === tanggal),
-    hadirCount: (state) =>
-      state.items.filter((a) => a.status === "hadir").length,
-    alfaCount: (state) => state.items.filter((a) => a.status === "alfa").length,
-  },
 
   actions: {
     async fetchAll() {
@@ -106,19 +94,6 @@ export const useAbsensiStore = defineStore("absensi", {
         return updated;
       } catch (err: any) {
         this.error = err?.message || "Gagal mengupdate absensi";
-        throw err;
-      } finally {
-        this.loading = false;
-      }
-    },
-
-    async ambil(id: number) {
-      this.loading = true;
-      this.error = "";
-      try {
-        return await AmbilAbsensi(id);
-      } catch (err: any) {
-        this.error = err?.message || "Gagal memuat detail absensi";
         throw err;
       } finally {
         this.loading = false;

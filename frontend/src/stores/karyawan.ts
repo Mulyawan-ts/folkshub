@@ -4,7 +4,6 @@ import {
   SemuaKaryawan,
   HapusKaryawan,
   UpdateKaryawan,
-  AmbilKaryawan,
 } from "../../wailsjs/go/main/App";
 
 export interface Karyawan {
@@ -20,10 +19,6 @@ export const useKaryawanStore = defineStore("karyawan", {
     loading: false,
     error: "" as string,
   }),
-
-  getters: {
-    itemById: (state) => (id: number) => state.items.find((k) => k.id === id),
-  },
 
   actions: {
     async fetchAll() {
@@ -88,19 +83,6 @@ export const useKaryawanStore = defineStore("karyawan", {
         return updated;
       } catch (err: any) {
         this.error = err?.message || "Gagal mengupdate karyawan";
-        throw err;
-      } finally {
-        this.loading = false;
-      }
-    },
-
-    async ambil(id: number) {
-      this.loading = true;
-      this.error = "";
-      try {
-        return await AmbilKaryawan(id);
-      } catch (err: any) {
-        this.error = err?.message || "Gagal memuat detail karyawan";
         throw err;
       } finally {
         this.loading = false;

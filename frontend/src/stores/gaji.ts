@@ -4,7 +4,6 @@ import {
   SemuaGaji,
   HapusGaji,
   UpdateGaji,
-  AmbilGaji,
 } from "../../wailsjs/go/main/App";
 
 export type StatusGaji = "draft" | "diproses" | "dibayar" | "ditolak";
@@ -28,24 +27,6 @@ export const useGajiStore = defineStore("gaji", {
     loading: false,
     error: "" as string,
   }),
-
-  getters: {
-    itemById: (state) => (id: number) => state.items.find((g) => g.id === id),
-    byKaryawan: (state) => (karyawan_id: number) =>
-      state.items.filter((g) => g.karyawan_id === karyawan_id),
-    byBulan: (state) => (bulan: string) =>
-      state.items.filter((g) => g.bulan === bulan),
-    byStatus: (state) => (status: StatusGaji) =>
-      state.items.filter((g) => g.status === status),
-    totalGaji: (state) =>
-      state.items.reduce((acc, g) => acc + (g.total ?? 0), 0),
-    totalDibayar: (state) =>
-      state.items
-        .filter((g) => g.status === "dibayar")
-        .reduce((acc, g) => acc + (g.total ?? 0), 0),
-    belumDibayarCount: (state) =>
-      state.items.filter((g) => g.status !== "dibayar").length,
-  },
 
   actions: {
     async fetchAll() {
@@ -116,19 +97,6 @@ export const useGajiStore = defineStore("gaji", {
         return updated;
       } catch (err: any) {
         this.error = err?.message || "Gagal mengupdate gaji";
-        throw err;
-      } finally {
-        this.loading = false;
-      }
-    },
-
-    async ambil(id: number) {
-      this.loading = true;
-      this.error = "";
-      try {
-        return await AmbilGaji(id);
-      } catch (err: any) {
-        this.error = err?.message || "Gagal memuat detail gaji";
         throw err;
       } finally {
         this.loading = false;

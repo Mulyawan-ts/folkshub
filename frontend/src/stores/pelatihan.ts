@@ -4,7 +4,6 @@ import {
   SemuaPelatihan,
   HapusPelatihan,
   UpdatePelatihan,
-  AmbilPelatihan,
 } from "../../wailsjs/go/main/App";
 
 export type StatusPelatihan =
@@ -30,14 +29,6 @@ export const usePelatihanStore = defineStore("pelatihan", {
     loading: false,
     error: "" as string,
   }),
-
-  getters: {
-    itemById: (state) => (id: number) => state.items.find((p) => p.id === id),
-    byKaryawan: (state) => (karyawan_id: number) =>
-      state.items.filter((p) => p.karyawan_id === karyawan_id),
-    byStatus: (state) => (status: StatusPelatihan) =>
-      state.items.filter((p) => p.status === status),
-  },
 
   actions: {
     async fetchAll() {
@@ -116,19 +107,6 @@ export const usePelatihanStore = defineStore("pelatihan", {
         return updated;
       } catch (err: any) {
         this.error = err?.message || "Gagal mengupdate pelatihan";
-        throw err;
-      } finally {
-        this.loading = false;
-      }
-    },
-
-    async ambil(id: number) {
-      this.loading = true;
-      this.error = "";
-      try {
-        return await AmbilPelatihan(id);
-      } catch (err: any) {
-        this.error = err?.message || "Gagal memuat detail pelatihan";
         throw err;
       } finally {
         this.loading = false;

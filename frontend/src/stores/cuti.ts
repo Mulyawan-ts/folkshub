@@ -4,7 +4,6 @@ import {
   SemuaCuti,
   HapusCuti,
   UpdateCuti,
-  AmbilCuti,
 } from "../../wailsjs/go/main/App";
 
 export type StatusCuti =
@@ -31,20 +30,6 @@ export const useCutiStore = defineStore("cuti", {
     loading: false,
     error: "" as string,
   }),
-
-  getters: {
-    itemById: (state) => (id: number) => state.items.find((c) => c.id === id),
-    byKaryawan: (state) => (karyawan_id: number) =>
-      state.items.filter((c) => c.karyawan_id === karyawan_id),
-    byStatus: (state) => (status: StatusCuti) =>
-      state.items.filter((c) => c.status === status),
-    byJenis: (state) => (jenis: JenisCuti) =>
-      state.items.filter((c) => c.jenis === jenis),
-    pendingCount: (state) =>
-      state.items.filter((c) => c.status === "submitted").length,
-    approvedCount: (state) =>
-      state.items.filter((c) => c.status === "approved").length,
-  },
 
   actions: {
     async fetchAll() {
@@ -117,19 +102,6 @@ export const useCutiStore = defineStore("cuti", {
         return updated;
       } catch (err: any) {
         this.error = err?.message || "Gagal mengupdate cuti";
-        throw err;
-      } finally {
-        this.loading = false;
-      }
-    },
-
-    async ambil(id: number) {
-      this.loading = true;
-      this.error = "";
-      try {
-        return await AmbilCuti(id);
-      } catch (err: any) {
-        this.error = err?.message || "Gagal memuat detail cuti";
         throw err;
       } finally {
         this.loading = false;

@@ -4,7 +4,6 @@ import {
   SemuaReimburse,
   HapusReimburse,
   UpdateReimburse,
-  AmbilReimburse,
 } from "../../wailsjs/go/main/App";
 
 export type StatusReimburse =
@@ -28,20 +27,6 @@ export const useReimburseStore = defineStore("reimburse", {
     loading: false,
     error: "" as string,
   }),
-
-  getters: {
-    itemById: (state) => (id: number) => state.items.find((r) => r.id === id),
-    byKaryawan: (state) => (karyawan_id: number) =>
-      state.items.filter((r) => r.karyawan_id === karyawan_id),
-    byStatus: (state) => (status: StatusReimburse) =>
-      state.items.filter((r) => r.status === status),
-    totalDiajujkan: (state) =>
-      state.items.reduce((acc, r) => acc + r.jumlah, 0),
-    totalDibayar: (state) =>
-      state.items
-        .filter((r) => r.status === "paid")
-        .reduce((acc, r) => acc + r.jumlah, 0),
-  },
 
   actions: {
     async fetchAll() {
@@ -114,19 +99,6 @@ export const useReimburseStore = defineStore("reimburse", {
         return updated;
       } catch (err: any) {
         this.error = err?.message || "Gagal mengupdate reimburse";
-        throw err;
-      } finally {
-        this.loading = false;
-      }
-    },
-
-    async ambil(id: number) {
-      this.loading = true;
-      this.error = "";
-      try {
-        return await AmbilReimburse(id);
-      } catch (err: any) {
-        this.error = err?.message || "Gagal memuat detail reimburse";
         throw err;
       } finally {
         this.loading = false;

@@ -4,7 +4,6 @@ import {
   SemuaDepartemen,
   HapusDepartemen,
   UpdateDepartemen,
-  AmbilDepartemen,
 } from "../../wailsjs/go/main/App";
 
 export interface Departemen {
@@ -21,12 +20,6 @@ export const useDepartemenStore = defineStore("departemen", {
     loading: false,
     error: "" as string,
   }),
-
-  getters: {
-    itemById: (state) => (id: number) => state.items.find((d) => d.id === id),
-    byKode: (state) => (kode: string) =>
-      state.items.find((d) => d.kode === kode),
-  },
 
   actions: {
     async fetchAll() {
@@ -93,19 +86,6 @@ export const useDepartemenStore = defineStore("departemen", {
         return updated;
       } catch (err: any) {
         this.error = err?.message || "Gagal mengupdate departemen";
-        throw err;
-      } finally {
-        this.loading = false;
-      }
-    },
-
-    async ambil(id: number) {
-      this.loading = true;
-      this.error = "";
-      try {
-        return await AmbilDepartemen(id);
-      } catch (err: any) {
-        this.error = err?.message || "Gagal memuat detail departemen";
         throw err;
       } finally {
         this.loading = false;

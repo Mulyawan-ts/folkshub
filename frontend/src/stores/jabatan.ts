@@ -4,7 +4,6 @@ import {
   SemuaJabatan,
   HapusJabatan,
   UpdateJabatan,
-  AmbilJabatan,
 } from "../../wailsjs/go/main/App";
 
 export interface Jabatan {
@@ -23,12 +22,6 @@ export const useJabatanStore = defineStore("jabatan", {
     loading: false,
     error: "" as string,
   }),
-
-  getters: {
-    itemById: (state) => (id: number) => state.items.find((j) => j.id === id),
-    byDepartemen: (state) => (departemen: string) =>
-      state.items.filter((j) => j.departemen === departemen),
-  },
 
   actions: {
     async fetchAll() {
@@ -99,19 +92,6 @@ export const useJabatanStore = defineStore("jabatan", {
         return updated;
       } catch (err: any) {
         this.error = err?.message || "Gagal mengupdate jabatan";
-        throw err;
-      } finally {
-        this.loading = false;
-      }
-    },
-
-    async ambil(id: number) {
-      this.loading = true;
-      this.error = "";
-      try {
-        return await AmbilJabatan(id);
-      } catch (err: any) {
-        this.error = err?.message || "Gagal memuat detail jabatan";
         throw err;
       } finally {
         this.loading = false;
