@@ -13,6 +13,7 @@ type Pembelian struct {
 	Satuan      string    `json:"satuan"`
 	HargaSatuan int       `json:"harga_satuan" gorm:"not null"`
 	Total       int       `json:"total" gorm:"not null"`
+	MetodeBayar string    `json:"metode_bayar" gorm:"not null"` // tunai, non_tunai
 	Vendor      string    `json:"vendor"`
 	Departemen  string    `json:"departemen"`
 	Catatan     string    `json:"catatan"`
@@ -27,6 +28,13 @@ const (
 	JenisLangganan = "langganan"
 	JenisJasa      = "jasa"
 	JenisLainnya   = "lainnya"
+)
+
+// MetodeBayar menentukan cara pembayaran. Terpisah dari Jenis karena ATK bisa
+// dibeli tunai maupun non tunai.
+const (
+	MetodeTunai    = "tunai"
+	MetodeNonTunai = "non_tunai"
 )
 
 func (p *Pembelian) TableName() string {

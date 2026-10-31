@@ -28,6 +28,11 @@ var validPembelianStatus = map[string]bool{
 	"ditolak":   true,
 }
 
+var validMetodeBayar = map[string]bool{
+	model.MetodeTunai:    true,
+	model.MetodeNonTunai: true,
+}
+
 type PembelianService struct {
 	mu sync.RWMutex
 	db *gorm.DB
@@ -133,6 +138,7 @@ func (s *PembelianService) Update(id int, p *model.Pembelian) (*model.Pembelian,
 	lama.Satuan = p.Satuan
 	lama.HargaSatuan = p.HargaSatuan
 	lama.Total = p.Jumlah * p.HargaSatuan
+	lama.MetodeBayar = p.MetodeBayar
 	lama.Vendor = p.Vendor
 	lama.Departemen = p.Departemen
 	lama.Catatan = p.Catatan
@@ -161,6 +167,9 @@ func validasiPembelian(p *model.Pembelian) error {
 		return ErrInvalidInput
 	}
 	if !validPembelianJenis[p.Jenis] {
+		return ErrInvalidInput
+	}
+	if !validMetodeBayar[p.MetodeBayar] {
 		return ErrInvalidInput
 	}
 	if !validPembelianStatus[p.Status] {

@@ -25,6 +25,7 @@ func pembelianValid() *model.Pembelian {
 		Jumlah:      10,
 		Satuan:      "rim",
 		HargaSatuan: 55000,
+		MetodeBayar: model.MetodeTunai,
 		Vendor:      "Toko Sinar",
 		Departemen:  "HRD",
 		Status:      "diajukan",
@@ -63,6 +64,8 @@ func TestPembelianMenolakInputTidakValid(t *testing.T) {
 		{"tanggal bukan kalender", func(p *model.Pembelian) { p.Tanggal = "2026-02-30" }},
 		{"jenis asing", func(p *model.Pembelian) { p.Jenis = "entah" }},
 		{"status asing", func(p *model.Pembelian) { p.Status = "entah" }},
+		{"metode bayar kosong", func(p *model.Pembelian) { p.MetodeBayar = "" }},
+		{"metode bayar asing", func(p *model.Pembelian) { p.MetodeBayar = "kripto" }},
 		{"jumlah nol", func(p *model.Pembelian) { p.Jumlah = 0 }},
 		{"harga negatif", func(p *model.Pembelian) { p.HargaSatuan = -1 }},
 	}
@@ -151,5 +154,25 @@ func TestPembelianHapusDanSemua(t *testing.T) {
 
 	if err := svc.Hapus(a.ID); !errors.Is(err, ErrPembelianNotFound) {
 		t.Fatalf("hapus dua kali: err = %v, want ErrPembelianNotFound", err)
+	}
+}
+
+func TestPembelianMetodeBayarIndependenDariJenis(t *testing.T) {
+	svc := newPembelianService(t)
+
+	for _, metode := range []string{model.MetodeTunai, model.MetodeNonTunai} {
+		for _, jenis := range []string{model.JenisATK, model.JenisLangganan} {
+			p := pembelianValid()
+			p.MetodeBayar = metode
+			p.Jenis = jenis
+			if err := svc.Simpan(p); err != nil {
+				t.Fatalf("metode=%s jenis=%s: %v", metode, jenis, err)
+			}
+		}
+	}
+
+	list, err := svc.Semua()
+	if err != nil || len(list) != 4 {
+		t.Fatalf("semua: %v / %d, want 4 kombinasi", err, len(list))
 	}
 }
