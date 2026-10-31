@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"os"
 	"path/filepath"
 	"testing"
@@ -16,14 +17,7 @@ func newTestApp(t *testing.T) *App {
 	if err != nil {
 		t.Fatalf("newApp: %v", err)
 	}
-	t.Cleanup(func() {
-		for _, c := range []interface{ Close() error }{
-			a.karyawanSvc, a.absensiSvc, a.cutiSvc, a.reimburseSvc,
-			a.gajiSvc, a.jabatanSvc, a.departemenSvc, a.pelatihanSvc,
-		} {
-			_ = c.Close()
-		}
-	})
+	t.Cleanup(func() { a.shutdown(context.Background()) })
 	return a
 }
 
@@ -395,5 +389,19 @@ func TestAppGreet(t *testing.T) {
 	a := newTestApp(t)
 	if got := a.Greet("Andi"); got != "Hello Andi, It's show time!" {
 		t.Fatalf("greet: %q", got)
+	}
+}
+
+func TestShutdownMenutupSemuaKoneksi(t *testing.T) {
+	a, err := newApp(t.TempDir())
+	if err != nil {
+		t.Fatalf("newApp: %v", err)
+	}
+
+	a.shutdown(context.Background())
+
+	// Setelah shutdown, koneksi sudah tertutup sehingga query harus gagal.
+	if _, err := a.karyawanSvc.Semua(); err == nil {
+		t.Fatalf("Semua() setelah shutdown seharusnya gagal karena koneksi sudah tertutup")
 	}
 }

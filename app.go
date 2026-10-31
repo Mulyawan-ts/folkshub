@@ -87,6 +87,17 @@ func (a *App) startup(ctx context.Context) {
 	a.ctx = ctx
 }
 
+// shutdown menutup semua koneksi SQLite agar file WAL ter-checkpoint sebelum
+// proses keluar.
+func (a *App) shutdown(_ context.Context) {
+	for _, penutup := range []interface{ Close() error }{
+		a.karyawanSvc, a.absensiSvc, a.cutiSvc, a.reimburseSvc,
+		a.gajiSvc, a.jabatanSvc, a.departemenSvc, a.pelatihanSvc,
+	} {
+		_ = penutup.Close()
+	}
+}
+
 // Greet returns a greeting for the given name
 func (a *App) Greet(name string) string {
 	return fmt.Sprintf("Hello %s, It's show time!", name)
