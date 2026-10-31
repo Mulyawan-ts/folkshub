@@ -9,6 +9,7 @@ import { useToastStore } from '../stores/toast'
 import AppInput from '../components/AppInput.vue'
 import AppButton from '../components/AppButton.vue'
 import AppBadge from '../components/AppBadge.vue'
+import { formatTanggal } from '../utils/tanggal'
 
 const reimburseStore = useReimburseStore()
 const karyawanStore = useKaryawanStore()
@@ -160,7 +161,7 @@ async function handleHapus(id: number) {
         <tbody>
           <tr v-for="r in items" :key="r.id" class="border-b">
             <td>{{ r.karyawan_id }}</td>
-            <td>{{ r.tanggal }}</td>
+            <td>{{ formatTanggal(r.tanggal) }}</td>
             <td>{{ r.jenis }}</td>
             <td>{{ r.jumlah }}</td>
             <td>{{ r.bukti || '-' }}</td>

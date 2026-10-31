@@ -9,6 +9,7 @@ import { useToastStore } from '../stores/toast'
 import AppInput from '../components/AppInput.vue'
 import AppButton from '../components/AppButton.vue'
 import AppBadge from '../components/AppBadge.vue'
+import { formatTanggal } from '../utils/tanggal'
 
 const cutiStore = useCutiStore()
 const karyawanStore = useKaryawanStore()
@@ -172,8 +173,8 @@ async function handleHapus(id: number) {
           <tr v-for="c in items" :key="c.id" class="border-b">
             <td>{{ c.karyawan_id }}</td>
             <td>{{ c.jenis }}</td>
-            <td>{{ c.tanggal_mulai }}</td>
-            <td>{{ c.tanggal_selesai }}</td>
+            <td>{{ formatTanggal(c.tanggal_mulai) }}</td>
+            <td>{{ formatTanggal(c.tanggal_selesai) }}</td>
             <td>{{ c.jumlah_hari }}</td>
             <td>
               <AppBadge :variant="statusVariant(c.status)" size="sm">
