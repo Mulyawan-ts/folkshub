@@ -80,3 +80,27 @@ func TestReimburseServiceValidationAndDuplicate(t *testing.T) {
 		t.Fatalf("expected not found on hapus, got %v", err)
 	}
 }
+
+func TestReimburseServiceDateValidation(t *testing.T) {
+	svc, err := NewReimburseService(":memory:")
+	if err != nil {
+		t.Fatalf("new service: %v", err)
+	}
+
+	for _, tanggal := range []string{"15-10-2026", "2026-10-32", "2026-02-30", "kemarin"} {
+		if err := svc.Simpan(&model.Reimburse{KaryawanId: 1, Tanggal: tanggal, Jenis: "transport", Status: "submitted"}); err != ErrInvalidInput {
+			t.Fatalf("tanggal %q: expected invalid input, got %v", tanggal, err)
+		}
+	}
+
+	r := &model.Reimburse{KaryawanId: 1, Tanggal: "2026-10-15", Jenis: "transport", Status: "draft"}
+	if err := svc.Simpan(r); err != nil {
+		t.Fatalf("tanggal valid ditolak: %v", err)
+	}
+	if _, err := svc.Update(r.ID, 1, "2026-10-32", "transport", "", "", "", 0); err != ErrInvalidInput {
+		t.Fatalf("expected invalid input on update, got %v", err)
+	}
+	if _, err := svc.Update(999, 1, "2026-10-32", "transport", "", "", "", 0); err != ErrReimburseNotFound {
+		t.Fatalf("expected not found before date check on update, got %v", err)
+	}
+}

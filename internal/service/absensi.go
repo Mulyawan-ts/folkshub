@@ -36,6 +36,9 @@ func (s *AbsensiService) Simpan(a *model.Absensi) error {
 	if a == nil || a.KaryawanId <= 0 || a.Tanggal == "" {
 		return ErrInvalidInput
 	}
+	if !validDate(a.Tanggal) {
+		return ErrInvalidInput
+	}
 
 	if a.ID == 0 {
 		return s.db.Create(a).Error
@@ -103,6 +106,10 @@ func (s *AbsensiService) Update(id int, karyawanId int, tanggal, checkIn, checkO
 			return nil, ErrAbsensiNotFound
 		}
 		return nil, err
+	}
+
+	if !validDate(tanggal) {
+		return nil, ErrInvalidInput
 	}
 
 	a.KaryawanId = karyawanId

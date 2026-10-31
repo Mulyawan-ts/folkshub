@@ -63,8 +63,18 @@ func TestPelatihanServiceValidationAndDuplicate(t *testing.T) {
 	if err := svc.Simpan(p); err != nil {
 		t.Fatalf("simpan: %v", err)
 	}
-	if err := svc.Simpan(&model.Pelatihan{ID: p.ID, KaryawanId: 1, Nama: "Dasar 2"}); err != ErrPelatihanExists {
+	if err := svc.Simpan(&model.Pelatihan{ID: p.ID, KaryawanId: 1, Nama: "Dasar 2", TanggalMulai: "2026-11-02"}); err != ErrPelatihanExists {
 		t.Fatalf("expected exists, got %v", err)
+	}
+
+	if err := svc.Simpan(&model.Pelatihan{KaryawanId: 1, Nama: "Tanggal Rusak", TanggalMulai: "11-11-2026"}); err != ErrInvalidInput {
+		t.Fatalf("expected invalid input (tanggal format), got %v", err)
+	}
+	if err := svc.Simpan(&model.Pelatihan{KaryawanId: 1, Nama: "Tanggal Mustahil", TanggalMulai: "2026-02-30"}); err != ErrInvalidInput {
+		t.Fatalf("expected invalid input (tanggal mustahil), got %v", err)
+	}
+	if _, err := svc.Update(p.ID, 1, "Nama", "", "x", "", "", "", "", "", 0); err != ErrInvalidInput {
+		t.Fatalf("expected invalid input (update tanggal format), got %v", err)
 	}
 
 	if _, err := svc.Update(p.ID, 0, "Nama", "", "", "", "", "", "", "", 0); err != ErrInvalidInput {

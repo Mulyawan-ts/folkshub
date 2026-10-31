@@ -53,6 +53,10 @@ func (s *CutiService) Simpan(c *model.Cuti) error {
 	if c == nil || c.KaryawanId <= 0 || c.Jenis == "" || c.TanggalMulai == "" || c.TanggalSelesai == "" {
 		return ErrInvalidInput
 	}
+	if !validDate(c.TanggalMulai) || !validDate(c.TanggalSelesai) {
+		return ErrCutiInvalid
+	}
+
 	if !validCutiJenis[c.Jenis] {
 		return ErrCutiInvalid
 	}
@@ -132,21 +136,6 @@ func (s *CutiService) Update(id int, karyawanId int, jenis, tanggalMulai, tangga
 	if karyawanId <= 0 || jenis == "" || tanggalMulai == "" || tanggalSelesai == "" {
 		return nil, ErrInvalidInput
 	}
-	if !validCutiJenis[jenis] {
-		return nil, ErrCutiInvalid
-	}
-	if status == "" {
-		status = "draft"
-	}
-	if !validCutiStatus[status] {
-		return nil, ErrCutiInvalid
-	}
-	if tanggalMulai > tanggalSelesai {
-		return nil, ErrCutiInvalid
-	}
-	if jumlahHari <= 0 {
-		return nil, ErrCutiInvalid
-	}
 
 	var c model.Cuti
 	if err := s.db.First(&c, id).Error; err != nil {
@@ -156,9 +145,29 @@ func (s *CutiService) Update(id int, karyawanId int, jenis, tanggalMulai, tangga
 		return nil, err
 	}
 
+	if !validCutiJenis[jenis] {
+		return nil, ErrCutiInvalid
+	}
+	if status == "" {
+		status = "draft"
+	}
+	if !validCutiStatus[status] {
+		return nil, ErrCutiInvalid
+	}
+	if !validDate(tanggalMulai) || !validDate(tanggalSelesai) {
+		return nil, ErrCutiInvalid
+	}
+	if tanggalMulai > tanggalSelesai {
+		return nil, ErrCutiInvalid
+	}
+	if jumlahHari <= 0 {
+		return nil, ErrCutiInvalid
+	}
+
 	if s.hasOverlap(karyawanId, tanggalMulai, tanggalSelesai, id) {
 		return nil, ErrCutiOverlap
 	}
+
 
 	c.KaryawanId = karyawanId
 	c.Jenis = jenis

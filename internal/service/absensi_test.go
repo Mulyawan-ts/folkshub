@@ -47,6 +47,30 @@ func TestAbsensiServiceCRUD(t *testing.T) {
 	}
 }
 
+func TestAbsensiServiceDateValidation(t *testing.T) {
+	svc, err := NewAbsensiService(":memory:")
+	if err != nil {
+		t.Fatalf("new service: %v", err)
+	}
+
+	for _, tanggal := range []string{"01-10-2026", "2026-13-01", "2026-02-30", "kemarin"} {
+		if err := svc.Simpan(&model.Absensi{KaryawanId: 1, Tanggal: tanggal, Status: "hadir"}); err != ErrInvalidInput {
+			t.Fatalf("tanggal %q: expected invalid input, got %v", tanggal, err)
+		}
+	}
+
+	a := &model.Absensi{KaryawanId: 1, Tanggal: "2026-10-01", Status: "hadir"}
+	if err := svc.Simpan(a); err != nil {
+		t.Fatalf("tanggal valid ditolak: %v", err)
+	}
+	if _, err := svc.Update(a.ID, 1, "2026-10-32", "", "", "", ""); err != ErrInvalidInput {
+		t.Fatalf("expected invalid input on update, got %v", err)
+	}
+	if _, err := svc.Update(999, 1, "2026-10-32", "", "", "", ""); err != ErrAbsensiNotFound {
+		t.Fatalf("expected not found before date check on update, got %v", err)
+	}
+}
+
 func TestGajiServiceTotal(t *testing.T) {
 	svc, err := NewGajiService(":memory:")
 	if err != nil {
@@ -69,6 +93,12 @@ func TestGajiServiceTotal(t *testing.T) {
 	list, err := svc.Semua()
 	if err != nil || len(list) != 1 || list[0].ID != g.ID {
 		t.Fatalf("semua: %v / %d", err, len(list))
+	}
+
+	for _, bulan := range []string{"2026-13", "11-2026", "2026-11-01", "november"} {
+		if err := svc.Simpan(&model.Gaji{KaryawanId: 1, Bulan: bulan}); err != ErrInvalidInput {
+			t.Fatalf("bulan %q: expected invalid input, got %v", bulan, err)
+		}
 	}
 
 	if err := svc.Simpan(&model.Gaji{KaryawanId: 0, Bulan: "x"}); err != ErrInvalidInput {

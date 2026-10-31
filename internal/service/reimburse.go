@@ -36,6 +36,9 @@ func (s *ReimburseService) Simpan(r *model.Reimburse) error {
 	if r == nil || r.KaryawanId <= 0 || r.Jenis == "" || r.Tanggal == "" {
 		return ErrInvalidInput
 	}
+	if !validDate(r.Tanggal) {
+		return ErrInvalidInput
+	}
 
 	if r.ID == 0 {
 		return s.db.Create(r).Error
@@ -103,6 +106,10 @@ func (s *ReimburseService) Update(id int, karyawanId int, tanggal, jenis, ketera
 			return nil, ErrReimburseNotFound
 		}
 		return nil, err
+	}
+
+	if !validDate(tanggal) {
+		return nil, ErrInvalidInput
 	}
 
 	r.KaryawanId = karyawanId

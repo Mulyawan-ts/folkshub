@@ -47,3 +47,25 @@ func TestCutiServiceValidation(t *testing.T) {
 		t.Fatalf("simpan karyawan lain: %v", err)
 	}
 }
+
+func TestCutiServiceDateValidation(t *testing.T) {
+	svc, err := NewCutiService(":memory:")
+	if err != nil {
+		t.Fatalf("new service: %v", err)
+	}
+
+	for _, tanggal := range []string{"01-10-2026", "2026-10-32", "2026-02-30", "besok"} {
+		err := svc.Simpan(&model.Cuti{KaryawanId: 1, Jenis: "tahunan", TanggalMulai: tanggal, TanggalSelesai: "2026-12-31", JumlahHari: 1, Status: "submitted"})
+		if err != ErrCutiInvalid {
+			t.Fatalf("tanggal mulai %q: expected cuti invalid, got %v", tanggal, err)
+		}
+		err = svc.Simpan(&model.Cuti{KaryawanId: 1, Jenis: "tahunan", TanggalMulai: "2026-01-01", TanggalSelesai: tanggal, JumlahHari: 1, Status: "submitted"})
+		if err != ErrCutiInvalid {
+			t.Fatalf("tanggal selesai %q: expected cuti invalid, got %v", tanggal, err)
+		}
+	}
+
+	if _, err := svc.Update(999, 1, "tahunan", "01-10-2026", "2026-10-02", "", "submitted", 2); err != ErrCutiNotFound {
+		t.Fatalf("expected not found, got %v", err)
+	}
+}

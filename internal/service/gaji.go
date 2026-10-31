@@ -36,6 +36,9 @@ func (s *GajiService) Simpan(g *model.Gaji) error {
 	if g == nil || g.KaryawanId <= 0 || g.Bulan == "" {
 		return ErrInvalidInput
 	}
+	if !validMonth(g.Bulan) {
+		return ErrInvalidInput
+	}
 
 	g.Total = g.GajiPokok + g.Tunjangan - g.Potongan
 
@@ -105,6 +108,10 @@ func (s *GajiService) Update(id int, karyawanId int, bulan string, gajiPokok, tu
 			return nil, ErrGajiNotFound
 		}
 		return nil, err
+	}
+
+	if !validMonth(bulan) {
+		return nil, ErrInvalidInput
 	}
 
 	g.KaryawanId = karyawanId
