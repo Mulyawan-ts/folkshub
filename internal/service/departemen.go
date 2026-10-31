@@ -115,3 +115,11 @@ func (s *DepartemenService) Update(id int, kode, nama, kepala, deskripsi string)
 	}
 	return &d, nil
 }
+
+func (s *DepartemenService) Close() error {
+	sqlDB, err := s.db.DB()
+	if err != nil {
+		return err
+	}
+	return sqlDB.Close()
+}

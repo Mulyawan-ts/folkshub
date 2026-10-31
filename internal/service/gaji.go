@@ -120,3 +120,11 @@ func (s *GajiService) Update(id int, karyawanId int, bulan string, gajiPokok, tu
 	}
 	return &g, nil
 }
+
+func (s *GajiService) Close() error {
+	sqlDB, err := s.db.DB()
+	if err != nil {
+		return err
+	}
+	return sqlDB.Close()
+}

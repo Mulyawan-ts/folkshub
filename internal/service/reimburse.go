@@ -118,3 +118,11 @@ func (s *ReimburseService) Update(id int, karyawanId int, tanggal, jenis, ketera
 	}
 	return &r, nil
 }
+
+func (s *ReimburseService) Close() error {
+	sqlDB, err := s.db.DB()
+	if err != nil {
+		return err
+	}
+	return sqlDB.Close()
+}

@@ -41,4 +41,9 @@ func TestCutiServiceValidation(t *testing.T) {
 	if err := svc.Simpan(c2); err != nil {
 		t.Fatalf("simpan2: %v", err)
 	}
+
+	// karyawan lain boleh tanggal sama
+	if err := svc.Simpan(&model.Cuti{KaryawanId: 2, Jenis: "sakit", TanggalMulai: "2026-10-10", TanggalSelesai: "2026-10-10", JumlahHari: 1, Status: "submitted"}); err != nil {
+		t.Fatalf("simpan karyawan lain: %v", err)
+	}
 }

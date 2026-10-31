@@ -121,3 +121,11 @@ func (s *PelatihanService) Update(id int, karyawanId int, nama, jenis, tanggalMu
 	}
 	return &p, nil
 }
+
+func (s *PelatihanService) Close() error {
+	sqlDB, err := s.db.DB()
+	if err != nil {
+		return err
+	}
+	return sqlDB.Close()
+}

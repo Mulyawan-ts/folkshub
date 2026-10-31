@@ -184,3 +184,11 @@ func (s *CutiService) hasOverlap(karyawanId int, start, end string, excludeID in
 	q.Count(&count)
 	return count > 0
 }
+
+func (s *CutiService) Close() error {
+	sqlDB, err := s.db.DB()
+	if err != nil {
+		return err
+	}
+	return sqlDB.Close()
+}

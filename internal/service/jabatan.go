@@ -117,3 +117,11 @@ func (s *JabatanService) Update(id int, kode, nama, departemen, deskripsi string
 	}
 	return &j, nil
 }
+
+func (s *JabatanService) Close() error {
+	sqlDB, err := s.db.DB()
+	if err != nil {
+		return err
+	}
+	return sqlDB.Close()
+}

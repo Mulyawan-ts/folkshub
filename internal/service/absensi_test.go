@@ -66,6 +66,11 @@ func TestGajiServiceTotal(t *testing.T) {
 		t.Fatalf("update total: %v / %d", err, upd.Total)
 	}
 
+	list, err := svc.Semua()
+	if err != nil || len(list) != 1 || list[0].ID != g.ID {
+		t.Fatalf("semua: %v / %d", err, len(list))
+	}
+
 	if err := svc.Simpan(&model.Gaji{KaryawanId: 0, Bulan: "x"}); err != ErrInvalidInput {
 		t.Fatalf("expected invalid input, got %v", err)
 	}

@@ -114,3 +114,11 @@ func (s *KaryawanService) Update(id int, nama, email, status string) (*model.Kar
 	}
 	return &k, nil
 }
+
+func (s *KaryawanService) Close() error {
+	sqlDB, err := s.db.DB()
+	if err != nil {
+		return err
+	}
+	return sqlDB.Close()
+}

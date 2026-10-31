@@ -117,3 +117,11 @@ func (s *AbsensiService) Update(id int, karyawanId int, tanggal, checkIn, checkO
 	}
 	return &a, nil
 }
+
+func (s *AbsensiService) Close() error {
+	sqlDB, err := s.db.DB()
+	if err != nil {
+		return err
+	}
+	return sqlDB.Close()
+}
