@@ -22,6 +22,9 @@ export const useDepartemenStore = defineStore("departemen", {
   }),
 
   actions: {
+    bersihkanError() {
+      this.error = "";
+    },
     async fetchAll() {
       this.loading = true;
       this.error = "";

@@ -32,6 +32,9 @@ export const useCutiStore = defineStore("cuti", {
   }),
 
   actions: {
+    bersihkanError() {
+      this.error = "";
+    },
     async fetchAll() {
       this.loading = true;
       this.error = "";

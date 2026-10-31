@@ -26,6 +26,9 @@ export const useAbsensiStore = defineStore("absensi", {
   }),
 
   actions: {
+    bersihkanError() {
+      this.error = "";
+    },
     async fetchAll() {
       this.loading = true;
       this.error = "";

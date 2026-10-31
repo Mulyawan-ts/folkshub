@@ -29,6 +29,9 @@ export const useReimburseStore = defineStore("reimburse", {
   }),
 
   actions: {
+    bersihkanError() {
+      this.error = "";
+    },
     async fetchAll() {
       this.loading = true;
       this.error = "";

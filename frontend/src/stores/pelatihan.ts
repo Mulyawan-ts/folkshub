@@ -31,6 +31,9 @@ export const usePelatihanStore = defineStore("pelatihan", {
   }),
 
   actions: {
+    bersihkanError() {
+      this.error = "";
+    },
     async fetchAll() {
       this.loading = true;
       this.error = "";

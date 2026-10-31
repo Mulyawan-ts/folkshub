@@ -24,6 +24,9 @@ export const useJabatanStore = defineStore("jabatan", {
   }),
 
   actions: {
+    bersihkanError() {
+      this.error = "";
+    },
     async fetchAll() {
       this.loading = true;
       this.error = "";

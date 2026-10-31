@@ -29,6 +29,9 @@ export const useGajiStore = defineStore("gaji", {
   }),
 
   actions: {
+    bersihkanError() {
+      this.error = "";
+    },
     async fetchAll() {
       this.loading = true;
       this.error = "";
