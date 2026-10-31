@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
+import { ref, computed, onMounted } from "vue";
 import { storeToRefs } from "pinia";
 import { useCutiStore, useKaryawanStore } from "../stores/index";
 import { useToastStore } from "../stores/toast";
@@ -20,6 +20,21 @@ const tanggalMulai = ref("");
 const tanggalSelesai = ref("");
 const jumlahHari = ref("");
 const keterangan = ref("");
+const cari = ref("");
+
+const filteredItems = computed(() => {
+  const q = cari.value.trim().toLowerCase();
+  if (!q) return items.value;
+  return items.value.filter(
+    (c) =>
+      String(c.karyawan_id).includes(q) ||
+      c.jenis.toLowerCase().includes(q) ||
+      c.status.toLowerCase().includes(q) ||
+      c.tanggal_mulai.includes(q) ||
+      c.tanggal_selesai.includes(q) ||
+      (c.keterangan ?? "").toLowerCase().includes(q),
+  );
+});
 
 const jenisOptions = [
   { value: "tahunan", label: "Tahunan" },
@@ -177,6 +192,11 @@ async function handleHapus(id: number) {
     </form>
 
     <div class="card p-4 bg-base-100 shadow-sm overflow-x-auto">
+      <AppInput
+        v-model="cari"
+        placeholder="Cari karyawan, jenis, tanggal, status, atau keterangan"
+        class="mb-4"
+      />
       <table class="table w-full text-left">
         <thead>
           <tr>
@@ -190,7 +210,7 @@ async function handleHapus(id: number) {
           </tr>
         </thead>
         <tbody>
-          <tr v-for="c in items" :key="c.id" class="border-b">
+          <tr v-for="c in filteredItems" :key="c.id" class="border-b">
             <td>{{ c.karyawan_id }}</td>
             <td>{{ c.jenis }}</td>
             <td>{{ formatTanggal(c.tanggal_mulai) }}</td>
@@ -212,9 +232,9 @@ async function handleHapus(id: number) {
               </AppButton>
             </td>
           </tr>
-          <tr v-if="items.length === 0">
+          <tr v-if="filteredItems.length === 0">
             <td colspan="7" class="text-center text-text-muted py-4">
-              Belum ada data cuti
+              {{ cari ? "Tidak ada cuti yang cocok" : "Belum ada data cuti" }}
             </td>
           </tr>
         </tbody>

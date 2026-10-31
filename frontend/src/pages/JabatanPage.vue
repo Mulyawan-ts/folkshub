@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
+import { ref, computed, onMounted } from "vue";
 import { storeToRefs } from "pinia";
 import { useJabatanStore } from "../stores/index";
 import { useToastStore } from "../stores/toast";
@@ -17,6 +17,19 @@ const departemen = ref("");
 const gajiPokok = ref("");
 const tunjangan = ref("");
 const deskripsi = ref("");
+const cari = ref("");
+
+const filteredItems = computed(() => {
+  const q = cari.value.trim().toLowerCase();
+  if (!q) return items.value;
+  return items.value.filter(
+    (j) =>
+      j.kode.toLowerCase().includes(q) ||
+      j.nama.toLowerCase().includes(q) ||
+      (j.departemen ?? "").toLowerCase().includes(q) ||
+      (j.deskripsi ?? "").toLowerCase().includes(q),
+  );
+});
 
 onMounted(() => {
   jabatanStore.fetchAll();
@@ -133,6 +146,11 @@ async function handleHapus(id: number) {
     </form>
 
     <div class="card p-4 bg-base-100 shadow-sm overflow-x-auto">
+      <AppInput
+        v-model="cari"
+        placeholder="Cari kode, nama, atau departemen"
+        class="mb-4"
+      />
       <table class="table w-full text-left">
         <thead>
           <tr>
@@ -146,7 +164,7 @@ async function handleHapus(id: number) {
           </tr>
         </thead>
         <tbody>
-          <tr v-for="j in items" :key="j.id" class="border-b">
+          <tr v-for="j in filteredItems" :key="j.id" class="border-b">
             <td>{{ j.kode }}</td>
             <td>{{ j.nama }}</td>
             <td>{{ j.departemen }}</td>
@@ -164,9 +182,11 @@ async function handleHapus(id: number) {
               </AppButton>
             </td>
           </tr>
-          <tr v-if="items.length === 0">
+          <tr v-if="filteredItems.length === 0">
             <td colspan="7" class="text-center text-text-muted py-4">
-              Belum ada data jabatan
+              {{
+                cari ? "Tidak ada jabatan yang cocok" : "Belum ada data jabatan"
+              }}
             </td>
           </tr>
         </tbody>

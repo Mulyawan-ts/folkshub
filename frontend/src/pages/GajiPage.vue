@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
+import { ref, computed, onMounted } from "vue";
 import { storeToRefs } from "pinia";
 import { useGajiStore, useKaryawanStore } from "../stores/index";
 import { useToastStore } from "../stores/toast";
@@ -19,6 +19,20 @@ const bulan = ref("");
 const gajiPokok = ref("");
 const tunjangan = ref("");
 const potongan = ref("");
+const cari = ref("");
+
+const filteredItems = computed(() => {
+  const q = cari.value.trim().toLowerCase();
+  if (!q) return items.value;
+  return items.value.filter(
+    (g) =>
+      String(g.karyawan_id).includes(q) ||
+      g.bulan.includes(q) ||
+      formatBulan(g.bulan).toLowerCase().includes(q) ||
+      g.status.toLowerCase().includes(q) ||
+      (g.keterangan ?? "").toLowerCase().includes(q),
+  );
+});
 
 const statusVariant = (s: string) => {
   switch (s) {
@@ -153,6 +167,11 @@ async function handleHapus(id: number) {
     </form>
 
     <div class="card p-4 bg-base-100 shadow-sm overflow-x-auto">
+      <AppInput
+        v-model="cari"
+        placeholder="Cari karyawan, bulan, status, atau keterangan"
+        class="mb-4"
+      />
       <table class="table w-full text-left">
         <thead>
           <tr>
@@ -167,7 +186,7 @@ async function handleHapus(id: number) {
           </tr>
         </thead>
         <tbody>
-          <tr v-for="g in items" :key="g.id" class="border-b">
+          <tr v-for="g in filteredItems" :key="g.id" class="border-b">
             <td>{{ g.karyawan_id }}</td>
             <td>{{ formatBulan(g.bulan) }}</td>
             <td>{{ g.gaji_pokok }}</td>
@@ -190,9 +209,9 @@ async function handleHapus(id: number) {
               </AppButton>
             </td>
           </tr>
-          <tr v-if="items.length === 0">
+          <tr v-if="filteredItems.length === 0">
             <td colspan="8" class="text-center text-text-muted py-4">
-              Belum ada data gaji
+              {{ cari ? "Tidak ada gaji yang cocok" : "Belum ada data gaji" }}
             </td>
           </tr>
         </tbody>

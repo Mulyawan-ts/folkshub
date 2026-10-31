@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
+import { ref, computed, onMounted } from "vue";
 import { storeToRefs } from "pinia";
 import { useReimburseStore, useKaryawanStore } from "../stores/index";
 import { useToastStore } from "../stores/toast";
@@ -20,6 +20,21 @@ const jenis = ref("");
 const jumlah = ref("");
 const keterangan = ref("");
 const bukti = ref("");
+const cari = ref("");
+
+const filteredItems = computed(() => {
+  const q = cari.value.trim().toLowerCase();
+  if (!q) return items.value;
+  return items.value.filter(
+    (r) =>
+      String(r.karyawan_id).includes(q) ||
+      r.tanggal.includes(q) ||
+      r.jenis.toLowerCase().includes(q) ||
+      r.status.toLowerCase().includes(q) ||
+      (r.keterangan ?? "").toLowerCase().includes(q) ||
+      (r.bukti ?? "").toLowerCase().includes(q),
+  );
+});
 
 const statusVariant = (s: string) => {
   switch (s) {
@@ -168,6 +183,11 @@ async function handleHapus(id: number) {
     </form>
 
     <div class="card p-4 bg-base-100 shadow-sm overflow-x-auto">
+      <AppInput
+        v-model="cari"
+        placeholder="Cari karyawan, jenis, status, atau keterangan"
+        class="mb-4"
+      />
       <table class="table w-full text-left">
         <thead>
           <tr>
@@ -181,7 +201,7 @@ async function handleHapus(id: number) {
           </tr>
         </thead>
         <tbody>
-          <tr v-for="r in items" :key="r.id" class="border-b">
+          <tr v-for="r in filteredItems" :key="r.id" class="border-b">
             <td>{{ r.karyawan_id }}</td>
             <td>{{ formatTanggal(r.tanggal) }}</td>
             <td>{{ r.jenis }}</td>
@@ -203,9 +223,13 @@ async function handleHapus(id: number) {
               </AppButton>
             </td>
           </tr>
-          <tr v-if="items.length === 0">
+          <tr v-if="filteredItems.length === 0">
             <td colspan="7" class="text-center text-text-muted py-4">
-              Belum ada data reimburse
+              {{
+                cari
+                  ? "Tidak ada reimburse yang cocok"
+                  : "Belum ada data reimburse"
+              }}
             </td>
           </tr>
         </tbody>

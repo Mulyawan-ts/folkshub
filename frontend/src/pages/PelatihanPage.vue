@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
+import { ref, computed, onMounted } from "vue";
 import { storeToRefs } from "pinia";
 import { usePelatihanStore } from "../stores/index";
 import { useToastStore } from "../stores/toast";
@@ -22,6 +22,23 @@ const lokasi = ref("");
 const biaya = ref("");
 const sertifikat = ref("");
 const catatan = ref("");
+const cari = ref("");
+
+const filteredItems = computed(() => {
+  const q = cari.value.trim().toLowerCase();
+  if (!q) return items.value;
+  return items.value.filter(
+    (p) =>
+      String(p.karyawan_id).includes(q) ||
+      p.nama.toLowerCase().includes(q) ||
+      (p.jenis ?? "").toLowerCase().includes(q) ||
+      (p.lokasi ?? "").toLowerCase().includes(q) ||
+      p.status.toLowerCase().includes(q) ||
+      p.tanggal_mulai.includes(q) ||
+      (p.tanggal_selesai ?? "").includes(q) ||
+      (p.catatan ?? "").toLowerCase().includes(q),
+  );
+});
 
 const statusVariant = (s: string) => {
   switch (s) {
@@ -189,6 +206,11 @@ async function handleHapus(id: number) {
     </form>
 
     <div class="card p-4 bg-base-100 shadow-sm overflow-x-auto">
+      <AppInput
+        v-model="cari"
+        placeholder="Cari nama, jenis, lokasi, tanggal, atau status"
+        class="mb-4"
+      />
       <table class="table w-full text-left">
         <thead>
           <tr>
@@ -203,7 +225,7 @@ async function handleHapus(id: number) {
           </tr>
         </thead>
         <tbody>
-          <tr v-for="p in items" :key="p.id" class="border-b">
+          <tr v-for="p in filteredItems" :key="p.id" class="border-b">
             <td>{{ p.karyawan_id }}</td>
             <td>{{ p.nama }}</td>
             <td>{{ p.jenis || "-" }}</td>
@@ -228,9 +250,13 @@ async function handleHapus(id: number) {
               </AppButton>
             </td>
           </tr>
-          <tr v-if="items.length === 0">
+          <tr v-if="filteredItems.length === 0">
             <td colspan="8" class="text-center text-text-muted py-4">
-              Belum ada data pelatihan
+              {{
+                cari
+                  ? "Tidak ada pelatihan yang cocok"
+                  : "Belum ada data pelatihan"
+              }}
             </td>
           </tr>
         </tbody>

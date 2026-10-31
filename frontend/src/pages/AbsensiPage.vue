@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
+import { ref, computed, onMounted } from "vue";
 import { storeToRefs } from "pinia";
 import { useAbsensiStore, useKaryawanStore } from "../stores/index";
 import { useToastStore } from "../stores/toast";
@@ -20,6 +20,20 @@ const checkIn = ref("");
 const checkOut = ref("");
 const status = ref("hadir");
 const keterangan = ref("");
+const cari = ref("");
+
+const filteredItems = computed(() => {
+  const q = cari.value.trim().toLowerCase();
+  if (!q) return items.value;
+  return items.value.filter(
+    (a) =>
+      String(a.karyawan_id).includes(q) ||
+      a.tanggal.includes(q) ||
+      formatTanggal(a.tanggal).toLowerCase().includes(q) ||
+      a.status.toLowerCase().includes(q) ||
+      (a.keterangan ?? "").toLowerCase().includes(q),
+  );
+});
 
 const statusOptions = [
   { value: "hadir", label: "Hadir" },
@@ -171,6 +185,11 @@ async function handleHapus(id: number) {
     </form>
 
     <div class="card p-4 bg-base-100 shadow-sm overflow-x-auto">
+      <AppInput
+        v-model="cari"
+        placeholder="Cari karyawan, tanggal, status, atau keterangan"
+        class="mb-4"
+      />
       <table class="table w-full text-left">
         <thead>
           <tr>
@@ -183,7 +202,7 @@ async function handleHapus(id: number) {
           </tr>
         </thead>
         <tbody>
-          <tr v-for="a in items" :key="a.id" class="border-b">
+          <tr v-for="a in filteredItems" :key="a.id" class="border-b">
             <td>{{ a.karyawan_id }}</td>
             <td>{{ formatTanggal(a.tanggal) }}</td>
             <td>{{ a.check_in || "-" }}</td>
@@ -204,9 +223,11 @@ async function handleHapus(id: number) {
               </AppButton>
             </td>
           </tr>
-          <tr v-if="items.length === 0">
+          <tr v-if="filteredItems.length === 0">
             <td colspan="6" class="text-center text-text-muted py-4">
-              Belum ada data absensi
+              {{
+                cari ? "Tidak ada absensi yang cocok" : "Belum ada data absensi"
+              }}
             </td>
           </tr>
         </tbody>
