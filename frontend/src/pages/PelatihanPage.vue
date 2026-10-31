@@ -121,32 +121,26 @@ async function jalankanHapus() {
 
     <AppCard as="form" padding="6" @submit.prevent="form.simpan">
       <div class="grid grid-cols-1 md:grid-cols-6 gap-4 items-end">
-        <div class="form-control w-full">
-          <AppLabel text="Karyawan ID" />
-          <AppInput
-            v-model="form.nilai.karyawanId"
-            type="number"
-            placeholder="ID karyawan"
-            required
-          />
-        </div>
+        <AppInput
+          v-model="form.nilai.karyawanId"
+          label="Karyawan ID"
+          type="number"
+          placeholder="ID karyawan"
+          required
+        />
 
-        <div class="form-control w-full">
-          <AppLabel text="Nama Pelatihan" />
-          <AppInput
-            v-model="form.nilai.nama"
-            placeholder="Nama pelatihan"
-            required
-          />
-        </div>
+        <AppInput
+          v-model="form.nilai.nama"
+          label="Nama Pelatihan"
+          placeholder="Nama pelatihan"
+          required
+        />
 
-        <div class="form-control w-full">
-          <AppLabel text="Jenis" />
-          <AppInput
-            v-model="form.nilai.jenis"
-            placeholder="Contoh: Teknis, Soft Skill"
-          />
-        </div>
+        <AppInput
+          v-model="form.nilai.jenis"
+          label="Jenis"
+          placeholder="Contoh: Teknis, Soft Skill"
+        />
 
         <div class="form-control w-full">
           <AppLabel text="Tanggal Mulai" />
@@ -158,18 +152,18 @@ async function jalankanHapus() {
           <AppInput v-model="form.nilai.tanggalSelesai" type="date" />
         </div>
 
-        <div class="form-control w-full">
-          <AppLabel text="Lokasi" />
-          <AppInput
-            v-model="form.nilai.lokasi"
-            placeholder="Lokasi pelatihan"
-          />
-        </div>
+        <AppInput
+          v-model="form.nilai.lokasi"
+          label="Lokasi"
+          placeholder="Lokasi pelatihan"
+        />
 
-        <div class="form-control w-full">
-          <AppLabel text="Biaya" />
-          <AppInput v-model="form.nilai.biaya" type="number" placeholder="0" />
-        </div>
+        <AppInput
+          v-model="form.nilai.biaya"
+          label="Biaya"
+          type="number"
+          placeholder="0"
+        />
 
         <div class="w-full col-span-6">
           <AppButton
