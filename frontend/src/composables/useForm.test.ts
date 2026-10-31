@@ -50,7 +50,7 @@ test("useForm: simpan sukses memberi notifikasi dan mereset field", async () => 
 
   assert.deepEqual(terkirim, [{ nama: "Budi" }]);
   assert.equal(f.nilai.nama, "");
-  assert.equal(f.sedangSimpan.value, false);
+  assert.equal(f.sedangSimpan, false);
   assert.deepEqual(toast.dicatat, [
     { tipe: "success", pesan: "Karyawan disimpan" },
   ]);
@@ -71,7 +71,7 @@ test("useForm: aksi gagal tetap reset status simpan tanpa mereset field", async 
   f.nilai.nama = "Ani";
   await f.simpan();
 
-  assert.equal(f.sedangSimpan.value, false);
+  assert.equal(f.sedangSimpan, false);
   assert.equal(f.nilai.nama, "Ani");
   assert.deepEqual(toast.dicatat, []);
 });

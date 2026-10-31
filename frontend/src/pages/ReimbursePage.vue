@@ -164,7 +164,7 @@ async function jalankanHapus() {
           <AppButton
             type="submit"
             variant="primary"
-            :loading="form.sedangSimpan.value"
+            :loading="form.sedangSimpan"
           >
             Ajukan
           </AppButton>

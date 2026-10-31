@@ -11,7 +11,7 @@ interface OpsiForm<T extends Record<string, string>> {
   };
 }
 
-// useForm menyatukan alur form halaman: simpan, validasi, notifikasi, dan reset.
+// useForm menyatukan alur form halaman: validasi, simpan, notifikasi, dan reset.
 // Semua field disimpan sebagai string karena berasal dari input; konversi
 // tipe (Number, dll.) dilakukan di opsi aksi.
 export function useForm<T extends Record<string, string>>(opsi: OpsiForm<T>) {
@@ -41,5 +41,7 @@ export function useForm<T extends Record<string, string>>(opsi: OpsiForm<T>) {
     }
   }
 
-  return { nilai, sedangSimpan, simpan, reset };
+  // reactive() meng-unwrap ref di dalamnya, sehingga template cukup menulis
+  // `form.sedangSimpan` tanpa `.value`.
+  return reactive({ nilai, sedangSimpan, simpan, reset });
 }
