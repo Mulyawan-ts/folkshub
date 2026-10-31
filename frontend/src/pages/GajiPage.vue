@@ -1,19 +1,19 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from "vue";
 import { storeToRefs } from "pinia";
-import { useGajiStore, useKaryawanStore } from "../stores/index";
-import { useToastStore } from "../stores/toast";
-import AppInput from "../components/AppInput.vue";
-import AppAlert from "../components/AppAlert.vue";
-import AppConfirm from "../components/AppConfirm.vue";
-import AppButton from "../components/AppButton.vue";
-import AppCard from "../components/AppCard.vue";
-import AppBadge from "../components/AppBadge.vue";
-import TabelData from "../components/TabelData.vue";
-import TabelKosong from "../components/TabelKosong.vue";
-import { formatBulan } from "../utils/tanggal";
-import { cocok } from "../utils/cari";
-import { statusVariant, GAJI_STATUS } from "../utils/status";
+import { useGajiStore, useKaryawanStore } from "@/stores/index";
+import { useToastStore } from "@/stores/toast";
+import AppInput from "@/components/AppInput.vue";
+import AppAlert from "@/components/AppAlert.vue";
+import AppConfirm from "@/components/AppConfirm.vue";
+import AppButton from "@/components/AppButton.vue";
+import AppCard from "@/components/AppCard.vue";
+import AppBadge from "@/components/AppBadge.vue";
+import TabelData from "@/components/TabelData.vue";
+import TabelKosong from "@/components/TabelKosong.vue";
+import { formatBulan } from "@/utils/tanggal";
+import { cocok } from "@/utils/cari";
+import { statusVariant, GAJI_STATUS } from "@/utils/status";
 
 const gajiStore = useGajiStore();
 const karyawanStore = useKaryawanStore();

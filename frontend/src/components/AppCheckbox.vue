@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, useId } from "vue";
-import type { Size, Variant } from "../types/ui";
+import type { Size, Variant } from "@/types/ui";
 
 const props = withDefaults(
   defineProps<{

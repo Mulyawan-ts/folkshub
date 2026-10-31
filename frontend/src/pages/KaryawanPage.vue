@@ -1,17 +1,17 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from "vue";
 import { storeToRefs } from "pinia";
-import { useKaryawanStore } from "../stores/karyawan";
-import { useToastStore } from "../stores/toast";
-import AppInput from "../components/AppInput.vue";
-import AppAlert from "../components/AppAlert.vue";
-import AppConfirm from "../components/AppConfirm.vue";
-import AppButton from "../components/AppButton.vue";
-import AppCard from "../components/AppCard.vue";
-import AppCardItem from "../components/AppCardItem.vue";
-import DaftarData from "../components/DaftarData.vue";
-import { cocok } from "../utils/cari";
-import { statusVariant, KARYAWAN_STATUS } from "../utils/status";
+import { useKaryawanStore } from "@/stores/karyawan";
+import { useToastStore } from "@/stores/toast";
+import AppInput from "@/components/AppInput.vue";
+import AppAlert from "@/components/AppAlert.vue";
+import AppConfirm from "@/components/AppConfirm.vue";
+import AppButton from "@/components/AppButton.vue";
+import AppCard from "@/components/AppCard.vue";
+import AppCardItem from "@/components/AppCardItem.vue";
+import DaftarData from "@/components/DaftarData.vue";
+import { cocok } from "@/utils/cari";
+import { statusVariant, KARYAWAN_STATUS } from "@/utils/status";
 
 const karyawanStore = useKaryawanStore();
 const toastStore = useToastStore();

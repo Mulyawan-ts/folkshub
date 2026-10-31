@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { ToastItem, ToastType } from "../stores/toast";
+import type { ToastItem, ToastType } from "@/stores/toast";
 
 withDefaults(
   defineProps<{

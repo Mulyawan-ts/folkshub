@@ -1,4 +1,4 @@
-import type { Variant } from "../types/ui";
+import type { Variant } from "@/types/ui";
 
 // statusVariant memetakan status domain ke varian AppBadge.
 // Status yang tidak dikenal dikembalikan sebagai "neutral".

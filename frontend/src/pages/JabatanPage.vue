@@ -1,16 +1,16 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from "vue";
 import { storeToRefs } from "pinia";
-import { useJabatanStore } from "../stores/index";
-import { useToastStore } from "../stores/toast";
-import AppInput from "../components/AppInput.vue";
-import AppAlert from "../components/AppAlert.vue";
-import AppConfirm from "../components/AppConfirm.vue";
-import AppButton from "../components/AppButton.vue";
-import AppCard from "../components/AppCard.vue";
-import TabelData from "../components/TabelData.vue";
-import TabelKosong from "../components/TabelKosong.vue";
-import { cocok } from "../utils/cari";
+import { useJabatanStore } from "@/stores/index";
+import { useToastStore } from "@/stores/toast";
+import AppInput from "@/components/AppInput.vue";
+import AppAlert from "@/components/AppAlert.vue";
+import AppConfirm from "@/components/AppConfirm.vue";
+import AppButton from "@/components/AppButton.vue";
+import AppCard from "@/components/AppCard.vue";
+import TabelData from "@/components/TabelData.vue";
+import TabelKosong from "@/components/TabelKosong.vue";
+import { cocok } from "@/utils/cari";
 
 const jabatanStore = useJabatanStore();
 const toastStore = useToastStore();

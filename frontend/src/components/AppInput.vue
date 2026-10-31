@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, useId } from "vue";
-import type { Size } from "../types/ui";
+import type { Size } from "@/types/ui";
 
 export type TipeInput = "text" | "select" | "textarea";
 

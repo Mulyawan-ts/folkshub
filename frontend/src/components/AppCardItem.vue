@@ -3,7 +3,7 @@ import AppCard from "./AppCard.vue";
 import AppButton from "./AppButton.vue";
 import AppBadge from "./AppBadge.vue";
 import AppInput from "./AppInput.vue";
-import type { Variant } from "../types/ui";
+import type { Variant } from "@/types/ui";
 
 withDefaults(
   defineProps<{

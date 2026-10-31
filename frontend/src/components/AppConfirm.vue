@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onUnmounted, watch } from "vue";
 import AppButton from "./AppButton.vue";
-import type { Variant } from "../types/ui";
+import type { Variant } from "@/types/ui";
 
 const props = withDefaults(
   defineProps<{
