@@ -6,9 +6,8 @@ import { useToastStore } from "../stores/toast";
 import AppInput from "../components/AppInput.vue";
 import AppButton from "../components/AppButton.vue";
 import AppCard from "../components/AppCard.vue";
-import AppBadge from "../components/AppBadge.vue";
-import TabelData from "../components/TabelData.vue";
-import TabelKosong from "../components/TabelKosong.vue";
+import AppCardItem from "../components/AppCardItem.vue";
+import DaftarData from "../components/DaftarData.vue";
 import { cocok } from "../utils/cari";
 import { statusVariant, KARYAWAN_STATUS } from "../utils/status";
 
@@ -129,44 +128,23 @@ async function handleHapus(id: number) {
       </div>
     </AppCard>
 
-    <TabelData v-model:cari="cari" placeholder="Cari nama, email, atau status">
-      <template #head>
-        <th>Nama</th>
-        <th>Email</th>
-        <th>Status</th>
-        <th class="text-right">Aksi</th>
-      </template>
-
-      <tr v-for="k in filteredItems" :key="k.id" class="border-b">
-        <td>{{ k.nama }}</td>
-        <td>{{ k.email }}</td>
-        <td>
-          <AppBadge
-            :variant="statusVariant(k.status, KARYAWAN_STATUS)"
-            size="sm"
-          >
-            {{ k.status }}
-          </AppBadge>
-        </td>
-        <td class="text-right">
-          <AppButton
-            variant="error"
-            size="sm"
-            outline
-            @click="handleHapus(k.id)"
-          >
-            Hapus
-          </AppButton>
-        </td>
-      </tr>
-
-      <TabelKosong
-        v-if="filteredItems.length === 0"
-        :colspan="4"
-        kosong="Belum ada data karyawan"
-        kosong-cari="Tidak ada karyawan yang cocok"
-        :mencari="!!cari"
+    <DaftarData
+      v-model:cari="cari"
+      placeholder="Cari nama, email, atau status"
+      kosong="Belum ada data karyawan"
+      kosong-cari="Tidak ada karyawan yang cocok"
+      :jumlah="filteredItems.length"
+    >
+      <AppCardItem
+        v-for="k in filteredItems"
+        :key="k.id"
+        :judul="k.nama"
+        :subjudul="k.email"
+        :status="k.status"
+        :status-variant="statusVariant(k.status, KARYAWAN_STATUS)"
+        hapus-label="Hapus"
+        @hapus="handleHapus(k.id)"
       />
-    </TabelData>
+    </DaftarData>
   </div>
 </template>
