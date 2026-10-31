@@ -142,15 +142,18 @@ async function jalankanHapus() {
           placeholder="Contoh: Teknis, Soft Skill"
         />
 
-        <div class="form-control w-full">
-          <AppLabel text="Tanggal Mulai" />
-          <AppInput v-model="form.nilai.tanggalMulai" type="date" required />
-        </div>
+        <AppInput
+          v-model="form.nilai.tanggalMulai"
+          label="Tanggal Mulai"
+          type="date"
+          required
+        />
 
-        <div class="form-control w-full">
-          <AppLabel text="Tanggal Selesai" />
-          <AppInput v-model="form.nilai.tanggalSelesai" type="date" />
-        </div>
+        <AppInput
+          v-model="form.nilai.tanggalSelesai"
+          label="Tanggal Selesai"
+          type="date"
+        />
 
         <AppInput
           v-model="form.nilai.lokasi"
