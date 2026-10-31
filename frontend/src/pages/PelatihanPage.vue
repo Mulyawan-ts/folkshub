@@ -14,21 +14,46 @@ import TabelKosong from "@/components/TabelKosong.vue";
 import { formatTanggal } from "@/utils/tanggal";
 import { cocok } from "@/utils/cari";
 import { statusVariant, PELATIHAN_STATUS } from "@/utils/status";
+import { useForm } from "@/composables/useForm";
 
 const pelatihanStore = usePelatihanStore();
 const toastStore = useToastStore();
 
-const { items, loading, error } = storeToRefs(pelatihanStore);
+const { items, error } = storeToRefs(pelatihanStore);
 
-const karyawanId = ref("");
-const nama = ref("");
-const jenis = ref("");
-const tanggalMulai = ref("");
-const tanggalSelesai = ref("");
-const lokasi = ref("");
-const biaya = ref("");
-const sertifikat = ref("");
-const catatan = ref("");
+const form = useForm({
+  awal: {
+    karyawanId: "",
+    nama: "",
+    jenis: "",
+    tanggalMulai: "",
+    tanggalSelesai: "",
+    lokasi: "",
+    biaya: "",
+    sertifikat: "",
+    catatan: "",
+  },
+  validasi: (v) =>
+    !v.karyawanId.trim() || !v.nama.trim() || !v.tanggalMulai.trim()
+      ? "Karyawan, nama pelatihan, dan tanggal mulai wajib diisi"
+      : "",
+  aksi: (v) =>
+    pelatihanStore.simpan({
+      karyawan_id: Number(v.karyawanId),
+      nama: v.nama,
+      jenis: v.jenis,
+      tanggal_mulai: v.tanggalMulai,
+      tanggal_selesai: v.tanggalSelesai,
+      lokasi: v.lokasi,
+      biaya: Number(v.biaya) || 0,
+      status: "terjadwal",
+      sertifikat: v.sertifikat,
+      catatan: v.catatan,
+    }),
+  pesanSukses: "Pelatihan berhasil disimpan",
+  toast: toastStore,
+});
+
 const konfirmasiHapus = ref(false);
 const hapusId = ref<number | null>(null);
 const cari = ref("");
@@ -52,44 +77,6 @@ const filteredItems = computed(() =>
 onMounted(() => {
   pelatihanStore.fetchAll();
 });
-
-async function handleSimpan() {
-  if (
-    !karyawanId.value.trim() ||
-    !nama.value.trim() ||
-    !tanggalMulai.value.trim()
-  ) {
-    toastStore.error("Karyawan, nama pelatihan, dan tanggal mulai wajib diisi");
-    return;
-  }
-  try {
-    await pelatihanStore.simpan({
-      karyawan_id: Number(karyawanId.value),
-      nama: nama.value,
-      jenis: jenis.value,
-      tanggal_mulai: tanggalMulai.value,
-      tanggal_selesai: tanggalSelesai.value,
-      lokasi: lokasi.value,
-      biaya: Number(biaya.value) || 0,
-      status: "terjadwal",
-      sertifikat: sertifikat.value,
-      catatan: catatan.value,
-    });
-    toastStore.success("Pelatihan berhasil disimpan");
-    karyawanId.value = "";
-    nama.value = "";
-    jenis.value = "";
-    tanggalMulai.value = "";
-    tanggalSelesai.value = "";
-    lokasi.value = "";
-    biaya.value = "";
-    sertifikat.value = "";
-    catatan.value = "";
-    pelatihanStore.fetchAll();
-  } catch {
-    // error already set in store
-  }
-}
 
 function mintaHapus(id: number) {
   hapusId.value = id;
@@ -131,14 +118,14 @@ async function jalankanHapus() {
       @dismiss="pelatihanStore.bersihkanError"
     />
 
-    <AppCard as="form" padding="6" @submit.prevent="handleSimpan">
+    <AppCard as="form" padding="6" @submit.prevent="form.simpan">
       <div class="grid grid-cols-1 md:grid-cols-6 gap-4 items-end">
         <div class="form-control w-full">
           <label class="label">
             <span class="label-text">Karyawan ID</span>
           </label>
           <AppInput
-            v-model="karyawanId"
+            v-model="form.nilai.karyawanId"
             type="number"
             placeholder="ID karyawan"
             required
@@ -149,46 +136,60 @@ async function jalankanHapus() {
           <label class="label">
             <span class="label-text">Nama Pelatihan</span>
           </label>
-          <AppInput v-model="nama" placeholder="Nama pelatihan" required />
+          <AppInput
+            v-model="form.nilai.nama"
+            placeholder="Nama pelatihan"
+            required
+          />
         </div>
 
         <div class="form-control w-full">
           <label class="label">
             <span class="label-text">Jenis</span>
           </label>
-          <AppInput v-model="jenis" placeholder="Contoh: Teknis, Soft Skill" />
+          <AppInput
+            v-model="form.nilai.jenis"
+            placeholder="Contoh: Teknis, Soft Skill"
+          />
         </div>
 
         <div class="form-control w-full">
           <label class="label">
             <span class="label-text">Tanggal Mulai</span>
           </label>
-          <AppInput v-model="tanggalMulai" type="date" required />
+          <AppInput v-model="form.nilai.tanggalMulai" type="date" required />
         </div>
 
         <div class="form-control w-full">
           <label class="label">
             <span class="label-text">Tanggal Selesai</span>
           </label>
-          <AppInput v-model="tanggalSelesai" type="date" />
+          <AppInput v-model="form.nilai.tanggalSelesai" type="date" />
         </div>
 
         <div class="form-control w-full">
           <label class="label">
             <span class="label-text">Lokasi</span>
           </label>
-          <AppInput v-model="lokasi" placeholder="Lokasi pelatihan" />
+          <AppInput
+            v-model="form.nilai.lokasi"
+            placeholder="Lokasi pelatihan"
+          />
         </div>
 
         <div class="form-control w-full">
           <label class="label">
             <span class="label-text">Biaya</span>
           </label>
-          <AppInput v-model="biaya" type="number" placeholder="0" />
+          <AppInput v-model="form.nilai.biaya" type="number" placeholder="0" />
         </div>
 
         <div class="w-full col-span-6">
-          <AppButton type="submit" variant="primary" :loading="loading">
+          <AppButton
+            type="submit"
+            variant="primary"
+            :loading="form.sedangSimpan.value"
+          >
             Simpan
           </AppButton>
         </div>
@@ -199,7 +200,7 @@ async function jalankanHapus() {
           <span class="label-text">Sertifikat</span>
         </label>
         <AppInput
-          v-model="sertifikat"
+          v-model="form.nilai.sertifikat"
           placeholder="Nomor atau URL sertifikat"
         />
       </div>
@@ -208,7 +209,10 @@ async function jalankanHapus() {
         <label class="label">
           <span class="label-text">Catatan</span>
         </label>
-        <AppInput v-model="catatan" placeholder="Catatan pelatihan" />
+        <AppInput
+          v-model="form.nilai.catatan"
+          placeholder="Catatan pelatihan"
+        />
       </div>
     </AppCard>
 

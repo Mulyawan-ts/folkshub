@@ -11,18 +11,37 @@ import AppCard from "@/components/AppCard.vue";
 import TabelData from "@/components/TabelData.vue";
 import TabelKosong from "@/components/TabelKosong.vue";
 import { cocok } from "@/utils/cari";
+import { useForm } from "@/composables/useForm";
 
 const jabatanStore = useJabatanStore();
 const toastStore = useToastStore();
 
-const { items, loading, error } = storeToRefs(jabatanStore);
+const { items, error } = storeToRefs(jabatanStore);
 
-const kode = ref("");
-const nama = ref("");
-const departemen = ref("");
-const gajiPokok = ref("");
-const tunjangan = ref("");
-const deskripsi = ref("");
+const form = useForm({
+  awal: {
+    kode: "",
+    nama: "",
+    departemen: "",
+    gajiPokok: "",
+    tunjangan: "",
+    deskripsi: "",
+  },
+  validasi: (v) =>
+    !v.kode.trim() || !v.nama.trim() ? "Kode dan nama jabatan wajib diisi" : "",
+  aksi: (v) =>
+    jabatanStore.simpan({
+      kode: v.kode,
+      nama: v.nama,
+      departemen: v.departemen,
+      deskripsi: v.deskripsi,
+      gaji_pokok: Number(v.gajiPokok) || 0,
+      tunjangan: Number(v.tunjangan) || 0,
+    }),
+  pesanSukses: "Jabatan berhasil disimpan",
+  toast: toastStore,
+});
+
 const konfirmasiHapus = ref(false);
 const hapusId = ref<number | null>(null);
 const cari = ref("");
@@ -36,33 +55,6 @@ const filteredItems = computed(() =>
 onMounted(() => {
   jabatanStore.fetchAll();
 });
-
-async function handleSimpan() {
-  if (!kode.value.trim() || !nama.value.trim() || !departemen.value.trim()) {
-    toastStore.error("Kode, nama, dan departemen wajib diisi");
-    return;
-  }
-  try {
-    await jabatanStore.simpan({
-      kode: kode.value,
-      nama: nama.value,
-      departemen: departemen.value,
-      gaji_pokok: Number(gajiPokok.value) || 0,
-      tunjangan: Number(tunjangan.value) || 0,
-      deskripsi: deskripsi.value,
-    });
-    toastStore.success("Jabatan berhasil disimpan");
-    kode.value = "";
-    nama.value = "";
-    departemen.value = "";
-    gajiPokok.value = "";
-    tunjangan.value = "";
-    deskripsi.value = "";
-    jabatanStore.fetchAll();
-  } catch {
-    // error already set in store
-  }
-}
 
 function mintaHapus(id: number) {
   hapusId.value = id;
@@ -104,20 +96,28 @@ async function jalankanHapus() {
       @dismiss="jabatanStore.bersihkanError"
     />
 
-    <AppCard as="form" padding="6" @submit.prevent="handleSimpan">
+    <AppCard as="form" padding="6" @submit.prevent="form.simpan">
       <div class="grid grid-cols-1 md:grid-cols-6 gap-4 items-end">
         <div class="form-control w-full">
           <label class="label">
             <span class="label-text">Kode Jabatan</span>
           </label>
-          <AppInput v-model="kode" placeholder="Contoh: MGR, STAFF" required />
+          <AppInput
+            v-model="form.nilai.kode"
+            placeholder="Contoh: MGR, STAFF"
+            required
+          />
         </div>
 
         <div class="form-control w-full">
           <label class="label">
             <span class="label-text">Nama Jabatan</span>
           </label>
-          <AppInput v-model="nama" placeholder="Contoh: Manager" required />
+          <AppInput
+            v-model="form.nilai.nama"
+            placeholder="Contoh: Manager"
+            required
+          />
         </div>
 
         <div class="form-control w-full">
@@ -125,7 +125,7 @@ async function jalankanHapus() {
             <span class="label-text">Departemen</span>
           </label>
           <AppInput
-            v-model="departemen"
+            v-model="form.nilai.departemen"
             placeholder="Contoh: HRD, Keuangan"
             required
           />
@@ -135,18 +135,30 @@ async function jalankanHapus() {
           <label class="label">
             <span class="label-text">Gaji Pokok</span>
           </label>
-          <AppInput v-model="gajiPokok" type="number" placeholder="0" />
+          <AppInput
+            v-model="form.nilai.gajiPokok"
+            type="number"
+            placeholder="0"
+          />
         </div>
 
         <div class="form-control w-full">
           <label class="label">
             <span class="label-text">Tunjangan</span>
           </label>
-          <AppInput v-model="tunjangan" type="number" placeholder="0" />
+          <AppInput
+            v-model="form.nilai.tunjangan"
+            type="number"
+            placeholder="0"
+          />
         </div>
 
         <div class="w-full">
-          <AppButton type="submit" variant="primary" :loading="loading">
+          <AppButton
+            type="submit"
+            variant="primary"
+            :loading="form.sedangSimpan.value"
+          >
             Simpan
           </AppButton>
         </div>
@@ -156,7 +168,10 @@ async function jalankanHapus() {
         <label class="label">
           <span class="label-text">Deskripsi</span>
         </label>
-        <AppInput v-model="deskripsi" placeholder="Deskripsi jabatan" />
+        <AppInput
+          v-model="form.nilai.deskripsi"
+          placeholder="Deskripsi jabatan"
+        />
       </div>
     </AppCard>
 

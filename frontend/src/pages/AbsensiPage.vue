@@ -14,19 +14,40 @@ import TabelKosong from "@/components/TabelKosong.vue";
 import { formatTanggal } from "@/utils/tanggal";
 import { cocok } from "@/utils/cari";
 import { statusVariant, ABSENSI_STATUS } from "@/utils/status";
+import { useForm } from "@/composables/useForm";
 
 const absensiStore = useAbsensiStore();
 const karyawanStore = useKaryawanStore();
 const toastStore = useToastStore();
 
-const { items, loading, error } = storeToRefs(absensiStore);
+const { items, error } = storeToRefs(absensiStore);
 
-const karyawanId = ref("");
-const tanggal = ref("");
-const checkIn = ref("");
-const checkOut = ref("");
-const status = ref("hadir");
-const keterangan = ref("");
+const form = useForm({
+  awal: {
+    karyawanId: "",
+    tanggal: "",
+    checkIn: "",
+    checkOut: "",
+    status: "hadir",
+    keterangan: "",
+  },
+  validasi: (v) =>
+    !v.karyawanId.trim() || !v.tanggal.trim()
+      ? "Karyawan dan tanggal wajib diisi"
+      : "",
+  aksi: (v) =>
+    absensiStore.simpan({
+      karyawan_id: Number(v.karyawanId),
+      tanggal: v.tanggal,
+      check_in: v.checkIn || undefined,
+      check_out: v.checkOut || undefined,
+      status: v.status as any,
+      keterangan: v.keterangan,
+    }),
+  pesanSukses: "Absensi berhasil disimpan",
+  toast: toastStore,
+});
+
 const konfirmasiHapus = ref(false);
 const hapusId = ref<number | null>(null);
 const cari = ref("");
@@ -56,33 +77,6 @@ onMounted(() => {
   karyawanStore.fetchAll();
   absensiStore.fetchAll();
 });
-
-async function handleSimpan() {
-  if (!karyawanId.value.trim() || !tanggal.value.trim()) {
-    toastStore.error("Karyawan dan tanggal wajib diisi");
-    return;
-  }
-  try {
-    await absensiStore.simpan({
-      karyawan_id: Number(karyawanId.value),
-      tanggal: tanggal.value,
-      check_in: checkIn.value || undefined,
-      check_out: checkOut.value || undefined,
-      status: status.value as any,
-      keterangan: keterangan.value,
-    });
-    toastStore.success("Absensi berhasil disimpan");
-    karyawanId.value = "";
-    tanggal.value = "";
-    checkIn.value = "";
-    checkOut.value = "";
-    keterangan.value = "";
-    status.value = "hadir";
-    absensiStore.fetchAll();
-  } catch {
-    // error already set in store
-  }
-}
 
 function mintaHapus(id: number) {
   hapusId.value = id;
@@ -124,14 +118,14 @@ async function jalankanHapus() {
       @dismiss="absensiStore.bersihkanError"
     />
 
-    <AppCard as="form" padding="6" @submit.prevent="handleSimpan">
+    <AppCard as="form" padding="6" @submit.prevent="form.simpan">
       <div class="grid grid-cols-1 md:grid-cols-6 gap-4 items-end">
         <div class="form-control w-full">
           <label class="label">
             <span class="label-text">Karyawan ID</span>
           </label>
           <AppInput
-            v-model="karyawanId"
+            v-model="form.nilai.karyawanId"
             type="number"
             placeholder="ID karyawan"
             required
@@ -142,28 +136,31 @@ async function jalankanHapus() {
           <label class="label">
             <span class="label-text">Tanggal</span>
           </label>
-          <AppInput v-model="tanggal" type="date" required />
+          <AppInput v-model="form.nilai.tanggal" type="date" required />
         </div>
 
         <div class="form-control w-full">
           <label class="label">
             <span class="label-text">Check In</span>
           </label>
-          <AppInput v-model="checkIn" type="time" />
+          <AppInput v-model="form.nilai.checkIn" type="time" />
         </div>
 
         <div class="form-control w-full">
           <label class="label">
             <span class="label-text">Check Out</span>
           </label>
-          <AppInput v-model="checkOut" type="time" />
+          <AppInput v-model="form.nilai.checkOut" type="time" />
         </div>
 
         <div class="form-control w-full">
           <label class="label">
             <span class="label-text">Status</span>
           </label>
-          <select v-model="status" class="select select-bordered w-full">
+          <select
+            v-model="form.nilai.status"
+            class="select select-bordered w-full"
+          >
             <option
               v-for="opt in statusOptions"
               :key="opt.value"
@@ -175,7 +172,11 @@ async function jalankanHapus() {
         </div>
 
         <div class="w-full">
-          <AppButton type="submit" variant="primary" :loading="loading">
+          <AppButton
+            type="submit"
+            variant="primary"
+            :loading="form.sedangSimpan.value"
+          >
             Simpan
           </AppButton>
         </div>
@@ -185,7 +186,10 @@ async function jalankanHapus() {
         <label class="label">
           <span class="label-text">Keterangan</span>
         </label>
-        <AppInput v-model="keterangan" placeholder="Catatan tambahan" />
+        <AppInput
+          v-model="form.nilai.keterangan"
+          placeholder="Catatan tambahan"
+        />
       </div>
     </AppCard>
 

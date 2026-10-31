@@ -14,21 +14,46 @@ import TabelKosong from "@/components/TabelKosong.vue";
 import { formatTanggal } from "@/utils/tanggal";
 import { cocok } from "@/utils/cari";
 import { statusVariant, REIMBURSE_STATUS } from "@/utils/status";
+import { useForm } from "@/composables/useForm";
 
 const reimburseStore = useReimburseStore();
 const karyawanStore = useKaryawanStore();
 const toastStore = useToastStore();
 
-const { items, loading, error } = storeToRefs(reimburseStore);
+const { items, error } = storeToRefs(reimburseStore);
 
-const karyawanId = ref("");
-const tanggal = ref("");
-const jenis = ref("");
-const jumlah = ref("");
-const keterangan = ref("");
+const form = useForm({
+  awal: {
+    karyawanId: "",
+    tanggal: "",
+    jenis: "",
+    jumlah: "",
+    keterangan: "",
+    bukti: "",
+  },
+  validasi: (v) =>
+    !v.karyawanId.trim() ||
+    !v.tanggal.trim() ||
+    !v.jenis.trim() ||
+    !v.jumlah.trim()
+      ? "Karyawan, tanggal, jenis, dan jumlah wajib diisi"
+      : "",
+  aksi: (v) =>
+    reimburseStore.simpan({
+      karyawan_id: Number(v.karyawanId),
+      tanggal: v.tanggal,
+      jenis: v.jenis,
+      jumlah: Number(v.jumlah),
+      keterangan: v.keterangan,
+      bukti: v.bukti,
+      status: "draft",
+    }),
+  pesanSukses: "Reimburse berhasil diajukan",
+  toast: toastStore,
+});
+
 const konfirmasiHapus = ref(false);
 const hapusId = ref<number | null>(null);
-const bukti = ref("");
 const cari = ref("");
 
 const filteredItems = computed(() =>
@@ -49,39 +74,6 @@ onMounted(() => {
   karyawanStore.fetchAll();
   reimburseStore.fetchAll();
 });
-
-async function handleSimpan() {
-  if (
-    !karyawanId.value.trim() ||
-    !tanggal.value.trim() ||
-    !jenis.value.trim() ||
-    !jumlah.value.trim()
-  ) {
-    toastStore.error("Karyawan, tanggal, jenis, dan jumlah wajib diisi");
-    return;
-  }
-  try {
-    await reimburseStore.simpan({
-      karyawan_id: Number(karyawanId.value),
-      tanggal: tanggal.value,
-      jenis: jenis.value,
-      jumlah: Number(jumlah.value),
-      keterangan: keterangan.value,
-      bukti: bukti.value,
-      status: "draft",
-    });
-    toastStore.success("Reimburse berhasil diajukan");
-    karyawanId.value = "";
-    tanggal.value = "";
-    jenis.value = "";
-    jumlah.value = "";
-    keterangan.value = "";
-    bukti.value = "";
-    reimburseStore.fetchAll();
-  } catch {
-    // error already set in store
-  }
-}
 
 function mintaHapus(id: number) {
   hapusId.value = id;
@@ -123,14 +115,14 @@ async function jalankanHapus() {
       @dismiss="reimburseStore.bersihkanError"
     />
 
-    <AppCard as="form" padding="6" @submit.prevent="handleSimpan">
+    <AppCard as="form" padding="6" @submit.prevent="form.simpan">
       <div class="grid grid-cols-1 md:grid-cols-6 gap-4 items-end">
         <div class="form-control w-full">
           <label class="label">
             <span class="label-text">Karyawan ID</span>
           </label>
           <AppInput
-            v-model="karyawanId"
+            v-model="form.nilai.karyawanId"
             type="number"
             placeholder="ID karyawan"
             required
@@ -141,7 +133,7 @@ async function jalankanHapus() {
           <label class="label">
             <span class="label-text">Tanggal</span>
           </label>
-          <AppInput v-model="tanggal" type="date" required />
+          <AppInput v-model="form.nilai.tanggal" type="date" required />
         </div>
 
         <div class="form-control w-full">
@@ -149,7 +141,7 @@ async function jalankanHapus() {
             <span class="label-text">Jenis Biaya</span>
           </label>
           <AppInput
-            v-model="jenis"
+            v-model="form.nilai.jenis"
             placeholder="Contoh: Transport, Makan, Akomodasi"
             required
           />
@@ -159,18 +151,30 @@ async function jalankanHapus() {
           <label class="label">
             <span class="label-text">Jumlah</span>
           </label>
-          <AppInput v-model="jumlah" type="number" placeholder="0" required />
+          <AppInput
+            v-model="form.nilai.jumlah"
+            type="number"
+            placeholder="0"
+            required
+          />
         </div>
 
         <div class="form-control w-full">
           <label class="label">
             <span class="label-text">Bukti</span>
           </label>
-          <AppInput v-model="bukti" placeholder="URL atau nomor bukti" />
+          <AppInput
+            v-model="form.nilai.bukti"
+            placeholder="URL atau nomor bukti"
+          />
         </div>
 
         <div class="w-full">
-          <AppButton type="submit" variant="primary" :loading="loading">
+          <AppButton
+            type="submit"
+            variant="primary"
+            :loading="form.sedangSimpan.value"
+          >
             Ajukan
           </AppButton>
         </div>
@@ -181,7 +185,7 @@ async function jalankanHapus() {
           <span class="label-text">Keterangan</span>
         </label>
         <AppInput
-          v-model="keterangan"
+          v-model="form.nilai.keterangan"
           placeholder="Alasan pengajuan reimburse"
         />
       </div>

@@ -11,16 +11,30 @@ import AppCard from "@/components/AppCard.vue";
 import TabelData from "@/components/TabelData.vue";
 import TabelKosong from "@/components/TabelKosong.vue";
 import { cocok } from "@/utils/cari";
+import { useForm } from "@/composables/useForm";
 
 const departemenStore = useDepartemenStore();
 const toastStore = useToastStore();
 
-const { items, loading, error } = storeToRefs(departemenStore);
+const { items, error } = storeToRefs(departemenStore);
 
-const kode = ref("");
-const nama = ref("");
-const kepala = ref("");
-const deskripsi = ref("");
+const form = useForm({
+  awal: { kode: "", nama: "", kepala: "", deskripsi: "" },
+  validasi: (v) =>
+    !v.kode.trim() || !v.nama.trim()
+      ? "Kode dan nama departemen wajib diisi"
+      : "",
+  aksi: (v) =>
+    departemenStore.simpan({
+      kode: v.kode,
+      nama: v.nama,
+      kepala: v.kepala,
+      deskripsi: v.deskripsi,
+    }),
+  pesanSukses: "Departemen berhasil disimpan",
+  toast: toastStore,
+});
+
 const konfirmasiHapus = ref(false);
 const hapusId = ref<number | null>(null);
 const cari = ref("");
@@ -34,29 +48,6 @@ const filteredItems = computed(() =>
 onMounted(() => {
   departemenStore.fetchAll();
 });
-
-async function handleSimpan() {
-  if (!kode.value.trim() || !nama.value.trim()) {
-    toastStore.error("Kode dan nama departemen wajib diisi");
-    return;
-  }
-  try {
-    await departemenStore.simpan({
-      kode: kode.value,
-      nama: nama.value,
-      kepala: kepala.value,
-      deskripsi: deskripsi.value,
-    });
-    toastStore.success("Departemen berhasil disimpan");
-    kode.value = "";
-    nama.value = "";
-    kepala.value = "";
-    deskripsi.value = "";
-    departemenStore.fetchAll();
-  } catch {
-    // error already set in store
-  }
-}
 
 function mintaHapus(id: number) {
   hapusId.value = id;
@@ -98,13 +89,17 @@ async function jalankanHapus() {
       @dismiss="departemenStore.bersihkanError"
     />
 
-    <AppCard as="form" padding="6" @submit.prevent="handleSimpan">
+    <AppCard as="form" padding="6" @submit.prevent="form.simpan">
       <div class="grid grid-cols-1 md:grid-cols-6 gap-4 items-end">
         <div class="form-control w-full">
           <label class="label">
             <span class="label-text">Kode Departemen</span>
           </label>
-          <AppInput v-model="kode" placeholder="Contoh: HRD, FIN" required />
+          <AppInput
+            v-model="form.nilai.kode"
+            placeholder="Contoh: HRD, FIN"
+            required
+          />
         </div>
 
         <div class="form-control w-full">
@@ -112,7 +107,7 @@ async function jalankanHapus() {
             <span class="label-text">Nama Departemen</span>
           </label>
           <AppInput
-            v-model="nama"
+            v-model="form.nilai.nama"
             placeholder="Contoh: Human Resources"
             required
           />
@@ -122,11 +117,18 @@ async function jalankanHapus() {
           <label class="label">
             <span class="label-text">Kepala</span>
           </label>
-          <AppInput v-model="kepala" placeholder="Nama kepala departemen" />
+          <AppInput
+            v-model="form.nilai.kepala"
+            placeholder="Nama kepala departemen"
+          />
         </div>
 
         <div class="w-full col-span-6">
-          <AppButton type="submit" variant="primary" :loading="loading">
+          <AppButton
+            type="submit"
+            variant="primary"
+            :loading="form.sedangSimpan.value"
+          >
             Simpan
           </AppButton>
         </div>
@@ -136,7 +138,10 @@ async function jalankanHapus() {
         <label class="label">
           <span class="label-text">Deskripsi</span>
         </label>
-        <AppInput v-model="deskripsi" placeholder="Deskripsi departemen" />
+        <AppInput
+          v-model="form.nilai.deskripsi"
+          placeholder="Deskripsi departemen"
+        />
       </div>
     </AppCard>
 

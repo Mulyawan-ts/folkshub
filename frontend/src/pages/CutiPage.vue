@@ -14,19 +14,41 @@ import TabelKosong from "@/components/TabelKosong.vue";
 import { formatTanggal } from "@/utils/tanggal";
 import { cocok } from "@/utils/cari";
 import { statusVariant, CUTI_STATUS } from "@/utils/status";
+import { useForm } from "@/composables/useForm";
 
 const cutiStore = useCutiStore();
 const karyawanStore = useKaryawanStore();
 const toastStore = useToastStore();
 
-const { items, loading, error } = storeToRefs(cutiStore);
+const { items, error } = storeToRefs(cutiStore);
 
-const karyawanId = ref("");
-const jenis = ref("tahunan");
-const tanggalMulai = ref("");
-const tanggalSelesai = ref("");
-const jumlahHari = ref("");
-const keterangan = ref("");
+const form = useForm({
+  awal: {
+    karyawanId: "",
+    jenis: "tahunan",
+    tanggalMulai: "",
+    tanggalSelesai: "",
+    jumlahHari: "",
+    keterangan: "",
+  },
+  validasi: (v) =>
+    !v.karyawanId.trim() || !v.tanggalMulai.trim() || !v.tanggalSelesai.trim()
+      ? "Karyawan, tanggal mulai, dan tanggal selesai wajib diisi"
+      : "",
+  aksi: (v) =>
+    cutiStore.simpan({
+      karyawan_id: Number(v.karyawanId),
+      jenis: v.jenis as any,
+      tanggal_mulai: v.tanggalMulai,
+      tanggal_selesai: v.tanggalSelesai,
+      jumlah_hari: Number(v.jumlahHari) || 0,
+      keterangan: v.keterangan,
+      status: "draft",
+    }),
+  pesanSukses: "Cuti berhasil diajukan",
+  toast: toastStore,
+});
+
 const konfirmasiHapus = ref(false);
 const hapusId = ref<number | null>(null);
 const cari = ref("");
@@ -57,39 +79,6 @@ onMounted(() => {
   karyawanStore.fetchAll();
   cutiStore.fetchAll();
 });
-
-async function handleSimpan() {
-  if (
-    !karyawanId.value.trim() ||
-    !tanggalMulai.value.trim() ||
-    !tanggalSelesai.value.trim()
-  ) {
-    toastStore.error(
-      "Karyawan, tanggal mulai, dan tanggal selesai wajib diisi",
-    );
-    return;
-  }
-  try {
-    await cutiStore.simpan({
-      karyawan_id: Number(karyawanId.value),
-      jenis: jenis.value as any,
-      tanggal_mulai: tanggalMulai.value,
-      tanggal_selesai: tanggalSelesai.value,
-      jumlah_hari: Number(jumlahHari.value) || 0,
-      keterangan: keterangan.value,
-      status: "draft",
-    });
-    toastStore.success("Cuti berhasil diajukan");
-    karyawanId.value = "";
-    tanggalMulai.value = "";
-    tanggalSelesai.value = "";
-    jumlahHari.value = "";
-    keterangan.value = "";
-    cutiStore.fetchAll();
-  } catch {
-    // error already set in store
-  }
-}
 
 function mintaHapus(id: number) {
   hapusId.value = id;
@@ -131,14 +120,14 @@ async function jalankanHapus() {
       @dismiss="cutiStore.bersihkanError"
     />
 
-    <AppCard as="form" padding="6" @submit.prevent="handleSimpan">
+    <AppCard as="form" padding="6" @submit.prevent="form.simpan">
       <div class="grid grid-cols-1 md:grid-cols-6 gap-4 items-end">
         <div class="form-control w-full">
           <label class="label">
             <span class="label-text">Karyawan ID</span>
           </label>
           <AppInput
-            v-model="karyawanId"
+            v-model="form.nilai.karyawanId"
             type="number"
             placeholder="ID karyawan"
             required
@@ -149,7 +138,10 @@ async function jalankanHapus() {
           <label class="label">
             <span class="label-text">Jenis Cuti</span>
           </label>
-          <select v-model="jenis" class="select select-bordered w-full">
+          <select
+            v-model="form.nilai.jenis"
+            class="select select-bordered w-full"
+          >
             <option
               v-for="opt in jenisOptions"
               :key="opt.value"
@@ -164,25 +156,33 @@ async function jalankanHapus() {
           <label class="label">
             <span class="label-text">Tanggal Mulai</span>
           </label>
-          <AppInput v-model="tanggalMulai" type="date" required />
+          <AppInput v-model="form.nilai.tanggalMulai" type="date" required />
         </div>
 
         <div class="form-control w-full">
           <label class="label">
             <span class="label-text">Tanggal Selesai</span>
           </label>
-          <AppInput v-model="tanggalSelesai" type="date" required />
+          <AppInput v-model="form.nilai.tanggalSelesai" type="date" required />
         </div>
 
         <div class="form-control w-full">
           <label class="label">
             <span class="label-text">Jumlah Hari</span>
           </label>
-          <AppInput v-model="jumlahHari" type="number" placeholder="0" />
+          <AppInput
+            v-model="form.nilai.jumlahHari"
+            type="number"
+            placeholder="0"
+          />
         </div>
 
         <div class="w-full">
-          <AppButton type="submit" variant="primary" :loading="loading">
+          <AppButton
+            type="submit"
+            variant="primary"
+            :loading="form.sedangSimpan.value"
+          >
             Ajukan
           </AppButton>
         </div>
@@ -192,7 +192,10 @@ async function jalankanHapus() {
         <label class="label">
           <span class="label-text">Keterangan</span>
         </label>
-        <AppInput v-model="keterangan" placeholder="Alasan pengajuan cuti" />
+        <AppInput
+          v-model="form.nilai.keterangan"
+          placeholder="Alasan pengajuan cuti"
+        />
       </div>
     </AppCard>
 

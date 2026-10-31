@@ -14,18 +14,39 @@ import TabelKosong from "@/components/TabelKosong.vue";
 import { formatBulan } from "@/utils/tanggal";
 import { cocok } from "@/utils/cari";
 import { statusVariant, GAJI_STATUS } from "@/utils/status";
+import { useForm } from "@/composables/useForm";
 
 const gajiStore = useGajiStore();
 const karyawanStore = useKaryawanStore();
 const toastStore = useToastStore();
 
-const { items, loading, error } = storeToRefs(gajiStore);
+const { items, error } = storeToRefs(gajiStore);
 
-const karyawanId = ref("");
-const bulan = ref("");
-const gajiPokok = ref("");
-const tunjangan = ref("");
-const potongan = ref("");
+const form = useForm({
+  awal: {
+    karyawanId: "",
+    bulan: "",
+    gajiPokok: "",
+    tunjangan: "",
+    potongan: "",
+  },
+  validasi: (v) =>
+    !v.karyawanId.trim() || !v.bulan.trim() || !v.gajiPokok.trim()
+      ? "Karyawan, bulan, dan gaji pokok wajib diisi"
+      : "",
+  aksi: (v) =>
+    gajiStore.simpan({
+      karyawan_id: Number(v.karyawanId),
+      bulan: v.bulan,
+      gaji_pokok: Number(v.gajiPokok),
+      tunjangan: Number(v.tunjangan) || 0,
+      potongan: Number(v.potongan) || 0,
+      status: "draft",
+    }),
+  pesanSukses: "Data gaji berhasil disimpan",
+  toast: toastStore,
+});
+
 const konfirmasiHapus = ref(false);
 const hapusId = ref<number | null>(null);
 const cari = ref("");
@@ -47,36 +68,6 @@ onMounted(() => {
   karyawanStore.fetchAll();
   gajiStore.fetchAll();
 });
-
-async function handleSimpan() {
-  if (
-    !karyawanId.value.trim() ||
-    !bulan.value.trim() ||
-    !gajiPokok.value.trim()
-  ) {
-    toastStore.error("Karyawan, bulan, dan gaji pokok wajib diisi");
-    return;
-  }
-  try {
-    await gajiStore.simpan({
-      karyawan_id: Number(karyawanId.value),
-      bulan: bulan.value,
-      gaji_pokok: Number(gajiPokok.value),
-      tunjangan: Number(tunjangan.value) || 0,
-      potongan: Number(potongan.value) || 0,
-      status: "draft",
-    });
-    toastStore.success("Data gaji berhasil disimpan");
-    karyawanId.value = "";
-    bulan.value = "";
-    gajiPokok.value = "";
-    tunjangan.value = "";
-    potongan.value = "";
-    gajiStore.fetchAll();
-  } catch {
-    // error already set in store
-  }
-}
 
 function mintaHapus(id: number) {
   hapusId.value = id;
@@ -118,14 +109,14 @@ async function jalankanHapus() {
       @dismiss="gajiStore.bersihkanError"
     />
 
-    <AppCard as="form" padding="6" @submit.prevent="handleSimpan">
+    <AppCard as="form" padding="6" @submit.prevent="form.simpan">
       <div class="grid grid-cols-1 md:grid-cols-6 gap-4 items-end">
         <div class="form-control w-full">
           <label class="label">
             <span class="label-text">Karyawan ID</span>
           </label>
           <AppInput
-            v-model="karyawanId"
+            v-model="form.nilai.karyawanId"
             type="number"
             placeholder="ID karyawan"
             required
@@ -136,7 +127,7 @@ async function jalankanHapus() {
           <label class="label">
             <span class="label-text">Bulan</span>
           </label>
-          <AppInput v-model="bulan" type="month" required />
+          <AppInput v-model="form.nilai.bulan" type="month" required />
         </div>
 
         <div class="form-control w-full">
@@ -144,7 +135,7 @@ async function jalankanHapus() {
             <span class="label-text">Gaji Pokok</span>
           </label>
           <AppInput
-            v-model="gajiPokok"
+            v-model="form.nilai.gajiPokok"
             type="number"
             placeholder="0"
             required
@@ -155,18 +146,30 @@ async function jalankanHapus() {
           <label class="label">
             <span class="label-text">Tunjangan</span>
           </label>
-          <AppInput v-model="tunjangan" type="number" placeholder="0" />
+          <AppInput
+            v-model="form.nilai.tunjangan"
+            type="number"
+            placeholder="0"
+          />
         </div>
 
         <div class="form-control w-full">
           <label class="label">
             <span class="label-text">Potongan</span>
           </label>
-          <AppInput v-model="potongan" type="number" placeholder="0" />
+          <AppInput
+            v-model="form.nilai.potongan"
+            type="number"
+            placeholder="0"
+          />
         </div>
 
         <div class="w-full">
-          <AppButton type="submit" variant="primary" :loading="loading">
+          <AppButton
+            type="submit"
+            variant="primary"
+            :loading="form.sedangSimpan.value"
+          >
             Simpan
           </AppButton>
         </div>
