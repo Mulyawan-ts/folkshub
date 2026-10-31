@@ -31,3 +31,16 @@ Sebelum membuat atau mengubah kode, WAJIB membaca file aturan modular di `docs/r
 - Urutan verifikasi wajib sebelum menyatakan selesai:
   - Frontend: `cd frontend && pnpm run type-check`, `pnpm test`, `pnpm exec prettier --check src`
   - Backend: `go build ./...`, `go vet ./...`, `go test ./...`
+
+## 4. Incremental & Single-File Execution (1 File Per Tahap)
+
+- **Fokus 1 File:** DILARANG MERUBAH ATAU MEMBUAT BANYAK FILE SEKALIGUS dalam satu langkah/respon.
+- **Alur Kerja Bertahap:**
+  1. HANYA buat atau sesuaikan 1 file pada satu waktu.
+  2. Pastikan file tersebut bebas dari syntax error atau broken import.
+  3. Konfirmasikan secara singkat file yang telah diubah sebelum beralih ke file berikutnya.
+- **Urutan Dependencies (Bottom-Up):** Jika tugas membutuhkan beberapa file, kerjakan dengan urutan:
+  1. File Type/Interface (`types/`)
+  2. File API Service (`services/`)
+  3. File State (`stores/`)
+  4. File Komponen UI (`components/` atau `views/`)
