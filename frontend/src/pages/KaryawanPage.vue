@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
+import { ref, computed, onMounted } from "vue";
 import { storeToRefs } from "pinia";
 import { useKaryawanStore } from "../stores/karyawan";
 import { useToastStore } from "../stores/toast";
@@ -15,6 +15,18 @@ const { items, loading, error } = storeToRefs(karyawanStore);
 const nama = ref("");
 const email = ref("");
 const status = ref("tetap");
+const cari = ref("");
+
+const filteredItems = computed(() => {
+  const q = cari.value.trim().toLowerCase();
+  if (!q) return items.value;
+  return items.value.filter(
+    (k) =>
+      k.nama.toLowerCase().includes(q) ||
+      k.email.toLowerCase().includes(q) ||
+      k.status.toLowerCase().includes(q),
+  );
+});
 
 const statusOptions = [
   { value: "tetap", label: "Tetap" },
@@ -133,6 +145,11 @@ async function handleHapus(id: number) {
     </form>
 
     <div class="card p-4 bg-base-100 shadow-sm overflow-x-auto">
+      <AppInput
+        v-model="cari"
+        placeholder="Cari nama, email, atau status"
+        class="mb-4"
+      />
       <table class="table w-full text-left">
         <thead>
           <tr>
@@ -143,7 +160,7 @@ async function handleHapus(id: number) {
           </tr>
         </thead>
         <tbody>
-          <tr v-for="k in items" :key="k.id" class="border-b">
+          <tr v-for="k in filteredItems" :key="k.id" class="border-b">
             <td>{{ k.nama }}</td>
             <td>{{ k.email }}</td>
             <td>
@@ -162,9 +179,13 @@ async function handleHapus(id: number) {
               </AppButton>
             </td>
           </tr>
-          <tr v-if="items.length === 0">
+          <tr v-if="filteredItems.length === 0">
             <td colspan="4" class="text-center text-text-muted py-4">
-              Belum ada data karyawan
+              {{
+                cari
+                  ? "Tidak ada karyawan yang cocok"
+                  : "Belum ada data karyawan"
+              }}
             </td>
           </tr>
         </tbody>
