@@ -87,3 +87,43 @@ func TestPelatihanServiceValidationAndDuplicate(t *testing.T) {
 		t.Fatalf("expected not found on hapus, got %v", err)
 	}
 }
+
+func TestPelatihanServiceStatusValidation(t *testing.T) {
+	svc, err := NewPelatihanService(":memory:")
+	if err != nil {
+		t.Fatalf("new service: %v", err)
+	}
+
+	for _, status := range []string{"terjadwal2", "TERJADWAL", "mulai", "selesai "} {
+		err := svc.Simpan(&model.Pelatihan{KaryawanId: 1, Nama: "X", TanggalMulai: "2026-11-01", Status: status})
+		if err != ErrInvalidInput {
+			t.Fatalf("status %q: expected invalid input, got %v", status, err)
+		}
+	}
+
+	for _, status := range []string{"terjadwal", "berlangsung", "selesai", "dibatalkan"} {
+		p := &model.Pelatihan{KaryawanId: 1, Nama: "X", TanggalMulai: "2026-11-01", Status: status}
+		if err := svc.Simpan(p); err != nil {
+			t.Fatalf("status %q ditolak: %v", status, err)
+		}
+	}
+
+	if err := svc.Simpan(&model.Pelatihan{KaryawanId: 1, Nama: "Y", TanggalMulai: "2026-11-02"}); err != nil {
+		t.Fatalf("status kosong ditolak: %v", err)
+	}
+
+	p := &model.Pelatihan{KaryawanId: 1, Nama: "Z", TanggalMulai: "2026-11-03", Status: "terjadwal"}
+	if err := svc.Simpan(p); err != nil {
+		t.Fatalf("simpan: %v", err)
+	}
+	if _, err := svc.Update(p.ID, 1, "Z", "", "2026-11-03", "", "", "", "", "mulai", 0); err != ErrInvalidInput {
+		t.Fatalf("expected invalid input on update, got %v", err)
+	}
+	if _, err := svc.Update(999, 1, "Z", "", "2026-11-03", "", "", "", "", "mulai", 0); err != ErrPelatihanNotFound {
+		t.Fatalf("expected not found before status check on update, got %v", err)
+	}
+	upd, err := svc.Update(p.ID, 1, "Z", "", "2026-11-03", "", "", "", "", "berlangsung", 0)
+	if err != nil || upd.Status != "berlangsung" {
+		t.Fatalf("update status valid: %v / %+v", err, upd)
+	}
+}

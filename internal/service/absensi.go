@@ -13,6 +13,14 @@ var (
 	ErrAbsensiExists   = errors.New("absensi sudah ada")
 )
 
+var validAbsensiStatus = map[string]bool{
+	"hadir":  true,
+	"izin":   true,
+	"sakit":  true,
+	"alfa":   true,
+	"lembur": true,
+}
+
 type AbsensiService struct {
 	mu sync.RWMutex
 	db *gorm.DB
@@ -37,6 +45,9 @@ func (s *AbsensiService) Simpan(a *model.Absensi) error {
 		return ErrInvalidInput
 	}
 	if !validDate(a.Tanggal) {
+		return ErrInvalidInput
+	}
+	if a.Status != "" && !validAbsensiStatus[a.Status] {
 		return ErrInvalidInput
 	}
 
@@ -109,6 +120,9 @@ func (s *AbsensiService) Update(id int, karyawanId int, tanggal, checkIn, checkO
 	}
 
 	if !validDate(tanggal) {
+		return nil, ErrInvalidInput
+	}
+	if status != "" && !validAbsensiStatus[status] {
 		return nil, ErrInvalidInput
 	}
 

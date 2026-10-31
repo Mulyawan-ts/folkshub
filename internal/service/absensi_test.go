@@ -71,6 +71,46 @@ func TestAbsensiServiceDateValidation(t *testing.T) {
 	}
 }
 
+func TestAbsensiServiceStatusValidation(t *testing.T) {
+	svc, err := NewAbsensiService(":memory:")
+	if err != nil {
+		t.Fatalf("new service: %v", err)
+	}
+
+	for _, status := range []string{"hadir2", "HADIR", "cuti", "lembur "} {
+		err := svc.Simpan(&model.Absensi{KaryawanId: 1, Tanggal: "2026-10-01", Status: status})
+		if err != ErrInvalidInput {
+			t.Fatalf("status %q: expected invalid input, got %v", status, err)
+		}
+	}
+
+	for _, status := range []string{"hadir", "izin", "sakit", "alfa", "lembur"} {
+		a := &model.Absensi{KaryawanId: 1, Tanggal: "2026-10-01", Status: status}
+		if err := svc.Simpan(a); err != nil {
+			t.Fatalf("status %q ditolak: %v", status, err)
+		}
+	}
+
+	if err := svc.Simpan(&model.Absensi{KaryawanId: 1, Tanggal: "2026-10-02"}); err != nil {
+		t.Fatalf("status kosong ditolak: %v", err)
+	}
+
+	a := &model.Absensi{KaryawanId: 1, Tanggal: "2026-10-03", Status: "hadir"}
+	if err := svc.Simpan(a); err != nil {
+		t.Fatalf("simpan: %v", err)
+	}
+	if _, err := svc.Update(a.ID, 1, "2026-10-03", "", "", "cuti", ""); err != ErrInvalidInput {
+		t.Fatalf("expected invalid input on update, got %v", err)
+	}
+	if _, err := svc.Update(999, 1, "2026-10-03", "", "", "cuti", ""); err != ErrAbsensiNotFound {
+		t.Fatalf("expected not found before status check on update, got %v", err)
+	}
+	upd, err := svc.Update(a.ID, 1, "2026-10-03", "08:00", "17:00", "lembur", "ok")
+	if err != nil || upd.Status != "lembur" {
+		t.Fatalf("update status valid: %v / %+v", err, upd)
+	}
+}
+
 func TestGajiServiceTotal(t *testing.T) {
 	svc, err := NewGajiService(":memory:")
 	if err != nil {
@@ -103,5 +143,45 @@ func TestGajiServiceTotal(t *testing.T) {
 
 	if err := svc.Simpan(&model.Gaji{KaryawanId: 0, Bulan: "x"}); err != ErrInvalidInput {
 		t.Fatalf("expected invalid input, got %v", err)
+	}
+}
+
+func TestGajiServiceStatusValidation(t *testing.T) {
+	svc, err := NewGajiService(":memory:")
+	if err != nil {
+		t.Fatalf("new service: %v", err)
+	}
+
+	for _, status := range []string{"draft2", "DRAFT", "bayar", "diproses "} {
+		err := svc.Simpan(&model.Gaji{KaryawanId: 1, Bulan: "2026-11", Status: status})
+		if err != ErrInvalidInput {
+			t.Fatalf("status %q: expected invalid input, got %v", status, err)
+		}
+	}
+
+	for _, status := range []string{"draft", "diproses", "dibayar", "ditolak"} {
+		g := &model.Gaji{KaryawanId: 1, Bulan: "2026-11", Status: status}
+		if err := svc.Simpan(g); err != nil {
+			t.Fatalf("status %q ditolak: %v", status, err)
+		}
+	}
+
+	if err := svc.Simpan(&model.Gaji{KaryawanId: 1, Bulan: "2026-12"}); err != nil {
+		t.Fatalf("status kosong ditolak: %v", err)
+	}
+
+	g := &model.Gaji{KaryawanId: 1, Bulan: "2027-01", Status: "draft"}
+	if err := svc.Simpan(g); err != nil {
+		t.Fatalf("simpan: %v", err)
+	}
+	if _, err := svc.Update(g.ID, 1, "2027-01", 0, 0, 0, "bayar"); err != ErrInvalidInput {
+		t.Fatalf("expected invalid input on update, got %v", err)
+	}
+	if _, err := svc.Update(999, 1, "2027-01", 0, 0, 0, "bayar"); err != ErrGajiNotFound {
+		t.Fatalf("expected not found before status check on update, got %v", err)
+	}
+	upd, err := svc.Update(g.ID, 1, "2027-01", 1000, 0, 0, "dibayar")
+	if err != nil || upd.Status != "dibayar" || upd.Total != 1000 {
+		t.Fatalf("update status valid: %v / %+v", err, upd)
 	}
 }

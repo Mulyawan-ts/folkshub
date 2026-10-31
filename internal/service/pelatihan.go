@@ -13,6 +13,13 @@ var (
 	ErrPelatihanExists   = errors.New("pelatihan sudah ada")
 )
 
+var validPelatihanStatus = map[string]bool{
+	"terjadwal":   true,
+	"berlangsung": true,
+	"selesai":     true,
+	"dibatalkan":  true,
+}
+
 type PelatihanService struct {
 	mu sync.RWMutex
 	db *gorm.DB
@@ -37,6 +44,9 @@ func (s *PelatihanService) Simpan(p *model.Pelatihan) error {
 		return ErrInvalidInput
 	}
 	if !validDate(p.TanggalMulai) || !validOptionalDate(p.TanggalSelesai) {
+		return ErrInvalidInput
+	}
+	if p.Status != "" && !validPelatihanStatus[p.Status] {
 		return ErrInvalidInput
 	}
 
@@ -109,6 +119,9 @@ func (s *PelatihanService) Update(id int, karyawanId int, nama, jenis, tanggalMu
 	}
 
 	if !validDate(tanggalMulai) || !validOptionalDate(tanggalSelesai) {
+		return nil, ErrInvalidInput
+	}
+	if status != "" && !validPelatihanStatus[status] {
 		return nil, ErrInvalidInput
 	}
 

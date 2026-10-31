@@ -13,6 +13,13 @@ var (
 	ErrGajiExists   = errors.New("gaji sudah ada")
 )
 
+var validGajiStatus = map[string]bool{
+	"draft":    true,
+	"diproses": true,
+	"dibayar":  true,
+	"ditolak":  true,
+}
+
 type GajiService struct {
 	mu sync.RWMutex
 	db *gorm.DB
@@ -37,6 +44,9 @@ func (s *GajiService) Simpan(g *model.Gaji) error {
 		return ErrInvalidInput
 	}
 	if !validMonth(g.Bulan) {
+		return ErrInvalidInput
+	}
+	if g.Status != "" && !validGajiStatus[g.Status] {
 		return ErrInvalidInput
 	}
 
@@ -111,6 +121,9 @@ func (s *GajiService) Update(id int, karyawanId int, bulan string, gajiPokok, tu
 	}
 
 	if !validMonth(bulan) {
+		return nil, ErrInvalidInput
+	}
+	if status != "" && !validGajiStatus[status] {
 		return nil, ErrInvalidInput
 	}
 
