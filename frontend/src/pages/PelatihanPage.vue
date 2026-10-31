@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from "vue";
 import { storeToRefs } from "pinia";
-import { usePelatihanStore } from "@/stores/index";
+import { usePelatihanStore, useKaryawanStore } from "@/stores/index";
 import { useToastStore } from "@/stores/toast";
 import AppInput from "@/components/AppInput.vue";
 import AppLabel from "@/components/AppLabel.vue";
@@ -16,11 +16,16 @@ import { formatTanggal } from "@/utils/tanggal";
 import { cocok } from "@/utils/cari";
 import { PELATIHAN_STATUS } from "@/utils/status";
 import { useForm } from "@/composables/useForm";
+import { karyawanOptions } from "@/utils/karyawan";
 
 const pelatihanStore = usePelatihanStore();
+const karyawanStore = useKaryawanStore();
 const toastStore = useToastStore();
 
 const { items, error } = storeToRefs(pelatihanStore);
+const { items: daftarKaryawan } = storeToRefs(karyawanStore);
+
+const opsiKaryawan = computed(() => karyawanOptions(daftarKaryawan.value));
 
 const form = useForm({
   awal: {
@@ -76,6 +81,7 @@ const filteredItems = computed(() =>
 );
 
 onMounted(() => {
+  karyawanStore.fetchAll();
   pelatihanStore.fetchAll();
 });
 
@@ -123,9 +129,10 @@ async function jalankanHapus() {
       <div class="grid grid-cols-1 md:grid-cols-6 gap-4 items-end">
         <AppInput
           v-model="form.nilai.karyawanId"
-          label="Karyawan ID"
-          type="number"
-          placeholder="ID karyawan"
+          label="Karyawan"
+          tipe="select"
+          :options="opsiKaryawan"
+          placeholder="Pilih karyawan"
           required
         />
 

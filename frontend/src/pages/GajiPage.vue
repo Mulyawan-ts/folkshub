@@ -16,12 +16,16 @@ import { formatBulan } from "@/utils/tanggal";
 import { cocok } from "@/utils/cari";
 import { GAJI_STATUS } from "@/utils/status";
 import { useForm } from "@/composables/useForm";
+import { karyawanOptions } from "@/utils/karyawan";
 
 const gajiStore = useGajiStore();
 const karyawanStore = useKaryawanStore();
 const toastStore = useToastStore();
 
 const { items, error } = storeToRefs(gajiStore);
+const { items: daftarKaryawan } = storeToRefs(karyawanStore);
+
+const opsiKaryawan = computed(() => karyawanOptions(daftarKaryawan.value));
 
 const form = useForm({
   awal: {
@@ -112,15 +116,14 @@ async function jalankanHapus() {
 
     <AppCard as="form" padding="6" @submit.prevent="form.simpan">
       <div class="grid grid-cols-1 md:grid-cols-6 gap-4 items-end">
-        <div class="form-control w-full">
-          <AppLabel text="Karyawan ID" />
-          <AppInput
-            v-model="form.nilai.karyawanId"
-            type="number"
-            placeholder="ID karyawan"
-            required
-          />
-        </div>
+        <AppInput
+          v-model="form.nilai.karyawanId"
+          label="Karyawan"
+          tipe="select"
+          :options="opsiKaryawan"
+          placeholder="Pilih karyawan"
+          required
+        />
 
         <div class="form-control w-full">
           <AppLabel text="Bulan" />
