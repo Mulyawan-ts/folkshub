@@ -2,6 +2,7 @@
 import AppCard from "./AppCard.vue";
 import AppButton from "./AppButton.vue";
 import AppBadge from "./AppBadge.vue";
+import AppInput from "./AppInput.vue";
 import type { Variant } from "../types/ui";
 
 withDefaults(
@@ -10,8 +11,9 @@ withDefaults(
     subjudul?: string;
     status?: string;
     statusVariant?: Variant;
-    fields?: { label: string; value: string | number }[];
+    fields?: { label: string; value: string | number; icon?: string }[];
     hapusLabel?: string;
+    editable?: boolean;
   }>(),
   {
     subjudul: "",
@@ -19,6 +21,7 @@ withDefaults(
     statusVariant: "neutral",
     fields: () => [],
     hapusLabel: "Hapus",
+    editable: false,
   },
 );
 
@@ -41,14 +44,24 @@ defineEmits<{
       </AppBadge>
     </div>
 
-    <dl v-if="fields.length" class="grid grid-cols-2 gap-x-3 gap-y-1 text-sm">
-      <template v-for="f in fields" :key="f.label">
-        <dt class="text-text-muted">{{ f.label }}</dt>
-        <dd class="text-right">{{ f.value }}</dd>
-      </template>
-    </dl>
+    <div v-if="editable" class="flex flex-col gap-2">
+      <slot name="edit" />
+    </div>
 
-    <div class="mt-auto flex justify-end">
+    <div v-else-if="fields.length" class="flex flex-col gap-2">
+      <AppInput
+        v-for="f in fields"
+        :key="f.label"
+        :label="f.label"
+        :icon="f.icon"
+        :model-value="f.value"
+        inline
+        readonly
+      />
+    </div>
+
+    <div class="mt-auto flex justify-end gap-2">
+      <slot name="aksi" />
       <AppButton variant="error" size="sm" outline @click="$emit('hapus')">
         {{ hapusLabel }}
       </AppButton>
