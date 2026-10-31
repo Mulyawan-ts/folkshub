@@ -99,7 +99,7 @@ async function handleHapus(id: number) {
     >
       <div>
         <h1 class="text-2xl font-bold">Kelola Reimburse</h1>
-        <p class="text-text-muted">Klaim biaya karyawan</p>
+        <p class="text-base-content/60">Klaim biaya karyawan</p>
       </div>
     </div>
 

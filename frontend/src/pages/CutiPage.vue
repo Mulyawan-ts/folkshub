@@ -107,7 +107,7 @@ async function handleHapus(id: number) {
     >
       <div>
         <h1 class="text-2xl font-bold">Kelola Cuti</h1>
-        <p class="text-text-muted">Pengajuan cuti karyawan</p>
+        <p class="text-base-content/60">Pengajuan cuti karyawan</p>
       </div>
     </div>
 

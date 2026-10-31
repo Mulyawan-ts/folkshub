@@ -78,7 +78,7 @@ const wrapperClasses = computed(() =>
 );
 
 const labelClasses = computed(() =>
-  props.inline ? "w-32 shrink-0 text-sm text-text-muted" : "label",
+  props.inline ? "w-32 shrink-0 text-sm text-base-content/60" : "label",
 );
 
 function onInput(event: Event) {
@@ -101,7 +101,7 @@ function onKeydown(event: KeyboardEvent) {
     <div class="flex w-full items-center gap-2">
       <svg
         v-if="icon"
-        class="size-4 shrink-0 text-text-muted"
+        class="size-4 shrink-0 text-base-content/60"
         fill="none"
         stroke-width="1.5"
         stroke="currentColor"

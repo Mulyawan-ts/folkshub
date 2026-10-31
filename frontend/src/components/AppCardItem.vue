@@ -35,7 +35,7 @@ defineEmits<{
     <div class="flex items-start justify-between gap-2">
       <div class="min-w-0">
         <p class="font-semibold truncate">{{ judul }}</p>
-        <p v-if="subjudul" class="text-sm text-text-muted truncate">
+        <p v-if="subjudul" class="text-sm text-base-content/60 truncate">
           {{ subjudul }}
         </p>
       </div>

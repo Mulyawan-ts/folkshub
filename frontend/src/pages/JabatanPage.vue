@@ -80,7 +80,7 @@ async function handleHapus(id: number) {
     >
       <div>
         <h1 class="text-2xl font-bold">Kelola Jabatan</h1>
-        <p class="text-text-muted">Data jabatan dan departemen</p>
+        <p class="text-base-content/60">Data jabatan dan departemen</p>
       </div>
     </div>
 

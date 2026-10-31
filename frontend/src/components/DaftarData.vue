@@ -39,7 +39,7 @@ defineEmits<{
       <slot />
     </div>
 
-    <p v-else class="text-center text-text-muted py-8">
+    <p v-else class="text-center text-base-content/60 py-8">
       {{ cari ? kosongCari : kosong }}
     </p>
   </AppCard>

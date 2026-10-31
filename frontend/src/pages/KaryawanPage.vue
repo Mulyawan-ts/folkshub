@@ -75,7 +75,7 @@ async function handleHapus(id: number) {
     >
       <div>
         <h1 class="text-2xl font-bold">Kelola Karyawan</h1>
-        <p class="text-text-muted">
+        <p class="text-base-content/60">
           Data karyawan (tetap, outsourcing, magang)
         </p>
       </div>

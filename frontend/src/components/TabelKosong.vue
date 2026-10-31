@@ -9,7 +9,7 @@ defineProps<{
 
 <template>
   <tr>
-    <td :colspan="colspan" class="text-center text-text-muted py-4">
+    <td :colspan="colspan" class="text-center text-base-content/60 py-4">
       <slot>
         {{ mencari ? (kosongCari ?? "Tidak ada hasil yang cocok") : kosong }}
       </slot>
