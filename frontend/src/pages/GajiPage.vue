@@ -9,6 +9,7 @@ import { useToastStore } from '../stores/toast'
 import AppInput from '../components/AppInput.vue'
 import AppButton from '../components/AppButton.vue'
 import AppBadge from '../components/AppBadge.vue'
+import { formatBulan } from '../utils/tanggal'
 
 const gajiStore = useGajiStore()
 const karyawanStore = useKaryawanStore()
@@ -150,7 +151,7 @@ async function handleHapus(id: number) {
         <tbody>
           <tr v-for="g in items" :key="g.id" class="border-b">
             <td>{{ g.karyawan_id }}</td>
-            <td>{{ g.bulan }}</td>
+            <td>{{ formatBulan(g.bulan) }}</td>
             <td>{{ g.gaji_pokok }}</td>
             <td>{{ g.tunjangan }}</td>
             <td>{{ g.potongan }}</td>
