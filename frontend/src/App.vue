@@ -29,6 +29,10 @@ const pages = [
 
 const activePage = ref("karyawan");
 
+const labelAktif = computed(
+  () => pages.find((p) => p.id === activePage.value)?.label || "Karyawan",
+);
+
 const PageComponent = computed(
   () => pages.find((p) => p.id === activePage.value)?.component || KaryawanPage,
 );
@@ -61,6 +65,10 @@ watchEffect(() => {
       </div>
     </div>
 
+    <AppBreadcrumb
+      :items="[{ label: 'Folkshub' }, { label: labelAktif }]"
+      class="mb-4"
+    />
     <component :is="PageComponent" />
   </main>
 

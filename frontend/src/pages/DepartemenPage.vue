@@ -4,6 +4,7 @@ import { storeToRefs } from "pinia";
 import { useDepartemenStore } from "@/stores/index";
 import { useToastStore } from "@/stores/toast";
 import AppInput from "@/components/AppInput.vue";
+import AppLabel from "@/components/AppLabel.vue";
 import AppAlert from "@/components/AppAlert.vue";
 import AppConfirm from "@/components/AppConfirm.vue";
 import AppButton from "@/components/AppButton.vue";
@@ -92,9 +93,7 @@ async function jalankanHapus() {
     <AppCard as="form" padding="6" @submit.prevent="form.simpan">
       <div class="grid grid-cols-1 md:grid-cols-6 gap-4 items-end">
         <div class="form-control w-full">
-          <label class="label">
-            <span class="label-text">Kode Departemen</span>
-          </label>
+          <AppLabel text="Kode Departemen" />
           <AppInput
             v-model="form.nilai.kode"
             placeholder="Contoh: HRD, FIN"
@@ -103,9 +102,7 @@ async function jalankanHapus() {
         </div>
 
         <div class="form-control w-full">
-          <label class="label">
-            <span class="label-text">Nama Departemen</span>
-          </label>
+          <AppLabel text="Nama Departemen" />
           <AppInput
             v-model="form.nilai.nama"
             placeholder="Contoh: Human Resources"
@@ -114,9 +111,7 @@ async function jalankanHapus() {
         </div>
 
         <div class="form-control w-full">
-          <label class="label">
-            <span class="label-text">Kepala</span>
-          </label>
+          <AppLabel text="Kepala" />
           <AppInput
             v-model="form.nilai.kepala"
             placeholder="Nama kepala departemen"
@@ -135,9 +130,7 @@ async function jalankanHapus() {
       </div>
 
       <div class="form-control w-full mt-4">
-        <label class="label">
-          <span class="label-text">Deskripsi</span>
-        </label>
+        <AppLabel text="Deskripsi" />
         <AppInput
           v-model="form.nilai.deskripsi"
           placeholder="Deskripsi departemen"

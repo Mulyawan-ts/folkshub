@@ -4,6 +4,7 @@ import { storeToRefs } from "pinia";
 import { useKaryawanStore } from "@/stores/karyawan";
 import { useToastStore } from "@/stores/toast";
 import AppInput from "@/components/AppInput.vue";
+import AppLabel from "@/components/AppLabel.vue";
 import AppAlert from "@/components/AppAlert.vue";
 import AppConfirm from "@/components/AppConfirm.vue";
 import AppButton from "@/components/AppButton.vue";
@@ -95,9 +96,7 @@ async function jalankanHapus() {
     <AppCard as="form" padding="6" @submit.prevent="form.simpan">
       <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
         <div class="form-control w-full">
-          <label class="label">
-            <span class="label-text">Nama</span>
-          </label>
+          <AppLabel text="Nama" />
           <AppInput
             v-model="form.nilai.nama"
             placeholder="Masukkan nama"
@@ -106,9 +105,7 @@ async function jalankanHapus() {
         </div>
 
         <div class="form-control w-full">
-          <label class="label">
-            <span class="label-text">Email</span>
-          </label>
+          <AppLabel text="Email" />
           <AppInput
             v-model="form.nilai.email"
             type="email"
@@ -118,9 +115,7 @@ async function jalankanHapus() {
         </div>
 
         <div class="form-control w-full">
-          <label class="label">
-            <span class="label-text">Status</span>
-          </label>
+          <AppLabel text="Status" />
           <select
             v-model="form.nilai.status"
             class="select select-bordered w-full"

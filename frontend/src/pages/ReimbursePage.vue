@@ -4,16 +4,17 @@ import { storeToRefs } from "pinia";
 import { useReimburseStore, useKaryawanStore } from "@/stores/index";
 import { useToastStore } from "@/stores/toast";
 import AppInput from "@/components/AppInput.vue";
+import AppLabel from "@/components/AppLabel.vue";
 import AppAlert from "@/components/AppAlert.vue";
 import AppConfirm from "@/components/AppConfirm.vue";
 import AppButton from "@/components/AppButton.vue";
 import AppCard from "@/components/AppCard.vue";
-import AppBadge from "@/components/AppBadge.vue";
+import AppStatus from "@/components/AppStatus.vue";
 import TabelData from "@/components/TabelData.vue";
 import TabelKosong from "@/components/TabelKosong.vue";
 import { formatTanggal } from "@/utils/tanggal";
 import { cocok } from "@/utils/cari";
-import { statusVariant, REIMBURSE_STATUS } from "@/utils/status";
+import { REIMBURSE_STATUS } from "@/utils/status";
 import { useForm } from "@/composables/useForm";
 
 const reimburseStore = useReimburseStore();
@@ -118,9 +119,7 @@ async function jalankanHapus() {
     <AppCard as="form" padding="6" @submit.prevent="form.simpan">
       <div class="grid grid-cols-1 md:grid-cols-6 gap-4 items-end">
         <div class="form-control w-full">
-          <label class="label">
-            <span class="label-text">Karyawan ID</span>
-          </label>
+          <AppLabel text="Karyawan ID" />
           <AppInput
             v-model="form.nilai.karyawanId"
             type="number"
@@ -130,16 +129,12 @@ async function jalankanHapus() {
         </div>
 
         <div class="form-control w-full">
-          <label class="label">
-            <span class="label-text">Tanggal</span>
-          </label>
+          <AppLabel text="Tanggal" />
           <AppInput v-model="form.nilai.tanggal" type="date" required />
         </div>
 
         <div class="form-control w-full">
-          <label class="label">
-            <span class="label-text">Jenis Biaya</span>
-          </label>
+          <AppLabel text="Jenis Biaya" />
           <AppInput
             v-model="form.nilai.jenis"
             placeholder="Contoh: Transport, Makan, Akomodasi"
@@ -148,9 +143,7 @@ async function jalankanHapus() {
         </div>
 
         <div class="form-control w-full">
-          <label class="label">
-            <span class="label-text">Jumlah</span>
-          </label>
+          <AppLabel text="Jumlah" />
           <AppInput
             v-model="form.nilai.jumlah"
             type="number"
@@ -160,9 +153,7 @@ async function jalankanHapus() {
         </div>
 
         <div class="form-control w-full">
-          <label class="label">
-            <span class="label-text">Bukti</span>
-          </label>
+          <AppLabel text="Bukti" />
           <AppInput
             v-model="form.nilai.bukti"
             placeholder="URL atau nomor bukti"
@@ -181,9 +172,7 @@ async function jalankanHapus() {
       </div>
 
       <div class="form-control w-full mt-4">
-        <label class="label">
-          <span class="label-text">Keterangan</span>
-        </label>
+        <AppLabel text="Keterangan" />
         <AppInput
           v-model="form.nilai.keterangan"
           placeholder="Alasan pengajuan reimburse"
@@ -212,12 +201,7 @@ async function jalankanHapus() {
         <td>{{ r.jumlah }}</td>
         <td>{{ r.bukti || "-" }}</td>
         <td>
-          <AppBadge
-            :variant="statusVariant(r.status, REIMBURSE_STATUS)"
-            size="sm"
-          >
-            {{ r.status }}
-          </AppBadge>
+          <AppStatus :status="r.status" :map="REIMBURSE_STATUS" />
         </td>
         <td class="text-right">
           <AppButton

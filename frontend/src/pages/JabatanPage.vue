@@ -4,6 +4,7 @@ import { storeToRefs } from "pinia";
 import { useJabatanStore } from "@/stores/index";
 import { useToastStore } from "@/stores/toast";
 import AppInput from "@/components/AppInput.vue";
+import AppLabel from "@/components/AppLabel.vue";
 import AppAlert from "@/components/AppAlert.vue";
 import AppConfirm from "@/components/AppConfirm.vue";
 import AppButton from "@/components/AppButton.vue";
@@ -99,9 +100,7 @@ async function jalankanHapus() {
     <AppCard as="form" padding="6" @submit.prevent="form.simpan">
       <div class="grid grid-cols-1 md:grid-cols-6 gap-4 items-end">
         <div class="form-control w-full">
-          <label class="label">
-            <span class="label-text">Kode Jabatan</span>
-          </label>
+          <AppLabel text="Kode Jabatan" />
           <AppInput
             v-model="form.nilai.kode"
             placeholder="Contoh: MGR, STAFF"
@@ -110,9 +109,7 @@ async function jalankanHapus() {
         </div>
 
         <div class="form-control w-full">
-          <label class="label">
-            <span class="label-text">Nama Jabatan</span>
-          </label>
+          <AppLabel text="Nama Jabatan" />
           <AppInput
             v-model="form.nilai.nama"
             placeholder="Contoh: Manager"
@@ -121,9 +118,7 @@ async function jalankanHapus() {
         </div>
 
         <div class="form-control w-full">
-          <label class="label">
-            <span class="label-text">Departemen</span>
-          </label>
+          <AppLabel text="Departemen" />
           <AppInput
             v-model="form.nilai.departemen"
             placeholder="Contoh: HRD, Keuangan"
@@ -132,9 +127,7 @@ async function jalankanHapus() {
         </div>
 
         <div class="form-control w-full">
-          <label class="label">
-            <span class="label-text">Gaji Pokok</span>
-          </label>
+          <AppLabel text="Gaji Pokok" />
           <AppInput
             v-model="form.nilai.gajiPokok"
             type="number"
@@ -143,9 +136,7 @@ async function jalankanHapus() {
         </div>
 
         <div class="form-control w-full">
-          <label class="label">
-            <span class="label-text">Tunjangan</span>
-          </label>
+          <AppLabel text="Tunjangan" />
           <AppInput
             v-model="form.nilai.tunjangan"
             type="number"
@@ -165,9 +156,7 @@ async function jalankanHapus() {
       </div>
 
       <div class="form-control w-full mt-4">
-        <label class="label">
-          <span class="label-text">Deskripsi</span>
-        </label>
+        <AppLabel text="Deskripsi" />
         <AppInput
           v-model="form.nilai.deskripsi"
           placeholder="Deskripsi jabatan"

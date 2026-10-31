@@ -4,16 +4,17 @@ import { storeToRefs } from "pinia";
 import { useAbsensiStore, useKaryawanStore } from "@/stores/index";
 import { useToastStore } from "@/stores/toast";
 import AppInput from "@/components/AppInput.vue";
+import AppLabel from "@/components/AppLabel.vue";
 import AppAlert from "@/components/AppAlert.vue";
 import AppConfirm from "@/components/AppConfirm.vue";
 import AppButton from "@/components/AppButton.vue";
 import AppCard from "@/components/AppCard.vue";
-import AppBadge from "@/components/AppBadge.vue";
+import AppStatus from "@/components/AppStatus.vue";
 import TabelData from "@/components/TabelData.vue";
 import TabelKosong from "@/components/TabelKosong.vue";
 import { formatTanggal } from "@/utils/tanggal";
 import { cocok } from "@/utils/cari";
-import { statusVariant, ABSENSI_STATUS } from "@/utils/status";
+import { ABSENSI_STATUS } from "@/utils/status";
 import { useForm } from "@/composables/useForm";
 
 const absensiStore = useAbsensiStore();
@@ -121,9 +122,7 @@ async function jalankanHapus() {
     <AppCard as="form" padding="6" @submit.prevent="form.simpan">
       <div class="grid grid-cols-1 md:grid-cols-6 gap-4 items-end">
         <div class="form-control w-full">
-          <label class="label">
-            <span class="label-text">Karyawan ID</span>
-          </label>
+          <AppLabel text="Karyawan ID" />
           <AppInput
             v-model="form.nilai.karyawanId"
             type="number"
@@ -133,30 +132,22 @@ async function jalankanHapus() {
         </div>
 
         <div class="form-control w-full">
-          <label class="label">
-            <span class="label-text">Tanggal</span>
-          </label>
+          <AppLabel text="Tanggal" />
           <AppInput v-model="form.nilai.tanggal" type="date" required />
         </div>
 
         <div class="form-control w-full">
-          <label class="label">
-            <span class="label-text">Check In</span>
-          </label>
+          <AppLabel text="Check In" />
           <AppInput v-model="form.nilai.checkIn" type="time" />
         </div>
 
         <div class="form-control w-full">
-          <label class="label">
-            <span class="label-text">Check Out</span>
-          </label>
+          <AppLabel text="Check Out" />
           <AppInput v-model="form.nilai.checkOut" type="time" />
         </div>
 
         <div class="form-control w-full">
-          <label class="label">
-            <span class="label-text">Status</span>
-          </label>
+          <AppLabel text="Status" />
           <select
             v-model="form.nilai.status"
             class="select select-bordered w-full"
@@ -183,9 +174,7 @@ async function jalankanHapus() {
       </div>
 
       <div class="form-control w-full mt-4">
-        <label class="label">
-          <span class="label-text">Keterangan</span>
-        </label>
+        <AppLabel text="Keterangan" />
         <AppInput
           v-model="form.nilai.keterangan"
           placeholder="Catatan tambahan"
@@ -212,12 +201,7 @@ async function jalankanHapus() {
         <td>{{ a.check_in || "-" }}</td>
         <td>{{ a.check_out || "-" }}</td>
         <td>
-          <AppBadge
-            :variant="statusVariant(a.status, ABSENSI_STATUS)"
-            size="sm"
-          >
-            {{ a.status }}
-          </AppBadge>
+          <AppStatus :status="a.status" :map="ABSENSI_STATUS" />
         </td>
         <td class="text-right">
           <AppButton

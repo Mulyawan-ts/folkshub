@@ -4,16 +4,17 @@ import { storeToRefs } from "pinia";
 import { usePelatihanStore } from "@/stores/index";
 import { useToastStore } from "@/stores/toast";
 import AppInput from "@/components/AppInput.vue";
+import AppLabel from "@/components/AppLabel.vue";
 import AppAlert from "@/components/AppAlert.vue";
 import AppConfirm from "@/components/AppConfirm.vue";
 import AppButton from "@/components/AppButton.vue";
 import AppCard from "@/components/AppCard.vue";
-import AppBadge from "@/components/AppBadge.vue";
+import AppStatus from "@/components/AppStatus.vue";
 import TabelData from "@/components/TabelData.vue";
 import TabelKosong from "@/components/TabelKosong.vue";
 import { formatTanggal } from "@/utils/tanggal";
 import { cocok } from "@/utils/cari";
-import { statusVariant, PELATIHAN_STATUS } from "@/utils/status";
+import { PELATIHAN_STATUS } from "@/utils/status";
 import { useForm } from "@/composables/useForm";
 
 const pelatihanStore = usePelatihanStore();
@@ -121,9 +122,7 @@ async function jalankanHapus() {
     <AppCard as="form" padding="6" @submit.prevent="form.simpan">
       <div class="grid grid-cols-1 md:grid-cols-6 gap-4 items-end">
         <div class="form-control w-full">
-          <label class="label">
-            <span class="label-text">Karyawan ID</span>
-          </label>
+          <AppLabel text="Karyawan ID" />
           <AppInput
             v-model="form.nilai.karyawanId"
             type="number"
@@ -133,9 +132,7 @@ async function jalankanHapus() {
         </div>
 
         <div class="form-control w-full">
-          <label class="label">
-            <span class="label-text">Nama Pelatihan</span>
-          </label>
+          <AppLabel text="Nama Pelatihan" />
           <AppInput
             v-model="form.nilai.nama"
             placeholder="Nama pelatihan"
@@ -144,9 +141,7 @@ async function jalankanHapus() {
         </div>
 
         <div class="form-control w-full">
-          <label class="label">
-            <span class="label-text">Jenis</span>
-          </label>
+          <AppLabel text="Jenis" />
           <AppInput
             v-model="form.nilai.jenis"
             placeholder="Contoh: Teknis, Soft Skill"
@@ -154,23 +149,17 @@ async function jalankanHapus() {
         </div>
 
         <div class="form-control w-full">
-          <label class="label">
-            <span class="label-text">Tanggal Mulai</span>
-          </label>
+          <AppLabel text="Tanggal Mulai" />
           <AppInput v-model="form.nilai.tanggalMulai" type="date" required />
         </div>
 
         <div class="form-control w-full">
-          <label class="label">
-            <span class="label-text">Tanggal Selesai</span>
-          </label>
+          <AppLabel text="Tanggal Selesai" />
           <AppInput v-model="form.nilai.tanggalSelesai" type="date" />
         </div>
 
         <div class="form-control w-full">
-          <label class="label">
-            <span class="label-text">Lokasi</span>
-          </label>
+          <AppLabel text="Lokasi" />
           <AppInput
             v-model="form.nilai.lokasi"
             placeholder="Lokasi pelatihan"
@@ -178,9 +167,7 @@ async function jalankanHapus() {
         </div>
 
         <div class="form-control w-full">
-          <label class="label">
-            <span class="label-text">Biaya</span>
-          </label>
+          <AppLabel text="Biaya" />
           <AppInput v-model="form.nilai.biaya" type="number" placeholder="0" />
         </div>
 
@@ -196,9 +183,7 @@ async function jalankanHapus() {
       </div>
 
       <div class="form-control w-full">
-        <label class="label">
-          <span class="label-text">Sertifikat</span>
-        </label>
+        <AppLabel text="Sertifikat" />
         <AppInput
           v-model="form.nilai.sertifikat"
           placeholder="Nomor atau URL sertifikat"
@@ -206,9 +191,7 @@ async function jalankanHapus() {
       </div>
 
       <div class="form-control w-full mt-4">
-        <label class="label">
-          <span class="label-text">Catatan</span>
-        </label>
+        <AppLabel text="Catatan" />
         <AppInput
           v-model="form.nilai.catatan"
           placeholder="Catatan pelatihan"
@@ -241,12 +224,7 @@ async function jalankanHapus() {
         </td>
         <td>{{ p.biaya }}</td>
         <td>
-          <AppBadge
-            :variant="statusVariant(p.status, PELATIHAN_STATUS)"
-            size="sm"
-          >
-            {{ p.status }}
-          </AppBadge>
+          <AppStatus :status="p.status" :map="PELATIHAN_STATUS" />
         </td>
         <td class="text-right">
           <AppButton

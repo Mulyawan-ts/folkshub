@@ -4,16 +4,17 @@ import { storeToRefs } from "pinia";
 import { useCutiStore, useKaryawanStore } from "@/stores/index";
 import { useToastStore } from "@/stores/toast";
 import AppInput from "@/components/AppInput.vue";
+import AppLabel from "@/components/AppLabel.vue";
 import AppAlert from "@/components/AppAlert.vue";
 import AppConfirm from "@/components/AppConfirm.vue";
 import AppButton from "@/components/AppButton.vue";
 import AppCard from "@/components/AppCard.vue";
-import AppBadge from "@/components/AppBadge.vue";
+import AppStatus from "@/components/AppStatus.vue";
 import TabelData from "@/components/TabelData.vue";
 import TabelKosong from "@/components/TabelKosong.vue";
 import { formatTanggal } from "@/utils/tanggal";
 import { cocok } from "@/utils/cari";
-import { statusVariant, CUTI_STATUS } from "@/utils/status";
+import { CUTI_STATUS } from "@/utils/status";
 import { useForm } from "@/composables/useForm";
 
 const cutiStore = useCutiStore();
@@ -123,9 +124,7 @@ async function jalankanHapus() {
     <AppCard as="form" padding="6" @submit.prevent="form.simpan">
       <div class="grid grid-cols-1 md:grid-cols-6 gap-4 items-end">
         <div class="form-control w-full">
-          <label class="label">
-            <span class="label-text">Karyawan ID</span>
-          </label>
+          <AppLabel text="Karyawan ID" />
           <AppInput
             v-model="form.nilai.karyawanId"
             type="number"
@@ -135,9 +134,7 @@ async function jalankanHapus() {
         </div>
 
         <div class="form-control w-full">
-          <label class="label">
-            <span class="label-text">Jenis Cuti</span>
-          </label>
+          <AppLabel text="Jenis Cuti" />
           <select
             v-model="form.nilai.jenis"
             class="select select-bordered w-full"
@@ -153,23 +150,17 @@ async function jalankanHapus() {
         </div>
 
         <div class="form-control w-full">
-          <label class="label">
-            <span class="label-text">Tanggal Mulai</span>
-          </label>
+          <AppLabel text="Tanggal Mulai" />
           <AppInput v-model="form.nilai.tanggalMulai" type="date" required />
         </div>
 
         <div class="form-control w-full">
-          <label class="label">
-            <span class="label-text">Tanggal Selesai</span>
-          </label>
+          <AppLabel text="Tanggal Selesai" />
           <AppInput v-model="form.nilai.tanggalSelesai" type="date" required />
         </div>
 
         <div class="form-control w-full">
-          <label class="label">
-            <span class="label-text">Jumlah Hari</span>
-          </label>
+          <AppLabel text="Jumlah Hari" />
           <AppInput
             v-model="form.nilai.jumlahHari"
             type="number"
@@ -189,9 +180,7 @@ async function jalankanHapus() {
       </div>
 
       <div class="form-control w-full mt-4">
-        <label class="label">
-          <span class="label-text">Keterangan</span>
-        </label>
+        <AppLabel text="Keterangan" />
         <AppInput
           v-model="form.nilai.keterangan"
           placeholder="Alasan pengajuan cuti"
@@ -220,9 +209,7 @@ async function jalankanHapus() {
         <td>{{ formatTanggal(c.tanggal_selesai) }}</td>
         <td>{{ c.jumlah_hari }}</td>
         <td>
-          <AppBadge :variant="statusVariant(c.status, CUTI_STATUS)" size="sm">
-            {{ c.status }}
-          </AppBadge>
+          <AppStatus :status="c.status" :map="CUTI_STATUS" />
         </td>
         <td class="text-right">
           <AppButton

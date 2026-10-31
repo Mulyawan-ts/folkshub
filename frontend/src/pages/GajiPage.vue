@@ -4,16 +4,17 @@ import { storeToRefs } from "pinia";
 import { useGajiStore, useKaryawanStore } from "@/stores/index";
 import { useToastStore } from "@/stores/toast";
 import AppInput from "@/components/AppInput.vue";
+import AppLabel from "@/components/AppLabel.vue";
 import AppAlert from "@/components/AppAlert.vue";
 import AppConfirm from "@/components/AppConfirm.vue";
 import AppButton from "@/components/AppButton.vue";
 import AppCard from "@/components/AppCard.vue";
-import AppBadge from "@/components/AppBadge.vue";
+import AppStatus from "@/components/AppStatus.vue";
 import TabelData from "@/components/TabelData.vue";
 import TabelKosong from "@/components/TabelKosong.vue";
 import { formatBulan } from "@/utils/tanggal";
 import { cocok } from "@/utils/cari";
-import { statusVariant, GAJI_STATUS } from "@/utils/status";
+import { GAJI_STATUS } from "@/utils/status";
 import { useForm } from "@/composables/useForm";
 
 const gajiStore = useGajiStore();
@@ -112,9 +113,7 @@ async function jalankanHapus() {
     <AppCard as="form" padding="6" @submit.prevent="form.simpan">
       <div class="grid grid-cols-1 md:grid-cols-6 gap-4 items-end">
         <div class="form-control w-full">
-          <label class="label">
-            <span class="label-text">Karyawan ID</span>
-          </label>
+          <AppLabel text="Karyawan ID" />
           <AppInput
             v-model="form.nilai.karyawanId"
             type="number"
@@ -124,16 +123,12 @@ async function jalankanHapus() {
         </div>
 
         <div class="form-control w-full">
-          <label class="label">
-            <span class="label-text">Bulan</span>
-          </label>
+          <AppLabel text="Bulan" />
           <AppInput v-model="form.nilai.bulan" type="month" required />
         </div>
 
         <div class="form-control w-full">
-          <label class="label">
-            <span class="label-text">Gaji Pokok</span>
-          </label>
+          <AppLabel text="Gaji Pokok" />
           <AppInput
             v-model="form.nilai.gajiPokok"
             type="number"
@@ -143,9 +138,7 @@ async function jalankanHapus() {
         </div>
 
         <div class="form-control w-full">
-          <label class="label">
-            <span class="label-text">Tunjangan</span>
-          </label>
+          <AppLabel text="Tunjangan" />
           <AppInput
             v-model="form.nilai.tunjangan"
             type="number"
@@ -154,9 +147,7 @@ async function jalankanHapus() {
         </div>
 
         <div class="form-control w-full">
-          <label class="label">
-            <span class="label-text">Potongan</span>
-          </label>
+          <AppLabel text="Potongan" />
           <AppInput
             v-model="form.nilai.potongan"
             type="number"
@@ -199,9 +190,7 @@ async function jalankanHapus() {
         <td>{{ g.potongan }}</td>
         <td class="font-bold">{{ g.total }}</td>
         <td>
-          <AppBadge :variant="statusVariant(g.status, GAJI_STATUS)" size="sm">
-            {{ g.status }}
-          </AppBadge>
+          <AppStatus :status="g.status" :map="GAJI_STATUS" />
         </td>
         <td class="text-right">
           <AppButton
