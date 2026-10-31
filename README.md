@@ -1,6 +1,8 @@
 # folkshub
 
-Aplikasi desktop manajemen karyawan berbasis Wails (Go + Vue 3 + Pinia). Data disimpan dalam file JSON per modul di direktori aplikasi.
+Aplikasi desktop HRIS (HR Management System) berbasis **Wails v2** dengan frontend **Vue 3 + TypeScript + Pinia + daisyUI** dan backend **Go + SQLite**.
+
+Bukan aplikasi web. Tidak ada server, tidak ada REST API, tidak ada HTTP client. Frontend dan backend berkomunikasi lewat binding Wails yang di-generate ke `frontend/wailsjs/`.
 
 ## Fitur
 
@@ -16,25 +18,31 @@ Aplikasi desktop manajemen karyawan berbasis Wails (Go + Vue 3 + Pinia). Data di
 ## Struktur
 
 ```
-app.go              # Titik masuk Wails, pendaftaran semua service & binding endpoint
-main.go             # Inisialisasi aplikasi Wails
-go.mod / go.sum     # Dependensi Go
+app.go                  # Titik masuk Wails, pendaftaran service & binding endpoint
+main.go                 # Konfigurasi jendela (ukuran, judul) dan inisialisasi Wails
+go.mod / go.sum         # Dependensi Go
 internal/
-  model/            # Struct domain + TableName()
-  service/          # Service per modul (CRUD berbasis JSON file)
+  model/                # Struct domain + TableName()
+  service/              # Service per modul (CRUD SQLite + validasi)
 frontend/
   src/
-    stores/         # Pinia store per modul
-    wailsjs/        # Binding Go yang di-generate ke TypeScript
-wails.json          # Konfigurasi project Wails
-build/              # Hasil build per platform
+    components/          # Komponen UI presentasional (props + emit)
+    composables/         # Logika bersama antar halaman (mis. useForm)
+    pages/               # Halaman container, pemegang store
+    stores/              # Pinia store per modul
+    utils/               # Helper murni + test (tanggal, pencarian, status)
+    types/               # Tipe UI bersama
+  wailsjs/               # Binding Go hasil generate, JANGAN diedit manual
+build/                   # Hasil build per platform
+docs/rules/              # Aturan pengembangan (dibaca agent sebelum menulis kode)
 ```
 
 ## Persiapan
 
-- [Go](https://go.dev/) (untuk backend)
-- [Node.js](https://nodejs.org/) + npm (untuk frontend)
-- [Wails CLI](https://wails.io/docs/gettingstarted/installation) (opsional, untuk `wails dev`/`wails build`)
+- [Go](https://go.dev/) 1.25+
+- [Node.js](https://nodejs.org/) 18+
+- [pnpm](https://pnpm.io/) (project memakai `pnpm-lock.yaml`)
+- [Wails CLI](https://wails.io/docs/gettingstarted/installation) v2
 
 ## Menjalankan
 
@@ -46,15 +54,17 @@ go vet ./...
 go test ./...
 ```
 
-Frontend (type-check):
+Frontend:
 
 ```sh
 cd frontend
-npm install
-npm run type-check
+pnpm install
+pnpm run type-check
+pnpm test
+pnpm run format:check
 ```
 
-Menjalankan dalam mode development:
+Menjalankan aplikasi dalam mode development (Wails menjalankan Vite otomatis):
 
 ```sh
 wails dev
@@ -66,14 +76,16 @@ Build produksi:
 wails build
 ```
 
-Hasil build tersedia di `build/bin`, `build/darwin`, atau `build/windows` sesuai platform.
+Hasil build tersedia di `build/bin` sesuai platform.
 
 ## Data
 
-Setiap modul menyimpan data ke file JSON sendiri di direktori aplikasi:
+Setiap modul menyimpan datanya di file SQLite terpisah pada direktori aplikasi:
 
 - `karyawan.db`, `absensi.db`, `cuti.db`, `reimburse.db`
 - `gaji.db`, `jabatan.db`, `departemen.db`, `pelatihan.db`
+
+File `*.db`, `*.db-shm`, dan `*.db-wal` tidak masuk repository (lihat `.gitignore`). Mode WAL aktif, jadi file `-wal` dapat muncul selama aplikasi berjalan.
 
 ## Lisensi
 
