@@ -6,6 +6,10 @@ import { useToastStore } from "../stores/toast";
 import AppInput from "../components/AppInput.vue";
 import AppButton from "../components/AppButton.vue";
 import AppBadge from "../components/AppBadge.vue";
+import TabelData from "../components/TabelData.vue";
+import TabelKosong from "../components/TabelKosong.vue";
+import { cocok } from "../utils/cari";
+import { statusVariant, KARYAWAN_STATUS } from "../utils/status";
 
 const karyawanStore = useKaryawanStore();
 const toastStore = useToastStore();
@@ -17,35 +21,15 @@ const email = ref("");
 const status = ref("tetap");
 const cari = ref("");
 
-const filteredItems = computed(() => {
-  const q = cari.value.trim().toLowerCase();
-  if (!q) return items.value;
-  return items.value.filter(
-    (k) =>
-      k.nama.toLowerCase().includes(q) ||
-      k.email.toLowerCase().includes(q) ||
-      k.status.toLowerCase().includes(q),
-  );
-});
+const filteredItems = computed(() =>
+  items.value.filter((k) => cocok(cari.value, k.nama, k.email, k.status)),
+);
 
 const statusOptions = [
   { value: "tetap", label: "Tetap" },
   { value: "outsourcing", label: "Outsourcing" },
   { value: "magang", label: "Magang" },
 ];
-
-const itemStatusVariant = (s: string) => {
-  switch (s) {
-    case "tetap":
-      return "success";
-    case "outsourcing":
-      return "warning";
-    case "magang":
-      return "info";
-    default:
-      return "neutral";
-  }
-};
 
 onMounted(() => {
   karyawanStore.fetchAll();
@@ -144,58 +128,44 @@ async function handleHapus(id: number) {
       </div>
     </form>
 
-    <div class="card p-4 bg-base-100 shadow-sm overflow-x-auto">
-      <AppInput
-        v-model="cari"
-        placeholder="Cari nama, email, atau status"
-        class="mb-4"
+    <TabelData v-model:cari="cari" placeholder="Cari nama, email, atau status">
+      <template #head>
+        <th>Nama</th>
+        <th>Email</th>
+        <th>Status</th>
+        <th class="text-right">Aksi</th>
+      </template>
+
+      <tr v-for="k in filteredItems" :key="k.id" class="border-b">
+        <td>{{ k.nama }}</td>
+        <td>{{ k.email }}</td>
+        <td>
+          <AppBadge
+            :variant="statusVariant(k.status, KARYAWAN_STATUS)"
+            size="sm"
+          >
+            {{ k.status }}
+          </AppBadge>
+        </td>
+        <td class="text-right">
+          <AppButton
+            variant="error"
+            size="sm"
+            outline
+            @click="handleHapus(k.id)"
+          >
+            Hapus
+          </AppButton>
+        </td>
+      </tr>
+
+      <TabelKosong
+        v-if="filteredItems.length === 0"
+        :colspan="4"
+        kosong="Belum ada data karyawan"
+        kosong-cari="Tidak ada karyawan yang cocok"
+        :mencari="!!cari"
       />
-      <table class="table w-full text-left">
-        <thead>
-          <tr>
-            <th>Nama</th>
-            <th>Email</th>
-            <th>Status</th>
-            <th class="text-right">Aksi</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="k in filteredItems" :key="k.id" class="border-b">
-            <td>{{ k.nama }}</td>
-            <td>{{ k.email }}</td>
-            <td>
-              <AppBadge :variant="itemStatusVariant(k.status)" size="sm">
-                {{ k.status }}
-              </AppBadge>
-            </td>
-            <td class="text-right">
-              <AppButton
-                variant="error"
-                size="sm"
-                outline
-                @click="handleHapus(k.id)"
-              >
-                Hapus
-              </AppButton>
-            </td>
-          </tr>
-          <tr v-if="filteredItems.length === 0">
-            <td colspan="4" class="text-center text-text-muted py-4">
-              {{
-                cari
-                  ? "Tidak ada karyawan yang cocok"
-                  : "Belum ada data karyawan"
-              }}
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+    </TabelData>
   </div>
 </template>
-
-<style scoped>
-.card {
-  @apply border;
-}
-</style>

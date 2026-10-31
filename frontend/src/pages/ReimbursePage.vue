@@ -6,7 +6,11 @@ import { useToastStore } from "../stores/toast";
 import AppInput from "../components/AppInput.vue";
 import AppButton from "../components/AppButton.vue";
 import AppBadge from "../components/AppBadge.vue";
+import TabelData from "../components/TabelData.vue";
+import TabelKosong from "../components/TabelKosong.vue";
 import { formatTanggal } from "../utils/tanggal";
+import { cocok } from "../utils/cari";
+import { statusVariant, REIMBURSE_STATUS } from "../utils/status";
 
 const reimburseStore = useReimburseStore();
 const karyawanStore = useKaryawanStore();
@@ -22,36 +26,19 @@ const keterangan = ref("");
 const bukti = ref("");
 const cari = ref("");
 
-const filteredItems = computed(() => {
-  const q = cari.value.trim().toLowerCase();
-  if (!q) return items.value;
-  return items.value.filter(
-    (r) =>
-      String(r.karyawan_id).includes(q) ||
-      r.tanggal.includes(q) ||
-      r.jenis.toLowerCase().includes(q) ||
-      r.status.toLowerCase().includes(q) ||
-      (r.keterangan ?? "").toLowerCase().includes(q) ||
-      (r.bukti ?? "").toLowerCase().includes(q),
-  );
-});
-
-const statusVariant = (s: string) => {
-  switch (s) {
-    case "submitted":
-      return "warning";
-    case "approved":
-      return "success";
-    case "rejected":
-      return "error";
-    case "paid":
-      return "success";
-    case "draft":
-      return "neutral";
-    default:
-      return "neutral";
-  }
-};
+const filteredItems = computed(() =>
+  items.value.filter((r) =>
+    cocok(
+      cari.value,
+      r.karyawan_id,
+      r.tanggal,
+      r.jenis,
+      r.status,
+      r.keterangan,
+      r.bukti,
+    ),
+  ),
+);
 
 onMounted(() => {
   karyawanStore.fetchAll();
@@ -182,64 +169,53 @@ async function handleHapus(id: number) {
       </div>
     </form>
 
-    <div class="card p-4 bg-base-100 shadow-sm overflow-x-auto">
-      <AppInput
-        v-model="cari"
-        placeholder="Cari karyawan, jenis, status, atau keterangan"
-        class="mb-4"
+    <TabelData
+      v-model:cari="cari"
+      placeholder="Cari karyawan, jenis, status, atau keterangan"
+    >
+      <template #head>
+        <th>Karyawan ID</th>
+        <th>Tanggal</th>
+        <th>Jenis</th>
+        <th>Jumlah</th>
+        <th>Bukti</th>
+        <th>Status</th>
+        <th class="text-right">Aksi</th>
+      </template>
+
+      <tr v-for="r in filteredItems" :key="r.id" class="border-b">
+        <td>{{ r.karyawan_id }}</td>
+        <td>{{ formatTanggal(r.tanggal) }}</td>
+        <td>{{ r.jenis }}</td>
+        <td>{{ r.jumlah }}</td>
+        <td>{{ r.bukti || "-" }}</td>
+        <td>
+          <AppBadge
+            :variant="statusVariant(r.status, REIMBURSE_STATUS)"
+            size="sm"
+          >
+            {{ r.status }}
+          </AppBadge>
+        </td>
+        <td class="text-right">
+          <AppButton
+            variant="error"
+            size="sm"
+            outline
+            @click="handleHapus(r.id)"
+          >
+            Hapus
+          </AppButton>
+        </td>
+      </tr>
+
+      <TabelKosong
+        v-if="filteredItems.length === 0"
+        :colspan="7"
+        kosong="Belum ada data reimburse"
+        kosong-cari="Tidak ada reimburse yang cocok"
+        :mencari="!!cari"
       />
-      <table class="table w-full text-left">
-        <thead>
-          <tr>
-            <th>Karyawan ID</th>
-            <th>Tanggal</th>
-            <th>Jenis</th>
-            <th>Jumlah</th>
-            <th>Bukti</th>
-            <th>Status</th>
-            <th class="text-right">Aksi</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="r in filteredItems" :key="r.id" class="border-b">
-            <td>{{ r.karyawan_id }}</td>
-            <td>{{ formatTanggal(r.tanggal) }}</td>
-            <td>{{ r.jenis }}</td>
-            <td>{{ r.jumlah }}</td>
-            <td>{{ r.bukti || "-" }}</td>
-            <td>
-              <AppBadge :variant="statusVariant(r.status)" size="sm">
-                {{ r.status }}
-              </AppBadge>
-            </td>
-            <td class="text-right">
-              <AppButton
-                variant="error"
-                size="sm"
-                outline
-                @click="handleHapus(r.id)"
-              >
-                Hapus
-              </AppButton>
-            </td>
-          </tr>
-          <tr v-if="filteredItems.length === 0">
-            <td colspan="7" class="text-center text-text-muted py-4">
-              {{
-                cari
-                  ? "Tidak ada reimburse yang cocok"
-                  : "Belum ada data reimburse"
-              }}
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+    </TabelData>
   </div>
 </template>
-
-<style scoped>
-.card {
-  @apply border;
-}
-</style>

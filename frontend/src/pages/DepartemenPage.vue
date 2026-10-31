@@ -5,6 +5,9 @@ import { useDepartemenStore } from "../stores/index";
 import { useToastStore } from "../stores/toast";
 import AppInput from "../components/AppInput.vue";
 import AppButton from "../components/AppButton.vue";
+import TabelData from "../components/TabelData.vue";
+import TabelKosong from "../components/TabelKosong.vue";
+import { cocok } from "../utils/cari";
 
 const departemenStore = useDepartemenStore();
 const toastStore = useToastStore();
@@ -17,17 +20,11 @@ const kepala = ref("");
 const deskripsi = ref("");
 const cari = ref("");
 
-const filteredItems = computed(() => {
-  const q = cari.value.trim().toLowerCase();
-  if (!q) return items.value;
-  return items.value.filter(
-    (d) =>
-      d.kode.toLowerCase().includes(q) ||
-      d.nama.toLowerCase().includes(q) ||
-      (d.kepala ?? "").toLowerCase().includes(q) ||
-      (d.deskripsi ?? "").toLowerCase().includes(q),
-  );
-});
+const filteredItems = computed(() =>
+  items.value.filter((d) =>
+    cocok(cari.value, d.kode, d.nama, d.kepala, d.deskripsi),
+  ),
+);
 
 onMounted(() => {
   departemenStore.fetchAll();
@@ -125,56 +122,39 @@ async function handleHapus(id: number) {
       </div>
     </form>
 
-    <div class="card p-4 bg-base-100 shadow-sm overflow-x-auto">
-      <AppInput
-        v-model="cari"
-        placeholder="Cari kode, nama, atau kepala"
-        class="mb-4"
+    <TabelData v-model:cari="cari" placeholder="Cari kode, nama, atau kepala">
+      <template #head>
+        <th>Kode</th>
+        <th>Nama Departemen</th>
+        <th>Kepala</th>
+        <th>Deskripsi</th>
+        <th class="text-right">Aksi</th>
+      </template>
+
+      <tr v-for="d in filteredItems" :key="d.id" class="border-b">
+        <td>{{ d.kode }}</td>
+        <td>{{ d.nama }}</td>
+        <td>{{ d.kepala || "-" }}</td>
+        <td>{{ d.deskripsi || "-" }}</td>
+        <td class="text-right">
+          <AppButton
+            variant="error"
+            size="sm"
+            outline
+            @click="handleHapus(d.id)"
+          >
+            Hapus
+          </AppButton>
+        </td>
+      </tr>
+
+      <TabelKosong
+        v-if="filteredItems.length === 0"
+        :colspan="5"
+        kosong="Belum ada data departemen"
+        kosong-cari="Tidak ada departemen yang cocok"
+        :mencari="!!cari"
       />
-      <table class="table w-full text-left">
-        <thead>
-          <tr>
-            <th>Kode</th>
-            <th>Nama Departemen</th>
-            <th>Kepala</th>
-            <th>Deskripsi</th>
-            <th class="text-right">Aksi</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="d in filteredItems" :key="d.id" class="border-b">
-            <td>{{ d.kode }}</td>
-            <td>{{ d.nama }}</td>
-            <td>{{ d.kepala || "-" }}</td>
-            <td>{{ d.deskripsi || "-" }}</td>
-            <td class="text-right">
-              <AppButton
-                variant="error"
-                size="sm"
-                outline
-                @click="handleHapus(d.id)"
-              >
-                Hapus
-              </AppButton>
-            </td>
-          </tr>
-          <tr v-if="filteredItems.length === 0">
-            <td colspan="5" class="text-center text-text-muted py-4">
-              {{
-                cari
-                  ? "Tidak ada departemen yang cocok"
-                  : "Belum ada data departemen"
-              }}
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+    </TabelData>
   </div>
 </template>
-
-<style scoped>
-.card {
-  @apply border;
-}
-</style>

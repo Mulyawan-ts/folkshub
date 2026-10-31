@@ -34,3 +34,7 @@ body {
 #app {
   height: 100vh;
 }
+
+.card {
+  @apply border;
+}

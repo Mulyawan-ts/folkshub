@@ -6,7 +6,11 @@ import { useToastStore } from "../stores/toast";
 import AppInput from "../components/AppInput.vue";
 import AppButton from "../components/AppButton.vue";
 import AppBadge from "../components/AppBadge.vue";
+import TabelData from "../components/TabelData.vue";
+import TabelKosong from "../components/TabelKosong.vue";
 import { formatTanggal } from "../utils/tanggal";
+import { cocok } from "../utils/cari";
+import { statusVariant, CUTI_STATUS } from "../utils/status";
 
 const cutiStore = useCutiStore();
 const karyawanStore = useKaryawanStore();
@@ -22,19 +26,19 @@ const jumlahHari = ref("");
 const keterangan = ref("");
 const cari = ref("");
 
-const filteredItems = computed(() => {
-  const q = cari.value.trim().toLowerCase();
-  if (!q) return items.value;
-  return items.value.filter(
-    (c) =>
-      String(c.karyawan_id).includes(q) ||
-      c.jenis.toLowerCase().includes(q) ||
-      c.status.toLowerCase().includes(q) ||
-      c.tanggal_mulai.includes(q) ||
-      c.tanggal_selesai.includes(q) ||
-      (c.keterangan ?? "").toLowerCase().includes(q),
-  );
-});
+const filteredItems = computed(() =>
+  items.value.filter((c) =>
+    cocok(
+      cari.value,
+      c.karyawan_id,
+      c.jenis,
+      c.status,
+      c.tanggal_mulai,
+      c.tanggal_selesai,
+      c.keterangan,
+    ),
+  ),
+);
 
 const jenisOptions = [
   { value: "tahunan", label: "Tahunan" },
@@ -43,23 +47,6 @@ const jenisOptions = [
   { value: "melahirkan", label: "Melahirkan" },
   { value: "lainnya", label: "Lainnya" },
 ];
-
-const statusVariant = (s: string) => {
-  switch (s) {
-    case "submitted":
-      return "warning";
-    case "approved":
-      return "success";
-    case "rejected":
-      return "error";
-    case "cancelled":
-      return "neutral";
-    case "draft":
-      return "neutral";
-    default:
-      return "neutral";
-  }
-};
 
 onMounted(() => {
   karyawanStore.fetchAll();
@@ -191,60 +178,50 @@ async function handleHapus(id: number) {
       </div>
     </form>
 
-    <div class="card p-4 bg-base-100 shadow-sm overflow-x-auto">
-      <AppInput
-        v-model="cari"
-        placeholder="Cari karyawan, jenis, tanggal, status, atau keterangan"
-        class="mb-4"
+    <TabelData
+      v-model:cari="cari"
+      placeholder="Cari karyawan, jenis, tanggal, status, atau keterangan"
+    >
+      <template #head>
+        <th>Karyawan ID</th>
+        <th>Jenis</th>
+        <th>Tanggal Mulai</th>
+        <th>Tanggal Selesai</th>
+        <th>Jumlah Hari</th>
+        <th>Status</th>
+        <th class="text-right">Aksi</th>
+      </template>
+
+      <tr v-for="c in filteredItems" :key="c.id" class="border-b">
+        <td>{{ c.karyawan_id }}</td>
+        <td>{{ c.jenis }}</td>
+        <td>{{ formatTanggal(c.tanggal_mulai) }}</td>
+        <td>{{ formatTanggal(c.tanggal_selesai) }}</td>
+        <td>{{ c.jumlah_hari }}</td>
+        <td>
+          <AppBadge :variant="statusVariant(c.status, CUTI_STATUS)" size="sm">
+            {{ c.status }}
+          </AppBadge>
+        </td>
+        <td class="text-right">
+          <AppButton
+            variant="error"
+            size="sm"
+            outline
+            @click="handleHapus(c.id)"
+          >
+            Hapus
+          </AppButton>
+        </td>
+      </tr>
+
+      <TabelKosong
+        v-if="filteredItems.length === 0"
+        :colspan="7"
+        kosong="Belum ada data cuti"
+        kosong-cari="Tidak ada cuti yang cocok"
+        :mencari="!!cari"
       />
-      <table class="table w-full text-left">
-        <thead>
-          <tr>
-            <th>Karyawan ID</th>
-            <th>Jenis</th>
-            <th>Tanggal Mulai</th>
-            <th>Tanggal Selesai</th>
-            <th>Jumlah Hari</th>
-            <th>Status</th>
-            <th class="text-right">Aksi</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="c in filteredItems" :key="c.id" class="border-b">
-            <td>{{ c.karyawan_id }}</td>
-            <td>{{ c.jenis }}</td>
-            <td>{{ formatTanggal(c.tanggal_mulai) }}</td>
-            <td>{{ formatTanggal(c.tanggal_selesai) }}</td>
-            <td>{{ c.jumlah_hari }}</td>
-            <td>
-              <AppBadge :variant="statusVariant(c.status)" size="sm">
-                {{ c.status }}
-              </AppBadge>
-            </td>
-            <td class="text-right">
-              <AppButton
-                variant="error"
-                size="sm"
-                outline
-                @click="handleHapus(c.id)"
-              >
-                Hapus
-              </AppButton>
-            </td>
-          </tr>
-          <tr v-if="filteredItems.length === 0">
-            <td colspan="7" class="text-center text-text-muted py-4">
-              {{ cari ? "Tidak ada cuti yang cocok" : "Belum ada data cuti" }}
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+    </TabelData>
   </div>
 </template>
-
-<style scoped>
-.card {
-  @apply border;
-}
-</style>
