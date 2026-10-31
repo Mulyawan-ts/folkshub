@@ -44,3 +44,22 @@ Sebelum membuat atau mengubah kode, WAJIB membaca file aturan modular di `docs/r
   2. File API Service (`services/`)
   3. File State (`stores/`)
   4. File Komponen UI (`components/` atau `views/`)
+
+## 5. Test-Driven Development (TDD) Workflow
+
+Jika tugas melibatkan penulisan logika bisnis, store, atau komponen baru, WAJIB mengikuti siklus TDD bertahap:
+
+1. **Fase 1: Red (Tulis Tes Terlebih Dahulu)**
+   - Buat atau sesuaikan file tes terlebih dahulu (misal: `*.spec.ts` atau `*.test.ts`).
+   - DILARANG menyentuh atau membuat file implementasi sebelum file tes selesai ditulis.
+
+2. **Fase 2: Green (Implementasi Minimal)**
+   - Buat/edit 1 file implementasi dengan logika seperlunya HANYA agar tes yang dibuat di Fase 1 lolos.
+   - DILARANG membuat variabel atau fungsi tambahan yang tidak diuji oleh tes tersebut (Prinsip YAGNI).
+
+3. **Fase 3: Refactor (Pembersihan)**
+   - Rapikan struktur kode implementasi atau komponen tanpa merusak atau mengubah skenario tes yang sudah lolos.
+
+- **Standard Stack Testing:**
+  - Gunakan **Vitest** untuk pengujian unit/integration (Pinia store, utilitas, API service).
+  - Gunakan **Vue Test Utils** atau **Testing Library Vue** untuk pengujian komponen `.vue`.
