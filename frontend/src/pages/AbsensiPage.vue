@@ -2,6 +2,7 @@
 import { ref, computed, onMounted } from "vue";
 import { storeToRefs } from "pinia";
 import { useAbsensiStore, useKaryawanStore } from "@/stores/index";
+import type { StatusAbsensi } from "@/stores/index";
 import { useToastStore } from "@/stores/toast";
 import AppInput from "@/components/AppInput.vue";
 import AppLabel from "@/components/AppLabel.vue";
@@ -46,7 +47,7 @@ const form = useForm({
       tanggal: nilai.tanggal,
       check_in: nilai.checkIn || undefined,
       check_out: nilai.checkOut || undefined,
-      status: nilai.status as any,
+      status: nilai.status as StatusAbsensi,
       keterangan: nilai.keterangan,
     }),
   pesanSukses: "Absensi berhasil disimpan",

@@ -2,6 +2,7 @@
 import { ref, computed, onMounted } from "vue";
 import { storeToRefs } from "pinia";
 import { useCutiStore, useKaryawanStore } from "@/stores/index";
+import type { JenisCuti } from "@/stores/index";
 import { useToastStore } from "@/stores/toast";
 import AppInput from "@/components/AppInput.vue";
 import AppLabel from "@/components/AppLabel.vue";
@@ -45,7 +46,7 @@ const form = useForm({
   aksi: (nilai) =>
     cutiStore.simpan({
       karyawan_id: Number(nilai.karyawanId),
-      jenis: nilai.jenis as any,
+      jenis: nilai.jenis as JenisCuti,
       tanggal_mulai: nilai.tanggalMulai,
       tanggal_selesai: nilai.tanggalSelesai,
       jumlah_hari: Number(nilai.jumlahHari) || 0,
