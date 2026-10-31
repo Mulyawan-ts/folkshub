@@ -263,10 +263,10 @@ async function handleHapus(id: number) {
       </table>
     </div>
   </div>
-
-  <style scoped>
-    .card {
-      @apply border;
-    }
-  </style>
 </template>
+
+<style scoped>
+.card {
+  @apply border;
+}
+</style>
