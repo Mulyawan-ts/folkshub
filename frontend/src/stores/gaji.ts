@@ -134,23 +134,5 @@ export const useGajiStore = defineStore("gaji", {
         this.loading = false;
       }
     },
-
-    async setStatus(id: number, status: string) {
-      this.loading = true;
-      this.error = "";
-      try {
-        const updated = await UpdateGaji(id, 0, "", 0, 0, 0, status);
-        const index = this.items.findIndex((g) => g.id === id);
-        if (index !== -1) {
-          this.items[index] = updated;
-        }
-        return this.items[index];
-      } catch (err: any) {
-        this.error = err?.message || "Gagal mengupdate status gaji";
-        throw err;
-      } finally {
-        this.loading = false;
-      }
-    },
   },
 });

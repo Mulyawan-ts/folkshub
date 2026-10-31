@@ -132,32 +132,5 @@ export const useReimburseStore = defineStore("reimburse", {
         this.loading = false;
       }
     },
-
-    async setStatus(id: number, status: StatusReimburse, catatan?: string) {
-      this.loading = true;
-      this.error = "";
-      try {
-        const updated = await UpdateReimburse(
-          id,
-          0,
-          "",
-          "",
-          catatan || "",
-          "",
-          status,
-          0,
-        );
-        const index = this.items.findIndex((r) => r.id === id);
-        if (index !== -1) {
-          this.items[index] = updated;
-        }
-        return this.items[index];
-      } catch (err: any) {
-        this.error = err?.message || "Gagal mengupdate status reimburse";
-        throw err;
-      } finally {
-        this.loading = false;
-      }
-    },
   },
 });
