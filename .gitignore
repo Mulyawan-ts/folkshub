@@ -5,6 +5,9 @@ frontend/dist
 # Wails internal dev cache
 frontend/package.json.md5
 
+# Konfigurasi editor/agent lokal
+.kilo/
+
 # (Opsional) Jika tidak ingin mentrack auto-generated binding Wails
 frontend/wailsjs/
 
