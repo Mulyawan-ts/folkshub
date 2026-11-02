@@ -4,13 +4,16 @@ import (
 	"context"
 	"path/filepath"
 
+	"app/internal/handler"
 	"app/internal/model"
 	"app/internal/service"
 )
 
 // App struct
 type App struct {
-	ctx           context.Context
+	ctx context.Context
+	*handler.Karyawan
+
 	karyawanSvc   *service.KaryawanService
 	absensiSvc    *service.AbsensiService
 	cutiSvc       *service.CutiService
@@ -69,7 +72,7 @@ func newApp(dbDir string) (*App, error) {
 	}
 
 	return &App{
-		karyawanSvc:   karyawanSvc,
+		Karyawan:      &handler.Karyawan{Svc: karyawanSvc},
 		absensiSvc:    absensiSvc,
 		cutiSvc:       cutiSvc,
 		reimburseSvc:  reimburseSvc,
@@ -95,37 +98,6 @@ func (a *App) shutdown(_ context.Context) {
 	} {
 		_ = penutup.Close()
 	}
-}
-
-// Karyawan
-func (a *App) SimpanKaryawan(nama, email, status string) (*model.Karyawan, error) {
-	k := &model.Karyawan{
-		Nama:   nama,
-		Email:  email,
-		Status: status,
-	}
-
-	if err := a.karyawanSvc.Simpan(k); err != nil {
-		return nil, err
-	}
-
-	return k, nil
-}
-
-func (a *App) AmbilKaryawan(id int) (*model.Karyawan, error) {
-	return a.karyawanSvc.Ambil(id)
-}
-
-func (a *App) SemuaKaryawan() ([]*model.Karyawan, error) {
-	return a.karyawanSvc.Semua()
-}
-
-func (a *App) HapusKaryawan(id int) error {
-	return a.karyawanSvc.Hapus(id)
-}
-
-func (a *App) UpdateKaryawan(id int, nama, email, status string) (*model.Karyawan, error) {
-	return a.karyawanSvc.Update(id, nama, email, status)
 }
 
 // Absensi

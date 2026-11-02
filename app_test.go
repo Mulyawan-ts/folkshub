@@ -33,14 +33,9 @@ func TestNewAppUsesWorkingDirectory(t *testing.T) {
 	t.Cleanup(func() { _ = os.Chdir(wd) })
 
 	a := NewApp()
-	t.Cleanup(func() {
-		for _, c := range []interface{ Close() error }{
-			a.karyawanSvc, a.absensiSvc, a.cutiSvc, a.reimburseSvc,
-			a.gajiSvc, a.jabatanSvc, a.departemenSvc, a.pelatihanSvc,
-		} {
-			_ = c.Close()
-		}
-	})
+	// Cleanup berjalan LIFO: shutdown dieksekusi sebelum os.Chdir(wd) agar
+	// koneksi SQLite tertutup saat direktori kerja masih menunjuk ke dir.
+	t.Cleanup(func() { a.shutdown(context.Background()) })
 
 	for _, name := range []string{
 		"karyawan", "absensi", "cuti", "reimburse",
