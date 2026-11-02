@@ -4,6 +4,7 @@ import (
 	"errors"
 	"sync"
 
+	"app/internal/core"
 	"app/internal/model"
 	"app/internal/utils"
 	"gorm.io/gorm"
@@ -27,7 +28,7 @@ type PelatihanService struct {
 }
 
 func NewPelatihanService(dbPath string) (*PelatihanService, error) {
-	db, err := Open(dbPath)
+	db, err := core.Open(dbPath)
 	if err != nil {
 		return nil, err
 	}
@@ -150,3 +151,4 @@ func (s *PelatihanService) Close() error {
 	}
 	return sqlDB.Close()
 }
+

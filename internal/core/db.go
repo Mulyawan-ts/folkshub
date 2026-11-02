@@ -1,10 +1,26 @@
 package core
 
 import (
-	"app/internal/service"
+	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
 
 func Open(path string) (*gorm.DB, error) {
-	return service.Open(path)
+	db, err := gorm.Open(sqlite.Open(path), &gorm.Config{})
+	if err != nil {
+		return nil, err
+	}
+	sqlDB, err := db.DB()
+	if err != nil {
+		return nil, err
+	}
+	sqlDB.SetMaxOpenConns(1)
+	for _, pragma := range []string{
+		"PRAGMA foreign_keys = ON",
+		"PRAGMA journal_mode = WAL",
+		"PRAGMA busy_timeout = 5000",
+	} {
+		_ = db.Exec(pragma).Error
+	}
+	return db, nil
 }

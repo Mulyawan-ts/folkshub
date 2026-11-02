@@ -4,6 +4,7 @@ import (
 	"errors"
 	"sync"
 
+	"app/internal/core"
 	"app/internal/model"
 	"app/internal/utils"
 	"gorm.io/gorm"
@@ -37,7 +38,7 @@ type CutiService struct {
 }
 
 func NewCutiService(dbPath string) (*CutiService, error) {
-	db, err := Open(dbPath)
+	db, err := core.Open(dbPath)
 	if err != nil {
 		return nil, err
 	}

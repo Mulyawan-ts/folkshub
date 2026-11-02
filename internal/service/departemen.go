@@ -4,6 +4,7 @@ import (
 	"errors"
 	"sync"
 
+	"app/internal/core"
 	"app/internal/model"
 	"gorm.io/gorm"
 )
@@ -19,7 +20,7 @@ type DepartemenService struct {
 }
 
 func NewDepartemenService(dbPath string) (*DepartemenService, error) {
-	db, err := Open(dbPath)
+	db, err := core.Open(dbPath)
 	if err != nil {
 		return nil, err
 	}
@@ -123,3 +124,4 @@ func (s *DepartemenService) Close() error {
 	}
 	return sqlDB.Close()
 }
+

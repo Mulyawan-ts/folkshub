@@ -4,6 +4,7 @@ import (
 	"errors"
 	"sync"
 
+	"app/internal/core"
 	"app/internal/model"
 	"app/internal/utils"
 	"gorm.io/gorm"
@@ -27,7 +28,7 @@ type GajiService struct {
 }
 
 func NewGajiService(dbPath string) (*GajiService, error) {
-	db, err := Open(dbPath)
+	db, err := core.Open(dbPath)
 	if err != nil {
 		return nil, err
 	}

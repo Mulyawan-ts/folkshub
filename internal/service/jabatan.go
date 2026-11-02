@@ -4,6 +4,7 @@ import (
 	"errors"
 	"sync"
 
+	"app/internal/core"
 	"app/internal/model"
 	"gorm.io/gorm"
 )
@@ -19,7 +20,7 @@ type JabatanService struct {
 }
 
 func NewJabatanService(dbPath string) (*JabatanService, error) {
-	db, err := Open(dbPath)
+	db, err := core.Open(dbPath)
 	if err != nil {
 		return nil, err
 	}
@@ -125,3 +126,4 @@ func (s *JabatanService) Close() error {
 	}
 	return sqlDB.Close()
 }
+

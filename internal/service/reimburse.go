@@ -4,6 +4,7 @@ import (
 	"errors"
 	"sync"
 
+	"app/internal/core"
 	"app/internal/model"
 	"app/internal/utils"
 	"gorm.io/gorm"
@@ -28,7 +29,7 @@ type ReimburseService struct {
 }
 
 func NewReimburseService(dbPath string) (*ReimburseService, error) {
-	db, err := Open(dbPath)
+	db, err := core.Open(dbPath)
 	if err != nil {
 		return nil, err
 	}
@@ -148,3 +149,4 @@ func (s *ReimburseService) Close() error {
 	}
 	return sqlDB.Close()
 }
+
