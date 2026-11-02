@@ -5,6 +5,7 @@ import (
 	"sync"
 
 	"app/internal/model"
+	"app/internal/utils"
 	"gorm.io/gorm"
 )
 
@@ -43,7 +44,7 @@ func (s *PelatihanService) Simpan(p *model.Pelatihan) error {
 	if p == nil || p.KaryawanId <= 0 || p.Nama == "" {
 		return ErrInvalidInput
 	}
-	if !validDate(p.TanggalMulai) || !validOptionalDate(p.TanggalSelesai) {
+	if !utils.ValidDate(p.TanggalMulai) || !utils.ValidOptionalDate(p.TanggalSelesai) {
 		return ErrInvalidInput
 	}
 	if p.Status != "" && !validPelatihanStatus[p.Status] {
@@ -118,7 +119,7 @@ func (s *PelatihanService) Update(id int, karyawanId int, nama, jenis, tanggalMu
 		return nil, err
 	}
 
-	if !validDate(tanggalMulai) || !validOptionalDate(tanggalSelesai) {
+	if !utils.ValidDate(tanggalMulai) || !utils.ValidOptionalDate(tanggalSelesai) {
 		return nil, ErrInvalidInput
 	}
 	if status != "" && !validPelatihanStatus[status] {
