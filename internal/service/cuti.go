@@ -5,6 +5,7 @@ import (
 	"sync"
 
 	"app/internal/model"
+	"app/internal/utils"
 	"gorm.io/gorm"
 )
 
@@ -53,7 +54,7 @@ func (s *CutiService) Simpan(c *model.Cuti) error {
 	if c == nil || c.KaryawanId <= 0 || c.Jenis == "" || c.TanggalMulai == "" || c.TanggalSelesai == "" {
 		return ErrInvalidInput
 	}
-	if !validDate(c.TanggalMulai) || !validDate(c.TanggalSelesai) {
+	if !utils.ValidDate(c.TanggalMulai) || !utils.ValidDate(c.TanggalSelesai) {
 		return ErrCutiInvalid
 	}
 
@@ -154,7 +155,7 @@ func (s *CutiService) Update(id int, karyawanId int, jenis, tanggalMulai, tangga
 	if !validCutiStatus[status] {
 		return nil, ErrCutiInvalid
 	}
-	if !validDate(tanggalMulai) || !validDate(tanggalSelesai) {
+	if !utils.ValidDate(tanggalMulai) || !utils.ValidDate(tanggalSelesai) {
 		return nil, ErrCutiInvalid
 	}
 	if tanggalMulai > tanggalSelesai {
