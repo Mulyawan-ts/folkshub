@@ -5,6 +5,7 @@ import (
 	"sync"
 
 	"app/internal/model"
+	"app/internal/utils"
 	"gorm.io/gorm"
 )
 
@@ -44,7 +45,7 @@ func (s *ReimburseService) Simpan(r *model.Reimburse) error {
 	if r == nil || r.KaryawanId <= 0 || r.Jenis == "" || r.Tanggal == "" {
 		return ErrInvalidInput
 	}
-	if !validDate(r.Tanggal) {
+	if !utils.ValidDate(r.Tanggal) {
 		return ErrInvalidInput
 	}
 	if r.Status != "" && !validReimburseStatus[r.Status] {
@@ -119,7 +120,7 @@ func (s *ReimburseService) Update(id int, karyawanId int, tanggal, jenis, ketera
 		return nil, err
 	}
 
-	if !validDate(tanggal) {
+	if !utils.ValidDate(tanggal) {
 		return nil, ErrInvalidInput
 	}
 	if status != "" && !validReimburseStatus[status] {
