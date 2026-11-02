@@ -5,6 +5,7 @@ import (
 	"sync"
 
 	"app/internal/model"
+	"app/internal/utils"
 	"gorm.io/gorm"
 )
 
@@ -44,7 +45,7 @@ func (s *AbsensiService) Simpan(a *model.Absensi) error {
 	if a == nil || a.KaryawanId <= 0 || a.Tanggal == "" {
 		return ErrInvalidInput
 	}
-	if !validDate(a.Tanggal) {
+	if !utils.ValidDate(a.Tanggal) {
 		return ErrInvalidInput
 	}
 	if a.Status != "" && !validAbsensiStatus[a.Status] {
@@ -119,7 +120,7 @@ func (s *AbsensiService) Update(id int, karyawanId int, tanggal, checkIn, checkO
 		return nil, err
 	}
 
-	if !validDate(tanggal) {
+	if !utils.ValidDate(tanggal) {
 		return nil, ErrInvalidInput
 	}
 	if status != "" && !validAbsensiStatus[status] {
