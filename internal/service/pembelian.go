@@ -5,6 +5,7 @@ import (
 	"sync"
 
 	"app/internal/model"
+	"app/internal/utils"
 	"gorm.io/gorm"
 )
 
@@ -163,7 +164,7 @@ func validasiPembelian(p *model.Pembelian) error {
 	if p == nil || p.Barang == "" || p.Tanggal == "" {
 		return ErrInvalidInput
 	}
-	if !validDate(p.Tanggal) {
+	if !utils.ValidDate(p.Tanggal) {
 		return ErrInvalidInput
 	}
 	if !validPembelianJenis[p.Jenis] {
