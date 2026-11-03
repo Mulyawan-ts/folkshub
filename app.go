@@ -89,6 +89,59 @@ func (a *App) startup(ctx context.Context) {
 	a.ctx = ctx
 }
 
+// RingkasanDashboard mengagregasi data dari semua modul untuk halaman dashboard.
+func (a *App) RingkasanDashboard() (*model.RingkasanDashboard, error) {
+	r := &model.RingkasanDashboard{}
+
+	if list, err := a.karyawanSvc.Semua(); err == nil {
+		r.TotalKaryawan = len(list)
+		for _, k := range list {
+			switch k.Status {
+			case model.StatusTetap:
+				r.KaryawanTetap++
+			case model.StatusOutsourcing:
+				r.KaryawanOutsourcing++
+			case model.StatusMagang:
+				r.KaryawanMagang++
+			}
+		}
+	}
+
+	if list, err := a.absensiSvc.Semua(); err == nil {
+		r.TotalAbsensi = len(list)
+	}
+	if list, err := a.cutiSvc.Semua(); err == nil {
+		r.TotalCuti = len(list)
+		for _, c := range list {
+			if c.Status == "submitted" {
+				r.CutiPending++
+			}
+		}
+	}
+	if list, err := a.reimburseSvc.Semua(); err == nil {
+		r.TotalReimburse = len(list)
+		for _, rr := range list {
+			if rr.Status == "submitted" {
+				r.ReimbursePending++
+			}
+		}
+	}
+	if list, err := a.gajiSvc.Semua(); err == nil {
+		r.TotalGaji = len(list)
+	}
+	if list, err := a.jabatanSvc.Semua(); err == nil {
+		r.TotalJabatan = len(list)
+	}
+	if list, err := a.departemenSvc.Semua(); err == nil {
+		r.TotalDepartemen = len(list)
+	}
+	if list, err := a.pelatihanSvc.Semua(); err == nil {
+		r.TotalPelatihan = len(list)
+	}
+
+	return r, nil
+}
+
 // shutdown menutup semua koneksi SQLite agar file WAL ter-checkpoint sebelum
 // proses keluar.
 func (a *App) shutdown(_ context.Context) {

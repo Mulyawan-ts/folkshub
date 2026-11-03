@@ -34,6 +34,8 @@ export function HapusPelatihan(arg1:number):Promise<void>;
 
 export function HapusReimburse(arg1:number):Promise<void>;
 
+export function RingkasanDashboard():Promise<model.RingkasanDashboard>;
+
 export function SemuaAbsensi():Promise<Array<model.Absensi>>;
 
 export function SemuaCuti():Promise<Array<model.Cuti>>;

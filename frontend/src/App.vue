@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
 import AdminLayout from "@/layouts/AdminLayout.vue";
+import DashboardPage from "@/pages/DashboardPage.vue";
 import KaryawanPage from "@/pages/KaryawanPage.vue";
 import AbsensiPage from "@/pages/AbsensiPage.vue";
 import CutiPage from "@/pages/CutiPage.vue";
@@ -11,6 +12,7 @@ import DepartemenPage from "@/pages/DepartemenPage.vue";
 import PelatihanPage from "@/pages/PelatihanPage.vue";
 
 const halaman = [
+  { id: "dashboard", label: "Dashboard", komponen: DashboardPage },
   { id: "karyawan", label: "Karyawan", komponen: KaryawanPage },
   { id: "absensi", label: "Absensi", komponen: AbsensiPage },
   { id: "cuti", label: "Cuti", komponen: CutiPage },
@@ -21,7 +23,7 @@ const halaman = [
   { id: "pelatihan", label: "Pelatihan", komponen: PelatihanPage },
 ];
 
-const aktif = ref("karyawan");
+const aktif = ref("dashboard");
 
 const halamanAktif = computed(
   () =>

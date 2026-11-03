@@ -66,6 +66,10 @@ export function HapusReimburse(arg1) {
   return window['go']['main']['App']['HapusReimburse'](arg1);
 }
 
+export function RingkasanDashboard() {
+  return window['go']['main']['App']['RingkasanDashboard']();
+}
+
 export function SemuaAbsensi() {
   return window['go']['main']['App']['SemuaAbsensi']();
 }
