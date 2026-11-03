@@ -22,8 +22,10 @@ app.go                  # Titik masuk Wails, pendaftaran service & binding endpo
 main.go                 # Konfigurasi jendela (ukuran, judul) dan inisialisasi Wails
 go.mod / go.sum         # Dependensi Go
 internal/
+  core/                # Infrastruktur bersama: Open() SQLite, audit log, error/crash logger
   model/                # Struct domain + TableName()
   service/              # Service per modul (CRUD SQLite + validasi)
+  utils/                # Helper murni: tanggal, format uang, telepon
 frontend/
   src/
     components/          # Komponen UI presentasional (props + emit)
